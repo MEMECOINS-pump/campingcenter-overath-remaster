@@ -1,0 +1,88 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/url';
+
+interface Props {
+  title?: string;
+  text?: string;
+  primary?: { label: string; href: string };
+  secondary?: { label: string; href: string };
+}
+const {
+  title = 'Bereit für dein nächstes Abenteuer?',
+  text = 'Ob kaufen, mieten oder erst einmal beraten lassen – wir helfen dir dabei, den Camper zu finden, der zu deinem Leben passt.',
+  primary = { label: 'Fahrzeuge entdecken', href: '/wohnmobile/' },
+  secondary = { label: 'Beratung vereinbaren', href: '/kontakt/#beratung' },
+} = Astro.props;
+---
+
+<section class="cta" aria-labelledby="cta-title">
+  <div class="cta-media">
+    <Photo src="road-landscape" alt="" sizes="100vw" widths={[640, 1024, 1600, 2200]} />
+  </div>
+  <div class="cta-shade" aria-hidden="true"></div>
+  <div class="container-narrow cta-inner">
+    <h2 id="cta-title">{title}</h2>
+    <p>{text}</p>
+    <div class="btn-row">
+      <a class="btn btn-accent btn-lg" href={url(primary.href)} data-track="cta_click" data-track-location="final-cta">
+        {primary.label} <Icon name="arrow-right" class="arrow" />
+      </a>
+      <a class="btn btn-glass btn-lg" href={url(secondary.href)} data-track="cta_click" data-track-location="final-cta">{secondary.label}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    min-height: 30rem;
+    color: #fff;
+    background: #1e2227;
+    text-align: center;
+  }
+
+  .cta-media,
+  .cta-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .cta-media :global(picture),
+  .cta-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cta-shade {
+    background: rgb(14 12 10 / 0.6);
+  }
+
+  .cta-inner {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 1.1rem;
+    padding-block: var(--section);
+  }
+
+  .cta h2 {
+    font-size: var(--fs-3xl);
+  }
+
+  .cta p {
+    max-width: 36rem;
+    font-size: var(--fs-lg);
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  .cta .btn-row {
+    justify-content: center;
+    margin-top: 0.75rem;
+  }
+</style>

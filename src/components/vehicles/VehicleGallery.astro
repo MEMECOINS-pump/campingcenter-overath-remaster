@@ -1,0 +1,358 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { vehicleImage, vehicleSrcset, type Vehicle } from '@/lib/vehicles';
+
+interface Props {
+  vehicle: Vehicle;
+}
+const { vehicle: v } = Astro.props;
+const images = v.images;
+const n = images.length;
+const alt = (i: number) => `${v.title} – Foto ${i + 1} von ${n}`;
+---
+
+{
+  n === 0 ? (
+    <div class="gal-empty">
+      <Icon name="camera" />
+      <p>Fotos folgen – gern schicken wir dir aktuelle Bilder.</p>
+    </div>
+  ) : (
+    <div class="gal" data-gallery data-count={n}>
+      <div class="gal-stage">
+        <ul class="gal-track" data-gal-track tabindex="0" aria-label={`Fotogalerie, ${n} Fotos. Mit Pfeiltasten oder Wischen blättern.`}>
+          {images.map((img, i) => (
+            <li class="gal-slide" aria-roledescription="Foto" aria-label={`${i + 1} von ${n}`}>
+              <img
+                src={vehicleImage(img, 1024)}
+                srcset={vehicleSrcset(img, 1600)}
+                sizes="(min-width: 64em) 58vw, 100vw"
+                width="1024"
+                height="768"
+                alt={alt(i)}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                fetchpriority={i === 0 ? 'high' : 'low'}
+                decoding={i === 0 ? 'sync' : 'async'}
+              />
+            </li>
+          ))}
+        </ul>
+
+        {n > 1 && (
+          <>
+            <button type="button" class="gal-nav gal-prev" data-gal-prev aria-label="Vorheriges Foto">
+              <Icon name="chevron-left" />
+            </button>
+            <button type="button" class="gal-nav gal-next" data-gal-next aria-label="Nächstes Foto">
+              <Icon name="chevron-right" />
+            </button>
+          </>
+        )}
+
+        <p class="gal-counter">
+          <span class="sr-only">Foto </span>
+          <span data-gal-current>1</span> / {n}
+        </p>
+        <button type="button" class="gal-full" data-gal-open aria-haspopup="dialog">
+          <Icon name="expand" /> <span>Vollbild</span>
+        </button>
+      </div>
+
+      {n > 1 && (
+        <ul class="gal-thumbs" aria-label="Fotoauswahl">
+          {images.map((img, i) => (
+            <li>
+              <button type="button" data-gal-thumb={i} aria-label={`Foto ${i + 1} von ${n} anzeigen`} aria-current={i === 0 ? 'true' : undefined}>
+                <img src={vehicleImage(img, 360)} width="120" height="90" alt="" loading="lazy" decoding="async" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <dialog class="lb" data-gal-dialog aria-label={`Fotogalerie: ${v.title}`}>
+        <div class="lb-head">
+          <p class="lb-counter">
+            <span data-lb-current>1</span> / {n}
+          </p>
+          <button type="button" class="lb-close" data-gal-close aria-label="Vollbild schließen" autofocus>
+            <Icon name="close" />
+          </button>
+        </div>
+        <ul class="lb-track" data-lb-track tabindex="0" aria-label="Fotos im Vollbild">
+          {images.map((img, i) => (
+            <li class="lb-slide">
+              <img src={vehicleImage(img, 1600)} srcset={vehicleSrcset(img, 1600)} sizes="100vw" width="1600" height="1200" alt={alt(i)} loading="lazy" decoding="async" />
+            </li>
+          ))}
+        </ul>
+        {n > 1 && (
+          <>
+            <button type="button" class="gal-nav lb-prev" data-lb-prev aria-label="Vorheriges Foto">
+              <Icon name="chevron-left" />
+            </button>
+            <button type="button" class="gal-nav lb-next" data-lb-next aria-label="Nächstes Foto">
+              <Icon name="chevron-right" />
+            </button>
+          </>
+        )}
+      </dialog>
+    </div>
+  )
+}
+
+<style>
+  .gal-empty {
+    display: grid;
+    place-items: center;
+    gap: 0.5rem;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+    background: var(--sand);
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .gal-stage {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--graphite);
+  }
+
+  @media (max-width: 47.99em) {
+    .gal-stage {
+      margin-inline: calc(var(--gutter) * -1);
+      border-radius: 0;
+    }
+  }
+
+  .gal-track,
+  .lb-track {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    list-style: none;
+  }
+
+  .gal-track::-webkit-scrollbar,
+  .lb-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gal-track:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: -3px;
+  }
+
+  .gal-slide {
+    flex: 0 0 100%;
+    aspect-ratio: 4 / 3;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .gal-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gal-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-top: -24px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.92);
+    color: var(--graphite);
+    box-shadow: var(--shadow-sm);
+    transition:
+      opacity var(--dur) var(--ease),
+      transform 0.15s var(--ease);
+  }
+
+  .gal-nav:active {
+    transform: scale(0.94);
+  }
+
+  .gal-nav:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .gal-prev,
+  .lb-prev {
+    left: 0.75rem;
+  }
+
+  .gal-next,
+  .lb-next {
+    right: 0.75rem;
+  }
+
+  @media (hover: none) {
+    .gal-stage .gal-nav {
+      display: none;
+    }
+  }
+
+  .gal-counter,
+  .gal-full {
+    position: absolute;
+    bottom: 0.75rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 36px;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: rgb(12 14 16 / 0.66);
+    color: #fff;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gal-counter {
+    left: 0.75rem;
+    pointer-events: none;
+  }
+
+  .gal-full {
+    right: 0.75rem;
+    min-height: 44px;
+    border: 0;
+  }
+
+  .gal-full:hover {
+    background: rgb(12 14 16 / 0.85);
+  }
+
+  .gal-full :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .gal-thumbs {
+    display: none;
+  }
+
+  @media (min-width: 48em) {
+    .gal-thumbs {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      overflow-x: auto;
+      padding: 3px 3px 6px;
+      list-style: none;
+      scrollbar-width: thin;
+    }
+
+    .gal-thumbs button {
+      display: block;
+      width: 5.5rem;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      padding: 0;
+      border: 0;
+      border-radius: 10px;
+      background: var(--sand);
+      opacity: 0.62;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    .gal-thumbs button:hover,
+    .gal-thumbs button[aria-current='true'] {
+      opacity: 1;
+    }
+
+    .gal-thumbs button[aria-current='true'] {
+      outline: 2px solid var(--graphite);
+      outline-offset: 2px;
+    }
+
+    .gal-thumbs img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* ---------- lightbox ---------- */
+  .lb {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #0b0c0e;
+    color: #fff;
+  }
+
+  .lb[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lb::backdrop {
+    background: #0b0c0e;
+  }
+
+  .lb-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: max(0.75rem, env(safe-area-inset-top)) 1rem 0.75rem;
+  }
+
+  .lb-counter {
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lb-close {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.14);
+    color: #fff;
+  }
+
+  .lb-track {
+    flex: 1;
+    min-height: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .lb-track:focus-visible {
+    outline: none;
+  }
+
+  .lb-slide {
+    display: grid;
+    flex: 0 0 100%;
+    place-items: center;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .lb-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+</style>

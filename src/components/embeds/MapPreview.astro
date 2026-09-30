@@ -1,0 +1,129 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+---
+
+<div class="map" data-map={company.mapsEmbed}>
+  <div class="map-frame" data-map-frame>
+    <div class="map-placeholder">
+      <svg class="map-art" viewBox="0 0 400 240" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
+        <rect width="400" height="240" fill="#e9e1d2"></rect>
+        <path d="M-10 170C60 150 90 190 160 168S260 110 410 132" stroke="#c9d8c6" stroke-width="26" fill="none"></path>
+        <path d="M-10 60 120 96 210 70 410 118" stroke="#fff" stroke-width="10" fill="none"></path>
+        <path d="M60 250 150 120 170 -10" stroke="#fff" stroke-width="7" fill="none"></path>
+        <path d="M240 250 250 150 330 -10" stroke="#fff" stroke-width="5" fill="none"></path>
+        <path d="M-10 60 120 96 210 70 410 118" stroke="#f3c77f" stroke-width="3" fill="none"></path>
+        <circle cx="206" cy="104" r="16" fill="#d08115"></circle>
+        <circle cx="206" cy="104" r="6" fill="#fff"></circle>
+      </svg>
+      <div class="map-card">
+        <p class="map-title">{company.name}</p>
+        <p>{company.address.street}, {company.address.postalCode} {company.address.city}</p>
+        <div class="map-actions">
+          <button type="button" class="btn btn-sm" data-map-load>
+            <Icon name="pin" /> Karte laden
+          </button>
+          <a class="btn btn-ghost btn-sm" href={company.directions} target="_blank" rel="noopener" data-track="route_click" data-track-location="map">
+            <Icon name="route" /> Route planen
+          </a>
+        </div>
+        <p class="map-note">
+          „Karte laden“ bindet Google Maps ein; dabei werden Daten an Google übertragen.{" "}
+          <a href={url('/datenschutz/#externe-medien')}>Mehr erfahren</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .map-frame {
+    position: relative;
+    min-height: 22rem;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--sand);
+  }
+
+  .map-frame :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .map-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-items: end;
+    padding: 1rem;
+  }
+
+  .map-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .map-card {
+    position: relative;
+    display: grid;
+    gap: 0.35rem;
+    max-width: 26rem;
+    padding: 1.1rem 1.2rem;
+    border-radius: var(--radius);
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    font-size: var(--fs-sm);
+  }
+
+  .map-title {
+    font-family: var(--font-head);
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .map-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .map-note {
+    margin-top: 0.35rem;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  import { hasMediaConsent, onConsent } from '@/lib/consent';
+  import { track } from '@/lib/analytics';
+
+  const load = (el: HTMLElement) => {
+    const frame = el.querySelector('[data-map-frame]');
+    if (!frame || frame.querySelector('iframe')) return;
+    const iframe = document.createElement('iframe');
+    iframe.src = el.dataset.map ?? '';
+    iframe.title = 'Google Maps: Anfahrt zum Campingcenter Overath';
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'no-referrer-when-downgrade';
+    frame.replaceChildren(iframe);
+    track('map_load');
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-map]').forEach((el) => {
+    if (hasMediaConsent()) load(el);
+    el.querySelector('[data-map-load]')?.addEventListener('click', () => load(el));
+  });
+  onConsent((s) => {
+    if (s.media) document.querySelectorAll<HTMLElement>('[data-map]').forEach(load);
+  });
+</script>

@@ -1,0 +1,226 @@
+---
+import { url } from '@/lib/url';
+---
+
+<section class="consent-banner" aria-labelledby="consent-title" data-consent-banner hidden>
+  <div class="cb-inner">
+    <div class="cb-text">
+      <h2 id="consent-title">Deine Privatsphäre</h2>
+      <p>
+        Kein Tracking. Google Maps und YouTube laden wir nur mit deiner Zustimmung.{" "}
+        <a href={url('/datenschutz/')}>Datenschutz</a>
+      </p>
+    </div>
+    <div class="cb-actions">
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-action="necessary">Nur notwendige</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-open>Einstellungen</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-action="all">Alle akzeptieren</button>
+    </div>
+  </div>
+</section>
+
+<dialog class="consent-dialog" aria-labelledby="consent-dialog-title" data-consent-dialog>
+  <form method="dialog" class="cd-form" data-consent-form>
+    <h2 id="consent-dialog-title">Cookie- und Medien-Einstellungen</h2>
+    <p class="cd-intro">Du entscheidest, was geladen wird. Deine Auswahl kannst du jederzeit im Footer unter „Cookie-Einstellungen“ ändern.</p>
+
+    <div class="cd-option">
+      <div>
+        <h3>Notwendig</h3>
+        <p>Speichert deine Merkliste, deinen Vergleich und diese Auswahl lokal in deinem Browser. Keine Übertragung an Dritte.</p>
+      </div>
+      <span class="cd-always">Immer aktiv</span>
+    </div>
+
+    <label class="cd-option">
+      <div>
+        <h3>Externe Medien</h3>
+        <p>Google Maps (Anfahrt) und YouTube-Videos (über youtube-nocookie.com). Beim Laden werden Daten an Google übertragen.</p>
+      </div>
+      <input type="checkbox" class="cd-switch" name="media" role="switch" />
+    </label>
+
+    <label class="cd-option">
+      <div>
+        <h3>Statistik</h3>
+        <p>Anonyme Reichweitenmessung zur Verbesserung der Seite. In dieser Präsentation ist kein Statistik-Dienst eingebunden.</p>
+      </div>
+      <input type="checkbox" class="cd-switch" name="stats" role="switch" />
+    </label>
+
+    <div class="cd-actions">
+      <button type="submit" class="btn btn-ghost" value="save">Auswahl speichern</button>
+      <button type="submit" class="btn btn-ghost" value="all">Alle akzeptieren</button>
+    </div>
+  </form>
+</dialog>
+
+<style>
+  .consent-banner {
+    position: fixed;
+    inset-inline: 0.6rem;
+    bottom: calc(var(--actionbar-h) + var(--safe-bottom) + 0.6rem);
+    z-index: 45;
+    max-width: 44rem;
+    margin-inline: auto;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .cb-inner {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .cb-text h2 {
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .cb-actions :global(.btn) {
+    padding-inline: 0.75rem;
+  }
+
+  .cb-text p {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .cb-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .cb-actions [data-consent-action='all'] {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 36em) {
+    .cb-actions {
+      grid-template-columns: repeat(3, auto);
+      justify-content: end;
+    }
+
+    .cb-actions [data-consent-action='all'] {
+      grid-column: auto;
+    }
+  }
+
+  @media (min-width: 64em) {
+    .consent-banner {
+      inset-inline: auto 1.5rem;
+      bottom: 1.5rem;
+      max-width: 34rem;
+    }
+  }
+
+  .consent-dialog {
+    width: min(100% - 1.5rem, 36rem);
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    color: var(--graphite);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .consent-dialog::backdrop {
+    background: rgb(12 14 16 / 0.55);
+  }
+
+  .cd-form {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+  }
+
+  .cd-form h2 {
+    font-size: var(--fs-xl);
+  }
+
+  .cd-intro {
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .cd-option {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  label.cd-option {
+    cursor: pointer;
+  }
+
+  .cd-option h3 {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+  }
+
+  .cd-option p {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .cd-always {
+    flex: none;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--success);
+  }
+
+  .cd-switch {
+    flex: none;
+    appearance: none;
+    position: relative;
+    width: 3rem;
+    height: 1.75rem;
+    margin: 0;
+    border-radius: var(--radius-pill);
+    background: var(--sand-strong);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .cd-switch::after {
+    content: '';
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s var(--ease);
+  }
+
+  .cd-switch:checked {
+    background: var(--forest);
+  }
+
+  .cd-switch:checked::after {
+    transform: translateX(1.25rem);
+  }
+
+  .cd-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+</style>

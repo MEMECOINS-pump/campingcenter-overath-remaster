@@ -1,0 +1,76 @@
+---
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { company } from '@/data/company';
+
+interface Props {
+  title: string;
+  path: string;
+  /** Path of the legally binding original on ccoverath.de. */
+  original: string;
+  updated?: string;
+}
+const { title, path, original, updated } = Astro.props;
+const originalUrl = new URL(original, company.officialWebsite).href;
+---
+
+<header class="page-hero">
+  <div class="container-narrow">
+    <Breadcrumbs items={[{ label: title, href: path }]} />
+    <h1>{title}</h1>
+    {updated && <p class="muted small">Stand: {updated}</p>}
+  </div>
+</header>
+
+<div class="container-narrow legal">
+  <aside class="legal-note" aria-label="Hinweis zur Präsentationsfassung">
+    <Icon name="info" />
+    <p>
+      Diese Website ist eine Redesign-Präsentation. Rechtlich maßgeblich ist die Fassung auf{' '}
+      <a href={originalUrl} target="_blank" rel="noopener">{originalUrl.replace('https://', '')}<span class="sr-only"> (öffnet in neuem Tab)</span></a>.
+    </p>
+  </aside>
+  <div class="prose legal-body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .legal {
+    padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .legal-note {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    padding: 1rem 1.15rem;
+    border-radius: var(--radius);
+    background: var(--brand-soft);
+    font-size: var(--fs-sm);
+  }
+
+  .legal-note :global(.icon) {
+    flex: none;
+    margin-top: 0.15rem;
+    color: var(--brand-ink);
+  }
+
+  .legal-note a {
+    overflow-wrap: anywhere;
+  }
+
+  .legal-body :global(h2) {
+    margin-top: 2.5rem;
+    scroll-margin-top: calc(var(--header-h, 4.5rem) + 1rem);
+  }
+
+  .legal-body :global(address) {
+    font-style: normal;
+  }
+
+  .legal-body :global(a) {
+    overflow-wrap: anywhere;
+  }
+</style>

@@ -1,0 +1,148 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { usedBenefits } from '@/data/content';
+import { snapshotDate, vehicles } from '@/lib/vehicles';
+import { breadcrumbSchema } from '@/lib/schema';
+import { formatDateDE } from '@/lib/format';
+import { url } from '@/lib/url';
+
+const used = vehicles.filter((v) => v.condition === 'gebraucht');
+const crumbs = [
+  { label: 'Wohnmobile', href: '/wohnmobile/' },
+  { label: 'Gebrauchte Wohnmobile', href: '/wohnmobil-verkauf/' },
+];
+const icons = ['tag', 'shield', 'key', 'check', 'users', 'refresh'] as const;
+---
+
+<BaseLayout
+  compareTray
+  title="Gebrauchte Wohnmobile kaufen in Overath"
+  description={`${used.length} gebrauchte Wohnmobile im Bestand – von Campern geprüft, mit ehrlicher Beratung, Finanzierung und Inzahlungnahme. Campingcenter Overath, Weberstraße 12.`}
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <section class="page-hero section-paper">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">Gebrauchte Wohnmobile</p>
+      <h1>Clever sparen. Sofort losfahren.</h1>
+      <p class="lead">
+        Ein gebrauchtes Wohnmobil hat den größten Wertverlust schon hinter sich – und steht sofort bereit. Jedes Fahrzeug wird von unserem Team aus echten Campern geprüft.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-accent btn-lg" href="#bestand">{used.length} Gebrauchte ansehen <Icon name="arrow-right" class="arrow" /></a>
+        <a class="btn btn-ghost btn-lg" href={url('/kontakt/#beratung')} data-track="consultation_click" data-track-location="used_hero">Beratung vereinbaren</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="used-why">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Warum gebraucht?</p>
+        <h2 id="used-why">Sechs gute Gründe für einen gebrauchten Camper</h2>
+      </div>
+      <ul class="grid grid-3 used-benefits" role="list">
+        {
+          usedBenefits.map((b, i) => (
+            <li class="card card-pad reveal">
+              <span class="used-icon">
+                <Icon name={icons[i] ?? 'check'} />
+              </span>
+              <h3>{b.title}</h3>
+              <p class="muted">{b.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section id="bestand" class="section section-paper" aria-labelledby="used-stock">
+    <div class="container">
+      <div class="section-head-row">
+        <div class="section-head">
+          <p class="eyebrow">Aktuell im Bestand</p>
+          <h2 id="used-stock">{used.length} gebrauchte Wohnmobile</h2>
+          <p class="muted small">Stand {formatDateDE(snapshotDate)} · Angaben laut Fahrzeuginserat, Zwischenverkauf vorbehalten.</p>
+        </div>
+        <a class="btn btn-ghost" href={url('/wohnmobile/?zustand=gebraucht')}>
+          <Icon name="filter" /> Filtern &amp; sortieren
+        </a>
+      </div>
+      <ul class="used-grid" role="list">
+        {
+          used.map((v, i) => (
+            <li>
+              <VehicleCard vehicle={v} index={i} priority={false} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="used-sell">
+    <div class="container">
+      <div class="used-sell card card-pad">
+        <div>
+          <p class="eyebrow">Tauschen statt doppelt suchen</p>
+          <h2 id="used-sell">Du hast schon ein Wohnmobil?</h2>
+          <p class="muted">Wir nehmen dein bisheriges Fahrzeug in Zahlung oder kaufen es direkt an – mit unverbindlichem Angebot innerhalb von 24 Stunden.</p>
+        </div>
+        <a class="btn btn-accent btn-lg" href={url('/wohnmobil-ankauf/')}>Ankauf starten <Icon name="arrow-right" class="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .used-benefits h3 {
+    margin: 1rem 0 0.4rem;
+    font-size: 1.2rem;
+  }
+
+  .used-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 12px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .used-grid {
+    display: grid;
+    gap: 1.25rem;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+
+  .used-grid > li {
+    display: grid;
+  }
+
+  .used-sell {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+    background: var(--sand);
+  }
+
+  .used-sell h2 {
+    margin: 0.4rem 0;
+    font-size: var(--fs-xl);
+  }
+
+  .used-sell p {
+    max-width: 38rem;
+  }
+</style>

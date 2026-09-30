@@ -1,0 +1,83 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { promotion } from '@/data/content';
+import { url } from '@/lib/url';
+---
+
+<section class="section-tight promo" aria-labelledby="promo-title">
+  <div class="container">
+    <div class="promo-card">
+      <div class="promo-media">
+        <Photo src="wash-result" alt="Frisch gewaschenes Wohnmobil" sizes="(min-width: 48em) 22rem, 92vw" widths={[360, 540, 720]} />
+      </div>
+      <div class="promo-copy">
+        <p class="eyebrow">{promotion.eyebrow}</p>
+        <h2 id="promo-title">Fahrzeugwäsche nach dem Urlaub</h2>
+        <p>{promotion.lead}</p>
+        <p class="promo-price"><span>Außenreinigung komplett</span> <strong>{promotion.price}</strong></p>
+        <a class="btn btn-accent" href={url(promotion.href)}>Details & Termin <Icon name="arrow-right" class="arrow" /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .promo-card {
+    display: grid;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--brand-soft);
+    border: 1px solid #efd6ad;
+  }
+
+  .promo-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .promo-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .promo-copy {
+    display: grid;
+    justify-items: start;
+    gap: 0.85rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  }
+
+  .promo-copy h2 {
+    font-size: var(--fs-xl);
+  }
+
+  .promo-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .promo-price span {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  .promo-price strong {
+    font-family: var(--font-head);
+    font-size: var(--fs-2xl);
+    font-weight: 600;
+    color: var(--graphite);
+  }
+
+  @media (min-width: 48em) {
+    .promo-card {
+      grid-template-columns: 22rem 1fr;
+    }
+
+    .promo-media {
+      aspect-ratio: auto;
+      min-height: 100%;
+    }
+  }
+</style>

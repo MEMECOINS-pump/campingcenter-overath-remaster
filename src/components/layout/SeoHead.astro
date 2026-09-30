@@ -1,0 +1,57 @@
+---
+import { Font } from 'astro:assets';
+import { absoluteUrl, stripBase, url } from '@/lib/url';
+import { company } from '@/data/company';
+
+export interface SeoProps {
+  title: string;
+  description: string;
+  path?: string | undefined;
+  image?: string | undefined;
+  imageAlt?: string | undefined;
+  noindex?: boolean;
+  type?: 'website' | 'article' | 'product';
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description, path, image, imageAlt, noindex = false, type = 'website', jsonLd = [] } = Astro.props as SeoProps;
+
+// The presentation duplicates ccoverath.de; it must not compete with it in search results.
+const indexable = import.meta.env.PUBLIC_INDEXABLE === 'true';
+const canonical = absoluteUrl(path ?? stripBase(Astro.url.pathname), Astro.site);
+const fullTitle = title.includes('Campingcenter Overath') ? title : `${title} | ${company.name}`;
+const ogImage = image
+  ? new URL(image, Astro.site ?? 'http://localhost:4321').href
+  : absoluteUrl('/og-default.jpg', Astro.site);
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{(noindex || !indexable) && <meta name="robots" content="noindex, follow" />}
+<meta name="theme-color" content="#f7f3ec" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+
+<link rel="icon" href={url('/favicon-32.png')} type="image/png" sizes="32x32" />
+<link rel="icon" href={url('/icon-192.png')} type="image/png" sizes="192x192" />
+<link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
+<link rel="manifest" href={url('/site.webmanifest')} />
+<link rel="sitemap" href={url('/sitemap-index.xml')} />
+
+<meta property="og:type" content={type === 'product' ? 'product' : type} />
+<meta property="og:locale" content="de_DE" />
+<meta property="og:site_name" content={company.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={imageAlt ?? 'Wohnmobil bei Sonnenuntergang am Meer – Campingcenter Overath'} />
+<meta name="twitter:card" content="summary_large_image" />
+
+<Font cssVariable="--font-sans" preload />
+<Font cssVariable="--font-display" preload />
+
+{jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}

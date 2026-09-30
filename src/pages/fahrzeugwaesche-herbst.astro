@@ -1,0 +1,184 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { promotion } from '@/data/content';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
+
+const crumbs = [
+  { label: 'Werkstatt', href: '/werkstatt-kundendienst/' },
+  { label: 'Fahrzeugwäsche', href: promotion.href },
+];
+const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin');
+---
+
+<BaseLayout
+  title="Fahrzeugwäsche für Wohnmobile – 125 €"
+  description="Professionelle Außenreinigung für dein Wohnmobil im Campingcenter Overath: Seitenwände, Dach, Felgen und Fahrerhaus für 125 €. Jetzt Waschtermin anfragen."
+  overlayHeader
+  inquiryHref={termin}
+  inquiryLabel="Termin"
+  jsonLd={[
+    breadcrumbSchema(crumbs, Astro.site),
+    serviceSchema('Fahrzeugwäsche für Wohnmobile', promotion.lead, promotion.href, Astro.site),
+  ]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow={promotion.eyebrow}
+    title="Sauber in die nächste Saison."
+    lead={promotion.lead}
+    image="wash-result"
+    imageAlt="Frisch gewaschenes Wohnmobil"
+  >
+    <a class="btn btn-accent btn-lg" href={termin} data-track="cta_click" data-track-location="wash_hero">
+      Waschtermin anfragen <Icon name="arrow-right" class="arrow" />
+    </a>
+    <a class="btn btn-glass btn-lg" href={company.phone.href} data-track="call_click" data-track-location="wash_hero">
+      <Icon name="phone" /> {company.phone.display}
+    </a>
+  </PageHero>
+
+  <section class="section" aria-labelledby="fw-offer">
+    <div class="container fw-grid">
+      <div class="card card-pad fw-price">
+        <p class="eyebrow">Außenreinigung komplett</p>
+        <h2 id="fw-offer">
+          <span class="fw-amount">{promotion.price}</span>
+          <span class="fw-label">Professionelle Fahrzeugwäsche</span>
+        </h2>
+        <ul class="check-list">
+          {promotion.includes.map((i) => <li>{i}</li>)}
+        </ul>
+        <a class="btn btn-accent btn-block" href={termin}>Waschtermin anfragen</a>
+        <p class="small muted fw-hint">{promotion.note}</p>
+      </div>
+      <div>
+        <p class="eyebrow">Dein Ergebnis</p>
+        <h2>Einfach abgeben, sauber zurückbekommen.</h2>
+        <ul class="fw-results" role="list">
+          {
+            promotion.results.map((r) => (
+              <li>
+                <Icon name="sparkle" /> {r}
+              </li>
+            ))
+          }
+        </ul>
+        <div class="fw-photo">
+          <Photo src="workshop-check-1" alt="Wohnmobil in der Werkstatt des Campingcenter Overath" sizes="(min-width: 64em) 40vw, 92vw" widths={[480, 768, 1080]} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" aria-label="Hinweis">
+    <div class="container-narrow">
+      <p class="small muted fw-disclaimer">
+        <Icon name="info" />
+        <span>{promotion.disclaimer}</span>
+      </p>
+    </div>
+  </section>
+
+  <CtaSection
+    title="Mehr als nur sauber."
+    text="Wenn dein Camper schon mal da ist: Gasprüfung, Dichtigkeitsprüfung oder TÜV lassen sich gut kombinieren."
+    primary={{ label: 'Werkstatt-Leistungen', href: '/werkstatt-kundendienst/' }}
+    secondary={{ label: 'Termin anfragen', href: '/werkstatt-kundendienst/#termin' }}
+  />
+</BaseLayout>
+
+<style>
+  h2 {
+    margin: 0.5rem 0 1rem;
+  }
+
+  .fw-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 64em) {
+    .fw-grid {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  .fw-price {
+    border-top: 4px solid var(--brand);
+  }
+
+  .fw-price h2 {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .fw-amount {
+    font-size: clamp(3rem, 2rem + 4vw, 4.5rem);
+    line-height: 1;
+  }
+
+  .fw-label {
+    font-size: 1.2rem;
+    font-family: var(--font-body);
+    font-weight: 650;
+    color: var(--text-muted);
+  }
+
+  .fw-price .check-list {
+    margin-bottom: 1.5rem;
+  }
+
+  .fw-hint {
+    margin-top: 0.9rem;
+  }
+
+  .fw-results {
+    display: grid;
+    gap: 0.75rem;
+    list-style: none;
+  }
+
+  .fw-results li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    font-weight: 560;
+  }
+
+  .fw-results :global(.icon) {
+    flex: none;
+    margin-top: 0.15rem;
+    color: var(--brand-ink);
+  }
+
+  .fw-photo {
+    overflow: hidden;
+    margin-top: 2rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .fw-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .fw-disclaimer {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .fw-disclaimer :global(.icon) {
+    flex: none;
+    margin-top: 0.15rem;
+  }
+</style>

@@ -1,0 +1,55 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+---
+
+<BaseLayout title="Danke für deine Anfrage" description="Deine Anfrage ist beim Campingcenter Overath angekommen. Wir melden uns so schnell wie möglich bei dir." noindex>
+  <section class="section dk" aria-labelledby="dk-title">
+    <div class="container-narrow dk-inner">
+      <span class="dk-icon"><Icon name="check" /></span>
+      <h1 id="dk-title">Danke! Deine Anfrage ist da.</h1>
+      <p class="lead">Wir melden uns so schnell wie möglich bei dir – in der Regel innerhalb der Öffnungszeiten.</p>
+      <div class="btn-row dk-actions">
+        <a class="btn btn-accent btn-lg" href={url('/wohnmobile/')}>Fahrzeuge entdecken</a>
+        <a class="btn btn-ghost btn-lg" href={url('/')}>Zur Startseite</a>
+      </div>
+      <p class="muted">Eilig? Ruf uns an: <a href={company.phone.href}>{company.phone.display}</a></p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .dk {
+    padding-top: calc(var(--header-h, 4.5rem) + 3rem);
+  }
+
+  .dk-inner {
+    text-align: center;
+  }
+
+  .dk-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--success-soft);
+    color: var(--success);
+  }
+
+  .dk-icon :global(.icon) {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .dk h1 {
+    margin: 1.25rem 0 0.75rem;
+  }
+
+  .dk-actions {
+    justify-content: center;
+    margin: 2rem 0 1rem;
+  }
+</style>

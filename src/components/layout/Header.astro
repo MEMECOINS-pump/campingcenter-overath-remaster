@@ -1,0 +1,396 @@
+---
+import Logo from '@/components/brand/Logo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { mainNav, moreNav } from '@/data/navigation';
+import { company } from '@/data/company';
+import { stripBase, url } from '@/lib/url';
+
+interface Props {
+  overlay?: boolean;
+}
+const { overlay = false } = Astro.props;
+const current = stripBase(Astro.url.pathname);
+const isActive = (href: string, children?: { href: string }[]) =>
+  current === href || (href !== '/' && current.startsWith(href)) || !!children?.some((c) => current.startsWith(c.href));
+---
+
+<header class="site-header" data-header data-overlay={overlay ? 'true' : undefined}>
+  <div class="container header-inner">
+    <a class="header-logo" href={url('/')} aria-label={`${company.name} – Startseite`}>
+      <Logo tone={overlay ? 'light' : 'dark'} />
+    </a>
+
+    <nav class="desktop-nav" aria-label="Hauptnavigation">
+      <ul class="nav-list">
+        {
+          mainNav.map((item) =>
+            item.children ? (
+              <li class="nav-item has-menu" data-dropdown>
+                <button
+                  type="button"
+                  class="nav-link"
+                  aria-expanded="false"
+                  aria-controls={`dd-${item.label}`}
+                  aria-current={isActive(item.href, item.children) ? 'true' : undefined}
+                >
+                  {item.label}
+                  <Icon name="chevron-down" class="nav-caret" />
+                </button>
+                <div class="dropdown" id={`dd-${item.label}`} hidden>
+                  <ul>
+                    {item.children.map((child) => (
+                      <li>
+                        <a href={url(child.href)} aria-current={current === child.href ? 'page' : undefined}>
+                          <span class="dd-label">{child.label}</span>
+                          {child.hint && <span class="dd-hint">{child.hint}</span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ) : (
+              <li class="nav-item">
+                <a class="nav-link" href={url(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ),
+          )
+        }
+        <li class="nav-item has-menu" data-dropdown>
+          <button type="button" class="nav-link" aria-expanded="false" aria-controls="dd-mehr">
+            Mehr
+            <Icon name="chevron-down" class="nav-caret" />
+          </button>
+          <div class="dropdown dropdown-end" id="dd-mehr" hidden>
+            <ul>
+              {
+                moreNav.map((child) => (
+                  <li>
+                    <a href={url(child.href)} aria-current={current === child.href ? 'page' : undefined}>
+                      <span class="dd-label">{child.label}</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a class="header-fav" href={url('/merkliste/')} aria-label="Merkliste" data-fav-link>
+        <Icon name="heart" />
+        <span class="fav-count" data-fav-count hidden>0</span>
+      </a>
+      <a class="header-phone" href={company.phone.href} data-track="call_click" data-track-location="header">
+        <Icon name="phone" />
+        <span>{company.phone.display}</span>
+      </a>
+      <a class="btn btn-accent btn-sm header-cta" href={url('/kontakt/#beratung')} data-track="cta_click" data-track-location="header">
+        Beratung vereinbaren
+      </a>
+      <a class="icon-btn header-call-mobile" href={company.phone.href} aria-label={`Anrufen: ${company.phone.display}`} data-track="call_click" data-track-location="header-mobile">
+        <Icon name="phone" />
+      </a>
+      <button type="button" class="icon-btn header-menu-btn" aria-haspopup="dialog" aria-controls="mobile-menu" aria-expanded="false" data-menu-open>
+        <Icon name="menu" />
+        <span class="sr-only">Menü öffnen</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: calc(var(--header-h) + var(--safe-top));
+    padding-top: var(--safe-top);
+    background: rgb(247 243 236 / 0.92);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid var(--line);
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .site-header[data-overlay] {
+    position: fixed;
+    inset-inline: 0;
+    background: linear-gradient(to bottom, rgb(12 14 16 / 0.55), rgb(12 14 16 / 0));
+    border-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: #fff;
+  }
+
+  .site-header[data-overlay].is-solid {
+    background: rgb(247 243 236 / 0.94);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-color: var(--line);
+    color: var(--graphite);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .site-header[data-overlay].is-solid :global(.logo-light .logo-name) {
+    color: var(--graphite);
+  }
+
+  .site-header[data-overlay].is-solid :global(.logo-light .logo-claim) {
+    color: #676c6d;
+  }
+
+  .header-inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: min(100% - 2 * var(--gutter), 90rem);
+  }
+
+  .header-logo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+    margin-right: auto;
+    border-radius: var(--radius-sm);
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-item {
+    position: relative;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 44px;
+    padding: 0 0.7rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 550;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+  }
+
+  .nav-link:hover {
+    background: rgb(28 32 36 / 0.07);
+  }
+
+  .site-header[data-overlay]:not(.is-solid) .nav-link:hover {
+    background: rgb(255 255 255 / 0.14);
+  }
+
+  .nav-link[aria-current] {
+    box-shadow: inset 0 -2px 0 var(--brand);
+    border-radius: 0;
+  }
+
+  .nav-caret {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.2s ease;
+  }
+
+  .nav-link[aria-expanded='true'] .nav-caret {
+    transform: rotate(180deg);
+  }
+
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: -0.5rem;
+    min-width: 19rem;
+    padding: 0.5rem;
+    background: var(--paper);
+    color: var(--graphite);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .dropdown-end {
+    left: auto;
+    right: -0.5rem;
+    min-width: 14rem;
+  }
+
+  .dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dropdown a {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .dropdown a:hover,
+  .dropdown a[aria-current='page'] {
+    background: var(--sand);
+  }
+
+  .dd-label {
+    font-weight: 600;
+  }
+
+  .dd-hint {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  @media (max-width: 22.49em) {
+    .header-inner {
+      gap: 0.5rem;
+    }
+  }
+
+  .icon-btn,
+  .header-fav {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .icon-btn:hover,
+  .header-fav:hover {
+    background: rgb(28 32 36 / 0.07);
+  }
+
+  .site-header[data-overlay]:not(.is-solid) .icon-btn:hover,
+  .site-header[data-overlay]:not(.is-solid) .header-fav:hover {
+    background: rgb(255 255 255 / 0.14);
+  }
+
+  .fav-count {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.25rem;
+    border-radius: var(--radius-pill);
+    background: var(--brand);
+    color: var(--graphite);
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.15rem;
+    text-align: center;
+  }
+
+  .header-phone,
+  .header-cta {
+    display: none;
+  }
+
+  .header-phone {
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0 0.6rem;
+    color: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .header-fav {
+    display: none;
+  }
+
+  @media (min-width: 40em) {
+    .header-fav {
+      display: inline-grid;
+    }
+  }
+
+  @media (min-width: 64em) {
+    .desktop-nav {
+      display: block;
+    }
+
+    .header-menu-btn,
+    .header-call-mobile {
+      display: none;
+    }
+
+    .header-cta {
+      display: inline-flex;
+    }
+  }
+
+  /* Desktop density tiers: 1024 → logo mark only, 1280 → name, 1600 → name + claim + phone number */
+  @media (min-width: 64em) and (max-width: 79.99em) {
+    .site-header :global(.logo-text) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 64em) and (max-width: 99.99em) {
+    .site-header :global(.logo-claim) {
+      display: none;
+    }
+
+    .header-inner {
+      gap: 0.5rem;
+    }
+
+    .nav-link {
+      padding: 0 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (min-width: 100em) {
+    .header-phone {
+      display: inline-flex;
+    }
+  }
+</style>

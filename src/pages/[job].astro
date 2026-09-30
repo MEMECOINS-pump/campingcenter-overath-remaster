@@ -1,0 +1,187 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { jobs, employer, type Job } from '@/data/jobs';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+import { breadcrumbSchema, jobSchema } from '@/lib/schema';
+
+export const getStaticPaths = (() => jobs.map((job) => ({ params: { job: job.slug }, props: { job } }))) satisfies GetStaticPaths;
+
+const { job } = Astro.props as { job: Job };
+const crumbs = [
+  { label: 'Jobs', href: '/jobs/' },
+  { label: job.title, href: `/${job.slug}/` },
+];
+const you = job.formal
+  ? { tasks: 'Ihre Aufgaben', profile: 'Ihr Profil', offer: 'Wir bieten Ihnen', apply: 'Jetzt bewerben', question: 'Fragen zur Stelle? Rufen Sie uns an:' }
+  : { tasks: 'Deine Aufgaben', profile: 'Dein Profil', offer: 'Wir bieten dir', apply: 'Jetzt bewerben', question: 'Fragen zur Stelle? Ruf uns an:' };
+const applyHref = url(`/bewerbung/?stelle=${encodeURIComponent(job.title)}`);
+const sections = [
+  { title: you.tasks, items: job.tasks, icon: 'briefcase' as const },
+  { title: you.profile, items: job.requirements, icon: 'users' as const },
+  { title: you.offer, items: job.offer, icon: 'sparkle' as const },
+];
+---
+
+<BaseLayout
+  title={job.title}
+  description={`${job.title} beim Campingcenter Overath – ${job.employment}. ${job.intro.split('. ')[0]}.`}
+  inquiryHref={applyHref}
+  inquiryLabel="Bewerben"
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site), jobSchema(job, Astro.site)]}
+>
+  <header class="page-hero jd-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">{job.employment}</p>
+      <h1>{job.title}</h1>
+      <p class="lead">{job.intro}</p>
+      <div class="btn-row">
+        <a class="btn btn-accent btn-lg" href={applyHref}>{you.apply} <Icon name="arrow-right" class="arrow" /></a>
+        <a class="btn btn-ghost btn-lg" href={company.phone.href} data-track="call_click" data-track-location="job_detail">
+          <Icon name="phone" /> {company.phone.display}
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section-tight">
+    <div class="container jd-grid">
+      <div class="jd-main">
+        {
+          job.facts && (
+            <ul class="jd-facts" role="list">
+              {job.facts.map((f) => (
+                <li>
+                  <Icon name="info" /> {f}
+                </li>
+              ))}
+            </ul>
+          )
+        }
+        {
+          sections.map((s) => (
+            <section class="jd-block" aria-labelledby={`jd-${s.icon}`}>
+              <h2 id={`jd-${s.icon}`}>
+                <Icon name={s.icon} /> {s.title}
+              </h2>
+              <ul class="check-list">
+                {s.items.map((i) => (
+                  <li>{i}</li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+      <aside class="jd-aside" aria-label="Bewerbung">
+        <div class="card card-pad">
+          <h2 class="jd-aside-title">{job.formal ? 'Interesse geweckt?' : 'Lust bekommen?'}</h2>
+          <p class="muted">{job.formal ? 'Wir freuen uns auf Ihre Bewerbung – online oder per Post.' : 'Wir freuen uns auf deine Bewerbung – online oder per Post.'}</p>
+          <a class="btn btn-accent btn-block" href={applyHref}>{you.apply}</a>
+          <p class="small muted jd-contact">{you.question} <a href={company.phone.href}>{company.phone.display}</a></p>
+          <p class="small muted">{employer.postalContact}</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="container jd-back">
+    <a class="link-arrow" href={url('/jobs/')}><Icon name="arrow-left" /> Alle Stellen</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .jd-hero h1 {
+    margin: 0.5rem 0 1rem;
+    max-width: 22ch;
+  }
+
+  .jd-hero .lead {
+    max-width: 44rem;
+  }
+
+  .jd-hero .btn-row {
+    margin-top: 1.75rem;
+  }
+
+  .jd-grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 64em) {
+    .jd-grid {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    .jd-aside {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1.5rem);
+    }
+  }
+
+  .jd-main {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .jd-facts {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--brand-soft);
+    list-style: none;
+  }
+
+  .jd-facts li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    font-weight: 600;
+  }
+
+  .jd-facts :global(.icon) {
+    flex: none;
+    margin-top: 0.2rem;
+    color: var(--brand-ink);
+  }
+
+  .jd-block h2 {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: var(--fs-xl);
+  }
+
+  .jd-block h2 :global(.icon) {
+    color: var(--brand-ink);
+  }
+
+  .jd-block li + li {
+    margin-top: 0.35rem;
+  }
+
+  .jd-aside-title {
+    font-size: 1.35rem;
+  }
+
+  .jd-aside .muted {
+    margin: 0.4rem 0 1.25rem;
+  }
+
+  .jd-aside .jd-contact {
+    margin: 1rem 0 0.5rem;
+  }
+
+  .jd-back {
+    padding-block: 1rem 4rem;
+  }
+</style>

@@ -1,0 +1,178 @@
+---
+import { facetCounts, vehicles } from '@/lib/vehicles';
+import { formatInt } from '@/lib/format';
+
+const makes = facetCounts(vehicles, 'make');
+const transmissions = facetCounts(vehicles, 'transmission');
+const categoryLabels = new Map(vehicles.map((v) => [v.category, v.categoryLabel]));
+const categories = facetCounts(vehicles, 'category').map((c) => ({ ...c, label: categoryLabels.get(c.value as never) ?? c.value }));
+
+const maxPrice = Math.max(...vehicles.map((v) => v.price));
+const priceSteps = [50000, 60000, 70000, 80000, 90000, 100000, 125000].filter((p) => p < maxPrice);
+const lengthSteps = [6000, 6500, 7000, 7500];
+
+const groups = [
+  {
+    key: 'zustand',
+    legend: 'Zustand',
+    options: [
+      { value: 'neu', label: 'Neufahrzeuge' },
+      { value: 'gebraucht', label: 'Gebrauchte' },
+    ].map((o) => ({ ...o, count: vehicles.filter((v) => v.condition === o.value).length })),
+  },
+  { key: 'art', legend: 'Fahrzeugart', options: categories.map((c) => ({ value: c.value, label: c.label, count: c.count })) },
+  { key: 'marke', legend: 'Marke', options: makes.map((m) => ({ value: m.value, label: m.value, count: m.count })) },
+  {
+    key: 'gewicht',
+    legend: 'Zulässiges Gesamtgewicht',
+    options: [
+      { value: 'bis35', label: 'bis 3,5 t', hint: 'Führerschein Klasse B' },
+      { value: 'ueber35', label: 'über 3,5 t', hint: 'Klasse C1 oder alte Klasse 3' },
+    ].map((o) => ({
+      ...o,
+      count: vehicles.filter((v) => v.grossWeightKg !== null && (o.value === 'bis35' ? v.grossWeightKg <= 3500 : v.grossWeightKg > 3500)).length,
+    })),
+  },
+  { key: 'getriebe', legend: 'Getriebe', options: transmissions.map((t) => ({ value: t.value, label: t.value, count: t.count })) },
+];
+---
+
+<form class="fpanel" data-filter-form aria-label="Fahrzeuge filtern">
+  {
+    groups.map((g) => (
+      <fieldset class="fgroup">
+        <legend>{g.legend}</legend>
+        <ul>
+          {g.options.map((o) => (
+            <li>
+              <label class="fcheck">
+                <input type="checkbox" name={g.key} value={o.value} />
+                <span class="fcheck-label">
+                  {o.label}
+                  {'hint' in o && o.hint && <small>{o.hint}</small>}
+                </span>
+                <span class="fcheck-count" data-facet-count={`${g.key}:${o.value}`}>
+                  {o.count}
+                </span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </fieldset>
+    ))
+  }
+
+  <div class="fgroup fgroup-selects">
+    <div class="field">
+      <label for="f-preis">Preis bis</label>
+      <select id="f-preis" name="preis" class="select">
+        <option value="">Beliebig</option>
+        {priceSteps.map((p) => <option value={p}>{formatInt(p)} €</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-laenge">Länge bis</label>
+      <select id="f-laenge" name="laenge" class="select">
+        <option value="">Beliebig</option>
+        {lengthSteps.map((l) => <option value={l}>{(l / 1000).toLocaleString('de-DE', { minimumFractionDigits: 1 })} m</option>)}
+      </select>
+    </div>
+  </div>
+
+  <button type="reset" class="btn btn-ghost btn-block fpanel-reset" data-filter-reset>Filter zurücksetzen</button>
+</form>
+
+<style>
+  .fpanel {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .fgroup {
+    border: 0;
+    margin: 0;
+    padding: 0 0 1.25rem;
+    min-width: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fgroup legend {
+    margin-bottom: 0.5rem;
+    padding: 0;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+
+  .fgroup ul {
+    display: grid;
+    gap: 0.15rem;
+    list-style: none;
+  }
+
+  .fcheck {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 44px;
+    padding: 0.35rem 0.5rem;
+    margin-inline: -0.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .fcheck:hover {
+    background: var(--sand);
+  }
+
+  .fcheck input {
+    flex: none;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin: 0;
+    accent-color: var(--graphite);
+  }
+
+  .fcheck-label {
+    display: grid;
+    flex: 1;
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+
+  .fcheck-label small {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  .fcheck-count {
+    min-width: 1.75rem;
+    padding: 0.05rem 0.45rem;
+    border-radius: var(--radius-pill);
+    background: var(--sand);
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    text-align: center;
+    color: var(--charcoal);
+  }
+
+  .fcheck:has(input:disabled) {
+    cursor: default;
+    opacity: 0.45;
+  }
+
+  .fcheck:has(input:disabled):hover {
+    background: none;
+  }
+
+  .fgroup-selects {
+    display: grid;
+    gap: 1rem;
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .fgroup-selects label {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+</style>

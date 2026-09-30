@@ -1,0 +1,332 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { rental, agbDocuments } from '@/data/content';
+import { partners } from '@/data/brands';
+import { company } from '@/data/company';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
+
+const crumbs = [{ label: 'Vermietung', href: '/vermietung-wohnmobile/' }];
+const rentalTerms = agbDocuments.find((d) => d.area === 'Vermietung');
+const benefitIcons = ['sparkle', 'bike', 'tag'] as const;
+const steps = [
+  { title: 'Fahrzeug wählen', text: 'Online rund um die Uhr über die ADAC Wohnmobilvermietung – oder persönlich bei uns vor Ort.' },
+  { title: 'Beraten lassen', text: 'Fragen zu Fahrzeug, Ausstattung oder Reiseroute? Unser Team hilft dir gern weiter.' },
+  { title: 'Losfahren', text: 'Du übernimmst dein Mietfahrzeug bei uns in Overath – und dein Abenteuer beginnt.' },
+];
+---
+
+<BaseLayout
+  title="Wohnmobil mieten in Overath – ADAC Mietstation Köln-Ost"
+  description="Wohnmobil mieten beim Campingcenter Overath, Mietstation Köln-Ost der ADAC Wohnmobilvermietung: neue Fahrzeuge, Fahrradträger und 3 % Rabatt für ADAC-Mitglieder."
+  overlayHeader
+  inquiryHref={rental.adacBookingUrl}
+  inquiryLabel="Buchen"
+  jsonLd={[
+    breadcrumbSchema(crumbs, Astro.site),
+    serviceSchema('Wohnmobilvermietung', rental.intro, '/vermietung-wohnmobile/', Astro.site),
+  ]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Wohnmobil mieten"
+    title="Freiheit auf Zeit."
+    lead="Wir sind Mietstation der ADAC Wohnmobilvermietung in Köln-Ost. Buche online rund um die Uhr – oder lass dich bei uns vor Ort beraten."
+    image="rental-header"
+    imageAlt="Mietwohnmobil auf einer Landstraße"
+  >
+    <a class="btn btn-accent btn-lg" href={rental.adacBookingUrl} target="_blank" rel="noopener" data-track="rental_booking_click" data-track-location="rental_hero">
+      Wohnmobil beim ADAC buchen <Icon name="external" /><span class="sr-only"> (öffnet in neuem Tab)</span>
+    </a>
+    <a class="btn btn-glass btn-lg" href={company.phone.href} data-track="call_click" data-track-location="rental_hero">
+      <Icon name="phone" /> Beratung am Telefon
+    </a>
+  </PageHero>
+
+  <section class="section" aria-labelledby="rt-partner">
+    <div class="container split">
+      <div class="rt-photo reveal">
+        <Photo src="rental-fleet" alt="Mietwohnmobile auf dem Gelände des Campingcenter Overath" sizes="(min-width: 60em) 45vw, 92vw" widths={[480, 768, 1080]} />
+      </div>
+      <div>
+        <p class="eyebrow">{rental.station}</p>
+        <h2 id="rt-partner">Doppelte Vorteile für deine Reise</h2>
+        <p class="lead">{rental.partnership}</p>
+        <p>{rental.intro}</p>
+        <p class="rt-hygiene">
+          <Icon name="shield" />
+          <span>{rental.hygiene}</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-sand" aria-labelledby="rt-benefits">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Deine Vorteile</p>
+        <h2 id="rt-benefits">Mieten mit gutem Gefühl</h2>
+      </div>
+      <ul class="grid grid-3" role="list">
+        {
+          rental.benefits.map((b, i) => (
+            <li class="card card-pad rt-benefit reveal" data-delay={i}>
+              <span class="rt-icon">
+                <Icon name={benefitIcons[i] ?? 'check'} />
+              </span>
+              <h3>{b.title}</h3>
+              <p class="muted">{b.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="rt-steps">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">So einfach geht's</p>
+        <h2 id="rt-steps">In drei Schritten unterwegs</h2>
+      </div>
+      <ol class="rt-steps">
+        {
+          steps.map((s, i) => (
+            <li class="reveal" data-delay={i}>
+              <span class="rt-no">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{s.title}</h3>
+              <p class="muted">{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="btn-row rt-actions">
+        <a class="btn btn-accent btn-lg" href={rental.adacBookingUrl} target="_blank" rel="noopener" data-track="rental_booking_click" data-track-location="rental_steps">
+          Verfügbarkeit prüfen <Icon name="external" /><span class="sr-only"> (öffnet in neuem Tab)</span>
+        </a>
+        {
+          rentalTerms && (
+            <a class="btn btn-ghost btn-lg" href={rentalTerms.href} target="_blank" rel="noopener">
+              <Icon name="document" /> Mietbedingungen (PDF)<span class="sr-only"> (öffnet in neuem Tab)</span>
+            </a>
+          )
+        }
+      </div>
+      <p class="small muted rt-note">
+        Buchung, Preise und Verfügbarkeit laufen über die ADAC Wohnmobilvermietung. Du verlässt dafür diese Website.
+      </p>
+    </div>
+  </section>
+
+  <section class="rt-freedom" aria-labelledby="rt-freedom">
+    <div class="rt-freedom-media">
+      <Photo src="lake-motorhomes" alt="" sizes="100vw" widths={[640, 1024, 1600]} />
+    </div>
+    <div class="container rt-freedom-inner">
+      <h2 id="rt-freedom">Dein Urlaub, deine Route.</h2>
+      <p>{rental.freedom}</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="rt-partners">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Unsere Partner</p>
+        <h2 id="rt-partners">Starke Partner an unserer Seite</h2>
+      </div>
+      <ul class="partner-grid" role="list">
+        {
+          partners.map((p) => (
+            <li>
+              <a href={p.website} target="_blank" rel="noopener" class="partner">
+                <Image src={p.logo} alt={p.name} widths={[160, 320]} sizes="10rem" loading="lazy" class="partner-logo" />
+                <span class="sr-only"> (öffnet in neuem Tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaSection
+    primary={{ label: 'Wohnmobil kaufen', href: '/wohnmobile/' }}
+    secondary={{ label: 'Beratung vereinbaren', href: '/kontakt/#beratung' }}
+  />
+</BaseLayout>
+
+<style>
+  .rt-photo {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .rt-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  h2 {
+    margin: 0.5rem 0 1rem;
+  }
+
+  .rt-hygiene {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius);
+    background: var(--forest-soft);
+    color: var(--forest);
+    font-weight: 600;
+  }
+
+  .rt-hygiene :global(.icon) {
+    flex: none;
+    width: 1.3rem;
+    height: 1.3rem;
+    margin-top: 0.1rem;
+  }
+
+  .rt-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 12px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .rt-benefit h3 {
+    margin: 1rem 0 0.4rem;
+    font-size: 1.2rem;
+  }
+
+  .rt-steps {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+    counter-reset: none;
+  }
+
+  @media (min-width: 48em) {
+    .rt-steps {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  .rt-steps li {
+    padding: 1.5rem;
+    border-top: 3px solid var(--brand);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .rt-no {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--brand-ink);
+  }
+
+  .rt-steps h3 {
+    margin: 0.5rem 0 0.35rem;
+    font-size: 1.2rem;
+  }
+
+  .rt-actions {
+    margin-top: 2rem;
+  }
+
+  .rt-note {
+    margin-top: 0.9rem;
+  }
+
+  .rt-freedom {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-height: clamp(24rem, 60svh, 36rem);
+    color: #fff;
+  }
+
+  .rt-freedom-media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .rt-freedom-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(14 12 10 / 0.82), rgb(14 12 10 / 0.1) 75%);
+  }
+
+  .rt-freedom-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .rt-freedom-inner {
+    padding-block: 3rem;
+  }
+
+  .rt-freedom h2 {
+    max-width: 16ch;
+    color: #fff;
+    font-size: var(--fs-3xl);
+  }
+
+  .rt-freedom p {
+    max-width: 38rem;
+    font-size: var(--fs-lg);
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    list-style: none;
+  }
+
+  @media (min-width: 48em) {
+    .partner-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .partner {
+    display: grid;
+    place-items: center;
+    min-height: 7rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    transition: box-shadow var(--dur) var(--ease);
+  }
+
+  .partner:hover {
+    box-shadow: var(--shadow);
+  }
+
+  .partner :global(.partner-logo) {
+    width: auto;
+    max-width: 100%;
+    height: 3rem;
+    object-fit: contain;
+  }
+</style>

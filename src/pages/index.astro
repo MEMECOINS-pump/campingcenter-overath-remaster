@@ -1,0 +1,65 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import QuickActions from '@/components/home/QuickActions.astro';
+import FeaturedVehicles from '@/components/home/FeaturedVehicles.astro';
+import FinderTeaser from '@/components/home/FinderTeaser.astro';
+import BrandShowcase from '@/components/sections/BrandShowcase.astro';
+import StorySection from '@/components/home/StorySection.astro';
+import AnkaufTeaser from '@/components/home/AnkaufTeaser.astro';
+import WorkshopTeaser from '@/components/home/WorkshopTeaser.astro';
+import PanamaTeaser from '@/components/home/PanamaTeaser.astro';
+import RentalTeaser from '@/components/home/RentalTeaser.astro';
+import Journey from '@/components/sections/Journey.astro';
+import TourTeaser from '@/components/home/TourTeaser.astro';
+import PromotionTeaser from '@/components/home/PromotionTeaser.astro';
+import FaqAccordion from '@/components/ui/FaqAccordion.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { faqs } from '@/data/faqs';
+import { faqSchema } from '@/lib/schema';
+---
+
+<BaseLayout
+  compareTray
+  title="Campingcenter Overath – Wohnmobile kaufen, mieten & Werkstatt"
+  description="Wohnmobile kaufen, mieten und professionell betreuen lassen: Vertragshändler von EURA MOBIL, CHALLENGER, KNAUS, LA STRADA und PANAMA, ADAC-Mietstation Köln-Ost und Fachwerkstatt in Overath."
+  overlayHeader
+  jsonLd={[faqSchema(faqs)]}
+>
+  <Hero />
+  <QuickActions />
+  <FeaturedVehicles />
+  <FinderTeaser />
+  <BrandShowcase />
+  <StorySection />
+  <AnkaufTeaser />
+  <WorkshopTeaser />
+  <PanamaTeaser />
+  <RentalTeaser />
+  <Journey />
+  <TourTeaser />
+  <PromotionTeaser />
+
+  <section class="section faq-section" aria-labelledby="faq-title">
+    <div class="container faq-grid">
+      <SectionHeader id="faq-title" eyebrow="Häufige Fragen" title="Gut zu wissen." lead="Die wichtigsten Antworten rund um Kauf, Ankauf, Miete und Werkstatt." />
+      <FaqAccordion items={faqs} />
+    </div>
+  </section>
+
+  <ContactSection />
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  @media (min-width: 64em) {
+    .faq-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+</style>

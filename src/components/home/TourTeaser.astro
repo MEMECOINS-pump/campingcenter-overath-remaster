@@ -1,0 +1,83 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/url';
+---
+
+<section class="section tour" aria-labelledby="tour-title">
+  <div class="container">
+    <div class="tour-card">
+      <Photo src="tour-header" alt="" sizes="(min-width: 78rem) 78rem, 100vw" widths={[640, 1024, 1600]} />
+      <span class="tour-shade" aria-hidden="true"></span>
+      <div class="tour-copy">
+        <p class="eyebrow">360° Rundgang</p>
+        <h2 id="tour-title">Schau dich bei uns um – bevor du vorbeikommst.</h2>
+        <p class="tour-text">13 Stationen rund um unser Gelände in Overath. Der Rundgang lädt erst, wenn du ihn startest.</p>
+        <a class="btn btn-light tour-link" href={url('/360-rundgang/')} data-track="cta_click" data-track-location="tour-teaser">
+          <Icon name="tour" /> 360° Rundgang starten
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tour-card {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-height: 26rem;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    color: #fff;
+  }
+
+  .tour-card :global(picture),
+  .tour-card :global(img) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+
+  .tour-card:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .tour-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgb(12 14 16 / 0.85), rgb(12 14 16 / 0.15) 70%);
+  }
+
+  .tour-copy {
+    display: grid;
+    justify-items: start;
+    gap: 0.8rem;
+    max-width: 38rem;
+    padding: clamp(1.5rem, 1rem + 3vw, 3rem);
+  }
+
+  .tour-copy .eyebrow {
+    color: #ffc778;
+  }
+
+  .tour-copy h2 {
+    color: #fff;
+  }
+
+  .tour-text {
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .tour-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+</style>

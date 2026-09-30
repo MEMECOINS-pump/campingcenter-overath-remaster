@@ -1,0 +1,170 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import { vehicles } from '@/lib/vehicles';
+import { breadcrumbSchema } from '@/lib/schema';
+import { url } from '@/lib/url';
+
+const crumbs = [{ label: 'Merkliste', href: '/merkliste/' }];
+---
+
+<BaseLayout
+  compareTray
+  title="Merkliste – deine gemerkten Wohnmobile"
+  description="Deine gemerkten Wohnmobile beim Campingcenter Overath – lokal in deinem Browser gespeichert, jederzeit vergleichen und anfragen."
+  noindex
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <section class="page-hero section-paper">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">Merkliste</p>
+      <h1>Deine Favoriten</h1>
+      <p class="lead">Gespeichert nur hier in deinem Browser – ohne Konto, ohne Übertragung. Vergleiche deine Favoriten oder frag sie gesammelt an.</p>
+    </div>
+  </section>
+
+  <section class="section-tight" aria-label="Gemerkte Fahrzeuge" data-favlist>
+    <div class="container">
+      <div class="fl-toolbar" data-fl-toolbar hidden>
+        <p class="fl-count" role="status" aria-live="polite"><strong data-fl-count>0</strong> <span data-fl-noun>Fahrzeuge</span> gemerkt</p>
+        <div class="btn-row">
+          <a class="btn btn-accent" href={url('/kontakt/#formular')} data-fl-inquiry data-track="cta_click" data-track-location="favorites_inquiry">
+            <Icon name="mail" /> Gesammelt anfragen
+          </a>
+          <button type="button" class="btn btn-ghost" data-fl-compare={url('/vergleich/')}>
+            <Icon name="compare" /> Vergleichen
+          </button>
+          <button type="button" class="btn btn-ghost" data-fl-clear>
+            <Icon name="trash" /> Alle entfernen
+          </button>
+        </div>
+      </div>
+
+      <ul class="fl-grid" role="list" data-fl-grid>
+        {
+          vehicles.map((v, i) => (
+            <li data-fl-item={v.id} data-title={v.title} hidden>
+              <VehicleCard vehicle={v} index={i} headingLevel={2} />
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="fl-empty card card-pad" data-fl-empty>
+        <span class="fl-empty-icon"><Icon name="heart" /></span>
+        <h2>Noch nichts gemerkt.</h2>
+        <p class="muted">Tippe bei einem Fahrzeug auf das Herz – dann findest du es hier wieder, auch beim nächsten Besuch.</p>
+        <div class="btn-row">
+          <a class="btn" href={url('/wohnmobile/')}>Fahrzeuge entdecken <Icon name="arrow-right" class="arrow" /></a>
+          <a class="btn btn-ghost" href={url('/camper-finder/')}>Camper-Finder starten</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { clearCollection, COMPARE_MAX, onCollectionChange, readCollection, toggleItem } from '@/lib/collections';
+  import { toast } from '@/scripts/site';
+
+  const grid = document.querySelector<HTMLElement>('[data-fl-grid]');
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-fl-item]'));
+  const empty = document.querySelector<HTMLElement>('[data-fl-empty]');
+  const toolbar = document.querySelector<HTMLElement>('[data-fl-toolbar]');
+  const count = document.querySelector('[data-fl-count]');
+  const noun = document.querySelector('[data-fl-noun]');
+  const inquiry = document.querySelector<HTMLAnchorElement>('[data-fl-inquiry]');
+  const inquiryBase = inquiry?.getAttribute('href') ?? '';
+
+  function render(): void {
+    const ids = readCollection('favorites');
+    const byId = new Map(items.map((el) => [el.dataset.flItem, el]));
+    const shown = ids.map((id) => byId.get(id)).filter((el): el is HTMLElement => Boolean(el));
+    items.forEach((el) => (el.hidden = !shown.includes(el)));
+    shown.forEach((el) => grid?.append(el));
+    if (empty) empty.hidden = shown.length > 0;
+    if (toolbar) toolbar.hidden = shown.length === 0;
+    if (count) count.textContent = String(shown.length);
+    if (noun) noun.textContent = shown.length === 1 ? 'Fahrzeug' : 'Fahrzeuge';
+    if (inquiry) {
+      const titles = shown.map((el) => el.dataset.title).join('; ');
+      const [path, hash] = inquiryBase.split('#');
+      inquiry.href = `${path}?fahrzeug=${encodeURIComponent(titles.slice(0, 480))}#${hash}`;
+    }
+  }
+
+  document.querySelector('[data-fl-clear]')?.addEventListener('click', () => {
+    clearCollection('favorites');
+    toast('Merkliste geleert');
+  });
+
+  const compareBtn = document.querySelector<HTMLButtonElement>('[data-fl-compare]');
+  compareBtn?.addEventListener('click', () => {
+    const favs = readCollection('favorites').slice(0, COMPARE_MAX);
+    clearCollection('compare');
+    favs.forEach((id) => toggleItem('compare', id));
+    location.href = compareBtn.dataset.flCompare ?? '/';
+  });
+
+  onCollectionChange(render);
+  render();
+</script>
+
+<style>
+  .fl-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .fl-toolbar[hidden],
+  .fl-empty[hidden] {
+    display: none;
+  }
+
+  .fl-grid {
+    display: grid;
+    gap: 1.25rem;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+
+  .fl-grid > li {
+    display: grid;
+  }
+
+  .fl-grid > li[hidden] {
+    display: none;
+  }
+
+  .fl-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding-block: 3rem;
+    text-align: center;
+  }
+
+  .fl-empty h2 {
+    font-size: 1.5rem;
+  }
+
+  .fl-empty .btn-row {
+    justify-content: center;
+  }
+
+  .fl-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--sand);
+  }
+</style>

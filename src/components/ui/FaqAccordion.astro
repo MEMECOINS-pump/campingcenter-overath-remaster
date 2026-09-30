@@ -1,0 +1,85 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import type { Faq } from '@/data/faqs';
+
+interface Props {
+  items: Faq[];
+}
+const { items } = Astro.props;
+---
+
+<div class="faq">
+  {
+    items.map((f) => (
+      <details class="faq-item" name="faq">
+        <summary>
+          <span>{f.q}</span>
+          <Icon name="chevron-down" class="faq-caret" />
+        </summary>
+        <div class="faq-body">
+          <p>{f.a}</p>
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 4rem;
+    padding: 1rem 0;
+    font-weight: 650;
+    font-size: var(--fs-md);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-caret {
+    flex: none;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .faq-item[open] .faq-caret {
+    transform: rotate(180deg);
+  }
+
+  .faq-body {
+    padding: 0 2.5rem 1.25rem 0;
+    color: var(--text-muted);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-item::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size 0.3s var(--ease),
+        content-visibility 0.3s allow-discrete;
+    }
+
+    .faq-item[open]::details-content {
+      block-size: auto;
+    }
+  }
+
+  :global(html) {
+    interpolate-size: allow-keywords;
+  }
+</style>

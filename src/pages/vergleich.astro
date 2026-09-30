@@ -1,0 +1,405 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { priceLabel, specRows, vehicleImage, vehicles } from '@/lib/vehicles';
+import { breadcrumbSchema } from '@/lib/schema';
+import { url } from '@/lib/url';
+
+const crumbs = [{ label: 'Vergleich', href: '/vergleich/' }];
+
+const groups: { title: string; keys: string[] }[] = [
+  { title: 'Grunddaten', keys: ['condition', 'category', 'modelYear', 'firstRegistration', 'mileage', 'owners', 'hu'] },
+  { title: 'Motor & Antrieb', keys: ['power', 'fuel', 'transmission', 'emission'] },
+  { title: 'Maße & Gewicht', keys: ['length', 'weight'] },
+  { title: 'Sonstiges', keys: ['color'] },
+];
+const labels = new Map<string, string>();
+const values = new Map<string, Map<string, string>>();
+for (const v of vehicles) {
+  const m = new Map<string, string>();
+  for (const s of specRows(v)) {
+    labels.set(s.key, s.label);
+    m.set(s.key, s.value);
+  }
+  values.set(v.id, m);
+}
+const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.has(k)) })).filter((g) => g.keys.length);
+---
+
+<BaseLayout
+  title="Wohnmobile vergleichen"
+  description="Bis zu drei Wohnmobile aus dem Bestand des Campingcenter Overath direkt nebeneinander vergleichen – Preis, Maße, Gewicht und Technik."
+  noindex
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <section class="page-hero section-paper cmp-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">Vergleich</p>
+      <h1>Fahrzeuge vergleichen</h1>
+      <p class="lead">Bis zu drei Fahrzeuge nebeneinander – so siehst du auf einen Blick, was sie unterscheidet.</p>
+    </div>
+  </section>
+
+  <section class="section-tight" aria-label="Vergleichstabelle">
+    <div class="container">
+      <div class="cmp-empty card card-pad" data-cmp-empty>
+        <span class="cmp-empty-icon"><Icon name="compare" /></span>
+        <h2 data-cmp-empty-title>Noch keine Fahrzeuge im Vergleich.</h2>
+        <p class="muted">Tippe in der Fahrzeugübersicht bei zwei oder drei Fahrzeugen auf „Vergleichen“.</p>
+        <div class="btn-row">
+          <a class="btn" href={url('/wohnmobile/')}>Fahrzeuge auswählen <Icon name="arrow-right" class="arrow" /></a>
+          <a class="btn btn-ghost" href={url('/merkliste/')}>Zur Merkliste</a>
+        </div>
+      </div>
+
+      <div class="cmp" data-cmp hidden>
+        <div class="cmp-tools">
+          <label class="cmp-diff">
+            <input type="checkbox" data-cmp-diff />
+            <span>Nur Unterschiede zeigen</span>
+          </label>
+          <a class="link-arrow" href={url('/wohnmobile/')}>Weitere hinzufügen <Icon name="arrow-right" /></a>
+        </div>
+
+        <div class="cmp-head" data-cmp-row>
+          {
+            vehicles.map((v) => (
+              <div class="cmp-vehicle" data-col={v.id} hidden>
+                <a class="cmp-vlink" href={url(`/wohnmobile/${v.slug}/`)}>
+                  {v.images[0] && <img src={vehicleImage(v.images[0], 360)} width="360" height="270" alt="" loading="lazy" decoding="async" />}
+                  <span class="cmp-vmake">{v.make}</span>
+                  <span class="cmp-vname">{v.model}</span>
+                </a>
+                <p class="cmp-vprice">{priceLabel(v)}</p>
+                <button type="button" class="cmp-remove" data-compare-toggle={v.id} aria-label={`${v.title} aus dem Vergleich entfernen`}>
+                  <Icon name="close" />
+                </button>
+              </div>
+            ))
+          }
+        </div>
+
+        {
+          usedGroups.map((g) => (
+            <section class="cmp-group" aria-label={g.title}>
+              <h2 class="cmp-group-title">{g.title}</h2>
+              {g.keys.map((k) => (
+                <div class="cmp-spec" data-cmp-spec>
+                  <p class="cmp-label">{labels.get(k)}</p>
+                  <div class="cmp-values" data-cmp-row>
+                    {vehicles.map((v) => (
+                      <p data-col={v.id} hidden>
+                        {values.get(v.id)?.get(k) ?? '–'}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </section>
+          ))
+        }
+
+        <div class="cmp-actions" data-cmp-row>
+          {
+            vehicles.map((v) => (
+              <div data-col={v.id} hidden>
+                <a class="btn btn-accent btn-sm btn-block" href={url(`/wohnmobile/${v.slug}/#anfrage`)}>
+                  Anfragen
+                </a>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { onCollectionChange, readCollection } from '@/lib/collections';
+
+  const root = document.querySelector<HTMLElement>('[data-cmp]');
+  const empty = document.querySelector<HTMLElement>('[data-cmp-empty]');
+  const emptyTitle = document.querySelector('[data-cmp-empty-title]');
+  const diff = document.querySelector<HTMLInputElement>('[data-cmp-diff]');
+
+  function render(): void {
+    if (!root || !empty) return;
+    const ids = readCollection('compare');
+    const known = ids.filter((id) => root.querySelector(`[data-col="${CSS.escape(id)}"]`));
+    const show = known.length >= 2;
+    root.hidden = !show;
+    empty.hidden = show;
+    if (emptyTitle) emptyTitle.textContent = known.length === 1 ? 'Noch ein Fahrzeug fehlt.' : 'Noch keine Fahrzeuge im Vergleich.';
+    root.style.setProperty('--cols', String(Math.max(2, known.length)));
+
+    root.querySelectorAll<HTMLElement>('[data-cmp-row]').forEach((row) => {
+      const cells = new Map(Array.from(row.querySelectorAll<HTMLElement>(':scope > [data-col]')).map((c) => [c.dataset.col, c]));
+      cells.forEach((c) => (c.hidden = true));
+      known.forEach((id) => {
+        const cell = cells.get(id);
+        if (cell) {
+          cell.hidden = false;
+          row.append(cell);
+        }
+      });
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-cmp-spec]').forEach((spec) => {
+      const vals = Array.from(spec.querySelectorAll<HTMLElement>('[data-col]:not([hidden])')).map((c) => c.textContent?.trim());
+      const same = vals.every((x) => x === vals[0]);
+      const unknown = vals.every((x) => x === '–');
+      spec.classList.toggle('is-same', same);
+      spec.hidden = unknown || (Boolean(diff?.checked) && same);
+    });
+  }
+
+  document.querySelector('[data-compare-tray]')?.remove();
+
+  diff?.addEventListener('change', render);
+  onCollectionChange(render);
+  render();
+</script>
+
+<style>
+  .cmp-hero {
+    padding-bottom: 1.5rem;
+  }
+
+  .cmp[hidden],
+  .cmp-empty[hidden] {
+    display: none;
+  }
+
+  .cmp {
+    --cols: 2;
+  }
+
+  .cmp-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding-block: 3rem;
+    text-align: center;
+  }
+
+  .cmp-empty h2 {
+    font-size: 1.5rem;
+  }
+
+  .cmp-empty .btn-row {
+    justify-content: center;
+  }
+
+  .cmp-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--sand);
+  }
+
+  .cmp-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .cmp-diff {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .cmp-diff input {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--graphite);
+  }
+
+  .cmp-head,
+  .cmp-values,
+  .cmp-actions {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .cmp-head > [hidden],
+  .cmp-values > [hidden],
+  .cmp-actions > [hidden],
+  .cmp-spec[hidden] {
+    display: none;
+  }
+
+  @media (min-width: 48em) {
+    .cmp-head,
+    .cmp-values,
+    .cmp-actions {
+      grid-template-columns: 12rem repeat(var(--cols), minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .cmp-head::before,
+    .cmp-actions::before {
+      content: '';
+    }
+  }
+
+  .cmp-head {
+    position: sticky;
+    z-index: 3;
+    top: var(--header-h, 4.5rem);
+    padding-block: 0.75rem;
+    background: var(--ivory);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cmp-vehicle {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .cmp-vlink {
+    display: grid;
+    gap: 0.2rem;
+    text-decoration: none;
+  }
+
+  .cmp-vlink img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 0.35rem;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--sand);
+  }
+
+  @media (max-width: 47.99em) {
+    .cmp-vlink img {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  .cmp-vmake {
+    font-size: 0.7rem;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+
+  .cmp-vname {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    line-height: 1.25;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .cmp-vlink:hover .cmp-vname {
+    text-decoration: underline;
+  }
+
+  .cmp-vprice {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .cmp-remove {
+    position: absolute;
+    top: 0.3rem;
+    right: 0.3rem;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.92);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cmp-remove::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+
+  .cmp-remove :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .cmp-group {
+    margin-top: 1.75rem;
+  }
+
+  .cmp-group-title {
+    margin-bottom: 0.25rem;
+    font-size: 1.2rem;
+  }
+
+  .cmp-spec {
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cmp-label {
+    margin-bottom: 0.2rem;
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    color: var(--text-muted);
+  }
+
+  .cmp-values p {
+    font-weight: 620;
+    overflow-wrap: anywhere;
+  }
+
+  .cmp-spec:not(.is-same) .cmp-values p {
+    color: var(--text);
+  }
+
+  .cmp-spec.is-same .cmp-values p {
+    font-weight: 450;
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 48em) {
+    .cmp-spec {
+      display: grid;
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: 1.25rem;
+      align-items: baseline;
+    }
+
+    .cmp-label {
+      margin: 0;
+      font-size: var(--fs-sm);
+    }
+
+    .cmp-values {
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    }
+  }
+
+  .cmp-actions {
+    margin-top: 1.5rem;
+  }
+</style>

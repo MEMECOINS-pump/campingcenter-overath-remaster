@@ -1,0 +1,169 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { jobs, employer } from '@/data/jobs';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const crumbs = [{ label: 'Jobs', href: '/jobs/' }];
+---
+
+<BaseLayout
+  title="Jobs im Campingcenter Overath"
+  description="Offene Stellen im Campingcenter Overath: Quereinsteiger (m/w/d) für die Werkstatt, Rechnungswesen in Teilzeit und Reinigungskraft. Festvertrag, 30 Tage Urlaub, familienfreundlich."
+  overlayHeader
+  inquiryHref="/bewerbung/"
+  inquiryLabel="Bewerben"
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Karriere"
+    title="Mach deine Leidenschaft zum Beruf."
+    lead="Unser Unternehmen wächst. Werde Teil eines Teams, das Camping liebt – in Verkauf, Werkstatt und Verwaltung."
+    image="workshop-check-2"
+    imageAlt="Mitarbeiter bei der Arbeit in der Werkstatt"
+  >
+    <a class="btn btn-accent btn-lg" href="#stellen">Offene Stellen <Icon name="arrow-right" class="arrow" /></a>
+    <a class="btn btn-glass btn-lg" href={url('/bewerbung/')}>Jetzt bewerben</a>
+  </PageHero>
+
+  <section class="section" aria-labelledby="jb-why">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Quereinsteiger willkommen</p>
+        <h2 id="jb-why">Arbeiten, wo andere Urlaub planen.</h2>
+        <p class="lead">{employer.text}</p>
+        <p>{employer.profile}</p>
+      </div>
+      <ul class="jb-benefits" role="list">
+        {
+          employer.benefits.map((b) => (
+            <li>
+              <Icon name="check" /> {b}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section id="stellen" class="section section-sand" aria-labelledby="jb-open">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Offene Stellen</p>
+        <h2 id="jb-open">Aktuelle Stellenangebote</h2>
+      </div>
+      <ul class="jb-list" role="list">
+        <li class="card card-pad jb-card">
+          <p class="jb-type">Festvertrag · Werkstatt</p>
+          <h3>Quereinsteiger (m/w/d) für unsere neue Werkstatt</h3>
+          <p class="muted">Mehrere Stellen zum nächstmöglichen Zeitpunkt – als Quereinsteiger bist du ausdrücklich willkommen.</p>
+          <a class="btn btn-accent" href={url('/bewerbung/?stelle=Quereinsteiger%20Werkstatt')}>
+            Jetzt bewerben <Icon name="arrow-right" class="arrow" />
+          </a>
+        </li>
+        {
+          jobs.map((j) => (
+            <li class="card card-pad jb-card">
+              <p class="jb-type">{j.employment}</p>
+              <h3>{j.title}</h3>
+              <p class="muted">{j.intro.split('. ')[0]}.</p>
+              <a class="btn" href={url(`/${j.slug}/`)}>
+                Stelle ansehen <Icon name="arrow-right" class="arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="jb-apply">
+    <div class="container-narrow jb-apply">
+      <h2 id="jb-apply">Nichts Passendes dabei?</h2>
+      <p class="lead">Bewirb dich initiativ – online oder per Post.</p>
+      <div class="btn-row jb-apply-actions">
+        <a class="btn btn-accent btn-lg" href={url('/bewerbung/?stelle=Initiativbewerbung')}>Initiativ bewerben</a>
+        <a class="btn btn-ghost btn-lg" href={company.phone.href} data-track="call_click" data-track-location="jobs">
+          <Icon name="phone" /> {company.phone.display}
+        </a>
+      </div>
+      <p class="small muted">Postanschrift: {employer.postalContact}</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  h2 {
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .jb-benefits {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+    gap: 0.6rem;
+    list-style: none;
+    align-self: center;
+  }
+
+  .jb-benefits li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+    font-weight: 620;
+  }
+
+  .jb-benefits :global(.icon) {
+    flex: none;
+    color: var(--forest);
+  }
+
+  .jb-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: 1rem;
+    list-style: none;
+  }
+
+  .jb-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .jb-card .btn {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+
+  .jb-card p.muted {
+    margin-bottom: 0.75rem;
+  }
+
+  .jb-type {
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--brand-ink);
+  }
+
+  .jb-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .jb-apply {
+    text-align: center;
+  }
+
+  .jb-apply-actions {
+    justify-content: center;
+    margin: 1.5rem 0 1rem;
+  }
+</style>

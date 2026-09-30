@@ -1,0 +1,617 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import VehicleGallery from '@/components/vehicles/VehicleGallery.astro';
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import { company } from '@/data/company';
+import { breadcrumbSchema, vehicleSchema } from '@/lib/schema';
+import { priceLabel, snapshotDate, specRows, vehicleImage, vehicles, type Vehicle } from '@/lib/vehicles';
+import { formatDateDE } from '@/lib/format';
+import { absoluteUrl, url } from '@/lib/url';
+
+export function getStaticPaths() {
+  return vehicles.map((vehicle) => ({ params: { slug: vehicle.slug }, props: { vehicle } }));
+}
+
+interface Props {
+  vehicle: Vehicle;
+}
+const { vehicle: v } = Astro.props;
+const path = `/wohnmobile/${v.slug}/`;
+const specs = specRows(v);
+const keyFacts = specs.filter((s) => ['firstRegistration', 'modelYear', 'mileage', 'length', 'transmission', 'power', 'weight'].includes(s.key)).slice(0, 6);
+const isNew = v.condition === 'neu';
+
+const similar = vehicles
+  .filter((o) => o.id !== v.id)
+  .map((o) => ({ o, score: (o.category === v.category ? 2 : 0) + (o.condition === v.condition ? 1 : 0) - Math.abs(o.price - v.price) / 50000 }))
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 3)
+  .map((x) => x.o);
+
+const crumbs = [
+  { label: 'Wohnmobile', href: '/wohnmobile/' },
+  { label: v.title, href: path },
+];
+const description = `${v.title} – ${isNew ? 'Neufahrzeug' : 'gebraucht'}, ${v.categoryLabel}, ${priceLabel(v)}. ${keyFacts
+  .map((f) => `${f.label}: ${f.value}`)
+  .join(', ')}. Jetzt anfragen beim Campingcenter Overath.`;
+const inquiryMessage = `Hallo, ich interessiere mich für den ${v.title} (Fahrzeug-Nr. ${v.id}, ${priceLabel(v)}). Bitte meldet euch bei mir.`;
+const benefits = isNew
+  ? [
+      { icon: 'shield', title: 'Vertragshändler', text: `Beratung und Übergabe direkt beim Vertragshändler für ${v.make}.` },
+      { icon: 'wrench', title: 'Werkstatt im Haus', text: 'Service, Wartung und Reparaturen später direkt bei uns in Overath.' },
+      { icon: 'refresh', title: 'Inzahlungnahme möglich', text: 'Dein bisheriges Fahrzeug nehmen wir gern in Zahlung.' },
+    ]
+  : [
+      { icon: 'check', title: 'Von Campern geprüft', text: 'Unser Team aus echten Campern prüft Stauraum, Autarkie und Bordelektronik.' },
+      { icon: 'wrench', title: 'Werkstatt im Haus', text: 'Service, Wartung und Reparaturen direkt bei uns in Overath.' },
+      { icon: 'refresh', title: 'Finanzierung & Inzahlungnahme', text: 'Flexible Finanzierungsmöglichkeiten – und dein altes Wohnmobil nehmen wir in Zahlung.' },
+    ];
+---
+
+<BaseLayout
+  compareTray
+  title={`${v.title} – ${priceLabel(v)}`}
+  description={description.slice(0, 300)}
+  path={path}
+  type="product"
+  image={v.images[0] ? vehicleImage(v.images[0], 1600) : undefined}
+  imageAlt={v.title}
+  actionBar={false}
+  jsonLd={[vehicleSchema(v, absoluteUrl(path, Astro.site), Astro.site), breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <article class="vd" data-vehicle-page={v.id}>
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+
+      <div class="vd-top">
+        <div class="vd-gallery">
+          <VehicleGallery vehicle={v} />
+        </div>
+
+        <aside class="vd-summary" aria-labelledby="vd-title">
+          <div class="vd-badges">
+            <span class:list={['badge', isNew ? 'badge-new' : 'badge-used']}>{isNew ? 'Neufahrzeug' : 'Gebraucht'}</span>
+            <span class="badge">{v.categoryLabel}</span>
+          </div>
+          <h1 id="vd-title" class="vd-title"><span class="vd-make">{v.make}</span>{' '}{v.model}</h1>
+
+          <p class="vd-price">
+            <span class="sr-only">Preis: </span>{priceLabel(v)}
+            <small>{v.vatDeductible ? 'MwSt. ausweisbar · ' : ''}Preis laut Fahrzeuginserat</small>
+          </p>
+
+          <dl class="vd-facts">
+            {
+              keyFacts.map((f) => (
+                <div>
+                  <dt>{f.label}</dt>
+                  <dd>{f.value}</dd>
+                </div>
+              ))
+            }
+          </dl>
+
+          <div class="vd-ctas">
+            <a class="btn btn-accent btn-lg btn-block" href="#anfrage" data-track="cta_click" data-track-location="vehicle_summary">
+              Fahrzeug anfragen <Icon name="arrow-right" class="arrow" />
+            </a>
+            <div class="vd-cta-row">
+              <a class="btn btn-ghost" href={url(`/kontakt/?fahrzeug=${encodeURIComponent(v.title)}#beratung`)} data-track="cta_click" data-track-location="vehicle_consultation">
+                <Icon name="calendar" /> Beratung vereinbaren
+              </a>
+              <a class="btn btn-ghost" href={company.phone.href} data-track="call_click" data-track-location="vehicle_summary">
+                <Icon name="phone" /> Anrufen
+              </a>
+            </div>
+            <div class="vd-cta-row vd-cta-quiet">
+              <button type="button" class="vd-toggle" data-fav-toggle={v.id} aria-pressed="false">
+                <Icon name="heart" /> <span data-label>Merken</span>
+              </button>
+              <button type="button" class="vd-toggle" data-compare-toggle={v.id} aria-pressed="false">
+                <Icon name="compare" /> <span data-label>Vergleichen</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="vd-id small muted">Fahrzeug-Nr. {v.id} · Stand {formatDateDE(snapshotDate)}</p>
+        </aside>
+      </div>
+    </div>
+
+    <div class="container vd-body">
+      <div class="vd-main">
+        {
+          v.highlights.length > 0 && (
+            <section class="vd-section" aria-labelledby="vd-highlights">
+              <h2 id="vd-highlights">Highlights</h2>
+              <ul class="vd-highlights">
+                {v.highlights.map((h) => (
+                  <li>
+                    <Icon name="check" /> {h}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        <section class="vd-section" aria-labelledby="vd-specs">
+          <h2 id="vd-specs">Technische Daten</h2>
+          <dl class="vd-spec-table">
+            {
+              specs.map((s) => (
+                <div>
+                  <dt>{s.label}</dt>
+                  <dd>{s.value}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="small muted vd-source">
+            Angaben laut Fahrzeuginserat (Stand {formatDateDE(snapshotDate)}). Irrtümer, Änderungen und Zwischenverkauf vorbehalten – Ausstattung und Verfügbarkeit bestätigen wir dir gern persönlich.{' '}
+            <a href={v.sourceUrl} target="_blank" rel="noopener">
+              Vollständiges Inserat auf mobile.de<span class="sr-only"> (öffnet in neuem Tab)</span>
+            </a>
+          </p>
+        </section>
+
+        <section class="vd-section" aria-labelledby="vd-benefits">
+          <h2 id="vd-benefits">Darauf kannst du dich verlassen</h2>
+          <ul class="vd-benefits">
+            {
+              benefits.map((b) => (
+                <li>
+                  <span class="vd-benefit-icon">
+                    <Icon name={b.icon as 'check'} />
+                  </span>
+                  <div>
+                    <h3>{b.title}</h3>
+                    <p>{b.text}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      </div>
+
+      <section id="anfrage" class="vd-inquiry card card-pad" aria-labelledby="vd-inquiry-title" data-hide-sticky>
+        <p class="eyebrow">Unverbindlich</p>
+        <h2 id="vd-inquiry-title">Fahrzeug anfragen</h2>
+        <p class="muted">Frag nach Details, vereinbare eine Besichtigung oder lass dir ein Angebot für dein bisheriges Fahrzeug machen.</p>
+
+        <form class="form-stack" data-form="vehicle_inquiry" data-subject={`Fahrzeuganfrage: ${v.title} (Nr. ${v.id})`}>
+          <input type="hidden" name="fahrzeug" value={`${v.title} (Nr. ${v.id})`} />
+          <fieldset class="fieldset">
+            <legend class="label">Worum geht es?</legend>
+            <div class="choice-grid choice-grid-compact">
+              {
+                ['Rückfrage zum Fahrzeug', 'Besichtigung vereinbaren', 'Inzahlungnahme meines Fahrzeugs'].map((opt, i) => (
+                  <label class="choice">
+                    <input type="radio" name="anliegen" value={opt} checked={i === 0} required />
+                    <span class="choice-body">
+                      <strong>{opt}</strong>
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+            <p class="field-error" aria-live="polite"></p>
+          </fieldset>
+          <Field name="name" label="Name" required autocomplete="name" />
+          <div class="field-row">
+            <Field name="email" type="email" label="E-Mail" required autocomplete="email" inputmode="email" />
+            <Field name="telefon" type="tel" label="Telefon" autocomplete="tel" inputmode="tel" hint="Für eine schnelle Rückmeldung" />
+          </div>
+          <Field name="nachricht" type="textarea" label="Nachricht" required rows={4} value={inquiryMessage} />
+          <FormEnd submitLabel="Anfrage senden" />
+        </form>
+        <FormSuccess title="Danke für deine Anfrage!" text={`Wir melden uns zum ${v.title} so schnell wie möglich – in der Regel innerhalb der Öffnungszeiten.`} />
+      </section>
+    </div>
+
+    {
+      similar.length > 0 && (
+        <section class="section section-paper" aria-labelledby="vd-similar">
+          <div class="container">
+            <div class="section-head-row">
+              <div class="section-head">
+                <p class="eyebrow">Auch interessant</p>
+                <h2 id="vd-similar">Ähnliche Fahrzeuge</h2>
+              </div>
+              <a class="btn btn-ghost" href={url('/wohnmobile/')}>
+                Alle Fahrzeuge <Icon name="arrow-right" class="arrow" />
+              </a>
+            </div>
+            <ul class="vd-similar-grid" role="list">
+              {similar.map((o, i) => (
+                <li>
+                  <VehicleCard vehicle={o} index={i} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+  </article>
+
+  <div slot="sticky" class="vd-sticky" data-sticky-cta>
+    <div class="vd-sticky-info">
+      <strong>{priceLabel(v)}</strong>
+      <span>{v.make} {v.model}</span>
+    </div>
+    <a class="vd-sticky-call" href={company.phone.href} aria-label={`Anrufen: ${company.phone.display}`} data-track="call_click" data-track-location="vehicle_sticky">
+      <Icon name="phone" />
+    </a>
+    <a class="btn btn-accent" href="#anfrage" data-track="cta_click" data-track-location="vehicle_sticky">Anfragen</a>
+  </div>
+</BaseLayout>
+
+<script>
+  import '@/scripts/vehicle-detail';
+  import '@/scripts/forms';
+</script>
+
+<style>
+  .vd {
+    padding-top: 1.25rem;
+  }
+
+  .vd-top {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 64em) {
+    .vd-top {
+      grid-template-columns: minmax(0, 1.55fr) minmax(20rem, 1fr);
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    .vd-summary {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1.25rem);
+    }
+  }
+
+  .vd-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .vd-make {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+
+  .vd-title {
+    margin-top: 0.9rem;
+    font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .vd-price {
+    display: grid;
+    margin-top: 1rem;
+    font-family: var(--font-head);
+    font-size: clamp(1.9rem, 1.6rem + 1vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1.05;
+  }
+
+  .vd-price small {
+    margin-top: 0.35rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .vd-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 1.25rem;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--line);
+  }
+
+  .vd-facts div {
+    padding: 0.7rem 0.85rem;
+    background: var(--surface);
+  }
+
+  .vd-facts dt {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  .vd-facts dd {
+    font-weight: 650;
+  }
+
+  .vd-ctas {
+    display: grid;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+  }
+
+  .vd-cta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .vd-cta-row :global(.btn) {
+    padding-inline: 0.6rem;
+  }
+
+  .vd-cta-quiet {
+    margin-top: 0.1rem;
+  }
+
+  .vd-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 44px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: none;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--text-muted);
+  }
+
+  .vd-toggle:hover {
+    background: var(--sand);
+    color: var(--text);
+  }
+
+  .vd-toggle[aria-pressed='true'] {
+    color: var(--forest);
+    background: var(--forest-soft);
+  }
+
+  .vd-toggle[data-fav-toggle][aria-pressed='true'] :global(.icon) {
+    fill: currentColor;
+  }
+
+  .vd-id {
+    margin-top: 1rem;
+  }
+
+  .vd-body {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  @media (min-width: 64em) {
+    .vd-body {
+      grid-template-columns: minmax(0, 1.55fr) minmax(20rem, 1fr);
+      align-items: start;
+    }
+  }
+
+  .vd-main {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .vd-section h2,
+  .vd-inquiry h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .vd-inquiry h2 {
+    margin: 0.35rem 0 0.4rem;
+  }
+
+  .vd-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+  }
+
+  .vd-highlights li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    font-weight: 600;
+  }
+
+  .vd-highlights :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--forest);
+  }
+
+  .vd-spec-table {
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 40em) {
+    .vd-spec-table {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 2rem;
+    }
+  }
+
+  .vd-spec-table div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .vd-spec-table dt {
+    color: var(--text-muted);
+  }
+
+  .vd-spec-table dd {
+    font-weight: 620;
+    text-align: right;
+  }
+
+  .vd-source {
+    margin-top: 1rem;
+  }
+
+  .vd-benefits {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+  }
+
+  .vd-benefits li {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .vd-benefits h3 {
+    font-size: 1.05rem;
+    font-family: var(--font-body);
+    font-weight: 700;
+  }
+
+  .vd-benefits p {
+    color: var(--text-muted);
+  }
+
+  .vd-benefit-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 12px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .vd-inquiry {
+    scroll-margin-top: calc(var(--header-h, 4.5rem) + 1rem);
+  }
+
+  @media (min-width: 64em) {
+    .vd-inquiry {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1.25rem);
+    }
+  }
+
+  .form-stack {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 1.25rem;
+  }
+
+  .choice-grid-compact {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .choice-grid-compact :global(.choice-body) {
+    min-height: 3.25rem;
+    padding-block: 0.7rem;
+  }
+
+  .vd-similar-grid {
+    display: grid;
+    gap: 1.25rem;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+
+  .vd-similar-grid > li {
+    display: grid;
+  }
+
+  /* ---------- sticky mobile CTA ---------- */
+  .vd-sticky {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem var(--gutter) calc(0.6rem + env(safe-area-inset-bottom, 0px));
+    background: rgb(255 255 255 / 0.96);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px rgb(12 14 16 / 0.08);
+    transition: transform 0.25s var(--ease);
+  }
+
+  .vd-sticky.is-hidden,
+  :global(body.kb-open) .vd-sticky,
+  :global(body.scroll-locked) .vd-sticky {
+    transform: translateY(110%);
+  }
+
+  @media (min-width: 64em) {
+    .vd-sticky {
+      display: none;
+    }
+  }
+
+  .vd-sticky-info {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    line-height: 1.2;
+  }
+
+  .vd-sticky-info strong {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+  }
+
+  .vd-sticky-info span {
+    overflow: hidden;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .vd-sticky-call {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    color: var(--text);
+  }
+</style>

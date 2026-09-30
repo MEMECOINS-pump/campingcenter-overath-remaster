@@ -1,0 +1,93 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { panamaUseCases } from '@/data/panama';
+import { url } from '@/lib/url';
+---
+
+<section class="panama" aria-labelledby="panama-title">
+  <div class="panama-media">
+    <Photo src="panama-wide" alt="PANAMA Van unterwegs in der Natur" sizes="100vw" widths={[640, 1024, 1600, 2200]} />
+  </div>
+  <div class="panama-shade" aria-hidden="true"></div>
+  <div class="container panama-inner">
+    <div class="panama-copy">
+      <p class="eyebrow">PANAMA Vans</p>
+      <h2 id="panama-title" class="display">365 Tage Freiheit.</h2>
+      <p class="lead">Ein Van für alles: Alltag, Wochenende, Urlaub. Als PANAMA-Profi im Raum Köln zeigen wir dir Peak, Peak Next Generation und Urban.</p>
+      <ul class="panama-uses" role="list">
+        {panamaUseCases.map((u) => <li>{u.title}</li>)}
+      </ul>
+      <div class="btn-row">
+        <a class="btn btn-accent btn-lg" href={url('/panama/')}>PANAMA Vans entdecken <Icon name="arrow-right" class="arrow" /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .panama {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    min-height: min(52rem, 92svh);
+    color: #fff;
+    background: #20252a;
+  }
+
+  .panama-media,
+  .panama-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .panama-media :global(picture),
+  .panama-media :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .panama-media :global(img) {
+    object-fit: cover;
+  }
+
+  .panama-shade {
+    background: linear-gradient(to top, rgb(12 14 16 / 0.85), rgb(12 14 16 / 0.2) 60%, rgb(12 14 16 / 0.25));
+  }
+
+  .panama-inner {
+    display: grid;
+    align-content: end;
+    padding-block: var(--section);
+  }
+
+  .panama-copy {
+    display: grid;
+    gap: 1.1rem;
+    max-width: 40rem;
+  }
+
+  .panama .eyebrow {
+    color: #ffc778;
+  }
+
+  .panama .lead {
+    color: rgb(255 255 255 / 0.88);
+  }
+
+  .panama-uses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+  }
+
+  .panama-uses li {
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgb(255 255 255 / 0.35);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+  }
+</style>

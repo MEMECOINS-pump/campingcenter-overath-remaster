@@ -1,0 +1,416 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import PhotoUploader from '@/components/forms/PhotoUploader.astro';
+import YouTubeLite from '@/components/embeds/YouTubeLite.astro';
+import PromotionTeaser from '@/components/home/PromotionTeaser.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { serviceGroups, workshopHighlights, workshopRequestTopics } from '@/data/services';
+import { agbDocuments, videos } from '@/data/content';
+import { company } from '@/data/company';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
+
+const crumbs = [{ label: 'Werkstatt & Kundendienst', href: '/werkstatt-kundendienst/' }];
+const repairTerms = agbDocuments.find((d) => d.area === 'Werkstatt');
+const highlightIcons = ['shield', 'drop', 'bolt'] as const;
+const today = new Date().toISOString().slice(0, 10);
+---
+
+<BaseLayout
+  title="Werkstatt & Kundendienst für Wohnmobile und Wohnwagen"
+  description="Fachwerkstatt in Overath: TÜV-Abnahme, Gasprüfung, Dichtigkeitsprüfung, GFK- und Nässeschäden, Solar, Elektrik, Markisen, Mover und mehr. Jetzt Werkstatt-Termin anfragen."
+  overlayHeader
+  inquiryHref="#termin"
+  inquiryLabel="Termin"
+  jsonLd={[
+    breadcrumbSchema(crumbs, Astro.site),
+    serviceSchema('Werkstatt & Kundendienst für Wohnmobile und Wohnwagen', 'Prüfung, Reparatur, Technik, Komfort und Fahrwerk – Fachwerkstatt in Overath.', '/werkstatt-kundendienst/', Astro.site),
+  ]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Werkstatt & Kundendienst"
+    title="Dein Camper verdient den besten Service."
+    lead="Fachwerkstatt für Wohnmobile und Wohnwagen in Overath – vom Sicherheitscheck mit Siegel bis zur GFK-Reparatur."
+    image="workshop-interior"
+    imageAlt="Werkstatt des Campingcenter Overath mit Wohnmobil auf der Hebebühne"
+  >
+    <a class="btn btn-accent btn-lg" href="#termin" data-track="cta_click" data-track-location="workshop_hero">
+      Werkstatt-Termin anfragen <Icon name="arrow-right" class="arrow" />
+    </a>
+    <a class="btn btn-glass btn-lg" href={company.phone.href} data-track="call_click" data-track-location="workshop_hero">
+      <Icon name="phone" /> {company.phone.display}
+    </a>
+  </PageHero>
+
+  <section class="section-tight ws-highlights" aria-label="Schwerpunkte">
+    <div class="container">
+      <ul class="grid grid-3" role="list">
+        {
+          workshopHighlights.map((h, i) => (
+            <li class="card card-pad ws-hl reveal">
+              <span class="ws-icon">
+                <Icon name={highlightIcons[i] ?? 'check'} />
+              </span>
+              <h2>{h.title}</h2>
+              <p class="muted">{h.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ws-services">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Leistungen</p>
+        <h2 id="ws-services">Alles für dein Wohnmobil und deinen Wohnwagen</h2>
+        <p class="lead">Ob Wartung, Reparatur oder Nachrüstung: Unser Werkstatt-Team kennt Reisemobile aus eigener Erfahrung.</p>
+      </div>
+
+      <nav class="ws-jump" aria-label="Leistungsbereiche">
+        <ul>
+          {
+            serviceGroups.map((g) => (
+              <li>
+                <a href={`#${g.id}`}>
+                  <Icon name={g.icon} /> {g.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="ws-groups">
+        {
+          serviceGroups.map((g) => (
+            <article id={g.id} class="ws-group card card-pad reveal" aria-labelledby={`${g.id}-t`}>
+              <header>
+                <span class="ws-icon">
+                  <Icon name={g.icon} />
+                </span>
+                <div>
+                  <h3 id={`${g.id}-t`}>{g.title}</h3>
+                  <p class="muted">{g.lead}</p>
+                </div>
+              </header>
+              <ul class="check-list">
+                {g.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-sand" aria-labelledby="ws-video">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Einblick</p>
+        <h2 id="ws-video">Dein Spezialist für Wohnmobile und Wohnwagen</h2>
+        <p class="lead">Ein kurzer Blick in unsere Werkstatt – und auf das Team, das sich um deinen Camper kümmert.</p>
+        <div class="ws-photos">
+          <Photo src="workshop-check-1" alt="Techniker prüft ein Wohnmobil" sizes="(min-width: 64em) 22vw, 45vw" widths={[360, 640]} class="ws-photo" />
+          <Photo src="workshop-check-2" alt="Detailarbeit in der Werkstatt" sizes="(min-width: 64em) 22vw, 45vw" widths={[360, 640]} class="ws-photo" />
+        </div>
+      </div>
+      <YouTubeLite id={videos.workshop.id} title={videos.workshop.title} />
+    </div>
+  </section>
+
+  <section id="termin" class="section ws-request" aria-labelledby="ws-form-title">
+    <div class="container ws-request-grid">
+      <div class="ws-request-intro">
+        <p class="eyebrow">Terminanfrage</p>
+        <h2 id="ws-form-title">Werkstatt-Termin anfragen</h2>
+        <p class="lead">Beschreib kurz, worum es geht. Wir melden uns mit einem Terminvorschlag.</p>
+        <ul class="ws-notes">
+          <li><Icon name="calendar" /> Keine Sofortbuchung – wir stimmen den Termin persönlich mit dir ab.</li>
+          <li><Icon name="camera" /> Fotos vom Schaden helfen uns bei der Einschätzung.</li>
+          <li><Icon name="phone" /> Eilig? Ruf uns an: <a href={company.phone.href}>{company.phone.display}</a></li>
+        </ul>
+        {
+          repairTerms && (
+            <p class="small muted">
+              Es gelten unsere{' '}
+              <a href={repairTerms.href} target="_blank" rel="noopener">
+                Reparaturbedingungen (PDF)<span class="sr-only"> (öffnet in neuem Tab)</span>
+              </a>
+              .
+            </p>
+          )
+        }
+      </div>
+
+      <div class="card card-pad ws-form-card">
+        <form class="form-stack" data-form="workshop_request" data-subject="Werkstatt-Terminanfrage über die Website">
+          <fieldset class="fieldset">
+            <legend class="label">Worum geht es?</legend>
+            <div class="chip-choices">
+              {
+                workshopRequestTopics.map((t) => (
+                  <label class="chip-choice">
+                    <input type="checkbox" name="anliegen" value={t} data-label="Anliegen" data-prefill="anliegen" />
+                    <span>{t}</span>
+                  </label>
+                ))
+              }
+            </div>
+            <p class="hint">Mehrfachauswahl möglich</p>
+          </fieldset>
+
+          <div data-show-if="anliegen:Unfall- / GFK-Schaden|Nässeschaden">
+            <fieldset class="fieldset">
+              <legend class="label">Ist es ein Versicherungsfall?</legend>
+              <div class="seg">
+                {['Ja', 'Nein', 'Weiß noch nicht'].map((o) => (
+                  <label class="seg-opt">
+                    <input type="radio" name="versicherung" value={o} />
+                    <span>{o}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+
+          <fieldset class="fieldset">
+            <legend class="label">Fahrzeug</legend>
+            <div class="seg">
+              {['Wohnmobil', 'Wohnwagen', 'Van'].map((o, i) => (
+                <label class="seg-opt">
+                  <input type="radio" name="fahrzeug" value={o} checked={i === 0} data-label="Fahrzeug" />
+                  <span>{o}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div class="field-row">
+            <Field name="modell" label="Hersteller & Modell" placeholder="z. B. Knaus Sky TI 650" />
+            <Field name="kennzeichen" label="Kennzeichen" autocomplete="off" />
+          </div>
+          <Field name="beschreibung" type="textarea" label="Beschreibung" required rows={4} minlength={10} placeholder="Was soll gemacht werden? Seit wann tritt das Problem auf?" />
+          <PhotoUploader name="dateien" label="Fotos oder Dokumente" hint="Zum Beispiel Schadensfotos, Serviceheft oder Prüfbericht" max={6} documents />
+          <div class="field-row">
+            <Field name="wunschtermin" type="date" label="Wunschtermin ab" min={today} hint="Wir melden uns mit einem konkreten Vorschlag" />
+            <Field
+              name="zeitraum"
+              type="select"
+              label="Tageszeit"
+              options={[
+                { value: 'Vormittags', label: 'Vormittags' },
+                { value: 'Nachmittags', label: 'Nachmittags' },
+                { value: 'Egal', label: 'Egal' },
+              ]}
+            />
+          </div>
+          <Field name="name" label="Name" required autocomplete="name" />
+          <div class="field-row">
+            <Field name="email" type="email" label="E-Mail" required autocomplete="email" inputmode="email" />
+            <Field name="telefon" type="tel" label="Telefon" autocomplete="tel" inputmode="tel" />
+          </div>
+          <fieldset class="fieldset">
+            <legend class="label">Wie sollen wir uns melden?</legend>
+            <div class="seg">
+              {['E-Mail', 'Telefon'].map((o, i) => (
+                <label class="seg-opt">
+                  <input type="radio" name="kontaktweg" value={o} checked={i === 0} data-label="Bevorzugter Kontaktweg" />
+                  <span>{o}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <FormEnd submitLabel="Terminanfrage senden" />
+        </form>
+        <FormSuccess title="Danke! Deine Terminanfrage ist da." text="Wir melden uns mit einem Terminvorschlag – in der Regel innerhalb der Öffnungszeiten." />
+      </div>
+    </div>
+  </section>
+
+  <PromotionTeaser />
+  <CtaSection />
+</BaseLayout>
+
+<script>
+  import '@/scripts/forms';
+</script>
+
+<style>
+  @media (min-width: 48em) {
+    .ws-highlights {
+      position: relative;
+      z-index: 2;
+      margin-top: -3rem;
+      padding-top: 0;
+    }
+  }
+
+  .ws-hl h2 {
+    margin: 1rem 0 0.4rem;
+    font-size: 1.25rem;
+  }
+
+  .ws-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 12px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .ws-jump {
+    position: sticky;
+    z-index: 4;
+    top: var(--header-h, 4.5rem);
+    margin: 0 calc(var(--gutter) * -1) 1.5rem;
+    padding: 0.6rem var(--gutter);
+    background: rgb(from var(--bg) r g b / 0.94);
+    backdrop-filter: blur(10px);
+  }
+
+  .ws-jump ul {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    list-style: none;
+    scrollbar-width: none;
+  }
+
+  .ws-jump a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 40px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--white);
+    font-size: var(--fs-sm);
+    font-weight: 620;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .ws-jump a:hover {
+    border-color: var(--graphite);
+  }
+
+  .ws-jump :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--brand-ink);
+  }
+
+  .ws-groups {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 60em) {
+    .ws-groups {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .ws-groups > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .ws-group {
+    scroll-margin-top: calc(var(--header-h, 4.5rem) + 4.5rem);
+  }
+
+  .ws-group header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .ws-group h3 {
+    font-size: 1.4rem;
+  }
+
+  .ws-group header p {
+    margin-top: 0.3rem;
+  }
+
+  @media (min-width: 40em) {
+    .ws-groups > :first-child .check-list {
+      columns: 2;
+      column-gap: 2rem;
+    }
+  }
+
+  .ws-photos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .ws-photos :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    object-fit: cover;
+  }
+
+  .ws-request {
+    scroll-margin-top: var(--header-h, 4.5rem);
+  }
+
+  .ws-request-grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 64em) {
+    .ws-request-grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    .ws-request-intro {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1.5rem);
+    }
+  }
+
+  .ws-request-intro h2 {
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .ws-notes {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+    list-style: none;
+  }
+
+  .ws-notes li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .ws-notes :global(.icon) {
+    flex: none;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: 0.15rem;
+    color: var(--brand-ink);
+  }
+</style>

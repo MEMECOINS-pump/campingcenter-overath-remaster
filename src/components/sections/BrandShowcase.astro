@@ -1,0 +1,119 @@
+---
+import { Image } from 'astro:assets';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { brands } from '@/data/brands';
+import { vehicles } from '@/lib/vehicles';
+import { url } from '@/lib/url';
+
+interface Props {
+  showHeader?: boolean;
+}
+const { showHeader = true } = Astro.props;
+const count = (make?: string) => (make ? vehicles.filter((v) => v.make === make).length : 0);
+---
+
+<section class="section brands" aria-labelledby="brands-title">
+  <div class="container">
+    {
+      showHeader && (
+        <div class="section-head-row">
+          <SectionHeader
+            id="brands-title"
+            eyebrow="Vertragshändler"
+            title="Starke Marken. Persönliche Beratung."
+            lead="Als Vertragshändler von EURA MOBIL, CHALLENGER, KNAUS, LA STRADA und PANAMA beraten wir dich herstellerübergreifend – und zeigen dir, welches Modell wirklich zu dir passt."
+          />
+          <a class="btn btn-ghost" href={url('/marken/')}>
+            Alle Marken <Icon name="arrow-right" class="arrow" />
+          </a>
+        </div>
+      )
+    }
+    <ul class="brand-grid" role="list">
+      {
+        brands.map((b) => {
+          const n = count(b.inventoryMake);
+          return (
+            <li class="brand">
+              <a href={url(`/marken/#${b.id}`)} class="brand-link">
+                <Image
+                  src={b.logo}
+                  alt={b.name}
+                  widths={[160, 320]}
+                  sizes="10rem"
+                  class:list={['brand-logo', { 'brand-logo-square': b.logo.width / b.logo.height < 1.6 }]}
+                  loading="lazy"
+                />
+                <span class="brand-meta">{b.internalHref ? 'Eigene Themenseite' : n > 0 ? `${n} im Bestand` : 'Mehr zur Marke'}</span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .brand-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+  }
+
+  .brand-link {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 0.9rem;
+    height: 100%;
+    min-height: 8.5rem;
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    text-decoration: none;
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .brand-link:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow);
+  }
+
+  .brand-logo {
+    width: auto;
+    max-width: min(100%, 9.5rem);
+    height: 2.5rem;
+    object-fit: contain;
+  }
+
+  .brand-logo-square {
+    height: 3.75rem;
+  }
+
+  .brand-meta {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .brand:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 48em) {
+    .brand-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .brand:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
+  }
+</style>

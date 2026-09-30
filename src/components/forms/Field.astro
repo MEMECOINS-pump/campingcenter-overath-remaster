@@ -1,0 +1,84 @@
+---
+interface Option {
+  value: string;
+  label: string;
+}
+interface Props {
+  name: string;
+  label: string;
+  id?: string;
+  type?: 'text' | 'email' | 'tel' | 'number' | 'date' | 'textarea' | 'select';
+  required?: boolean;
+  autocomplete?: string;
+  inputmode?: 'text' | 'numeric' | 'tel' | 'email' | 'decimal';
+  placeholder?: string;
+  hint?: string;
+  value?: string;
+  options?: Option[];
+  rows?: number;
+  minlength?: number;
+  maxlength?: number;
+  min?: string | number;
+  max?: string | number;
+  pattern?: string;
+  list?: string;
+  prefill?: string;
+  error?: string;
+  class?: string;
+}
+
+const {
+  name,
+  label,
+  id = `f-${name}-${Math.random().toString(36).slice(2, 7)}`,
+  type = 'text',
+  required = false,
+  hint,
+  options = [],
+  rows = 5,
+  value,
+  prefill,
+  error,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const hintId = hint ? `${id}-hint` : undefined;
+const errId = `${id}-err`;
+const describedby = [hintId, errId].filter(Boolean).join(' ');
+const common = {
+  id,
+  name,
+  required,
+  'aria-describedby': describedby,
+  'data-prefill': prefill,
+  'data-error': error,
+};
+---
+
+<div class:list={['field', className]}>
+  <label class="label" for={id}>
+    {label}
+    {!required && <span class="opt"> (optional)</span>}
+  </label>
+  {
+    type === 'textarea' ? (
+      <textarea class="textarea" rows={rows} {...common} {...rest} set:text={value ?? ''} />
+    ) : type === 'select' ? (
+      <select class="select" {...common}>
+        <option value="" selected={!value}>
+          Bitte wählen
+        </option>
+        {options.map((o) => (
+          <option value={o.value} selected={o.value === value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    ) : (
+      <input class="input" type={type} value={value} {...common} {...rest} />
+    )
+  }
+  {hint && <p class="hint" id={hintId}>{hint}</p>}
+  <p class="field-error" id={errId} aria-live="polite"></p>
+</div>

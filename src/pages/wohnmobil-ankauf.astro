@@ -1,0 +1,654 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import PhotoUploader from '@/components/forms/PhotoUploader.astro';
+import FaqAccordion from '@/components/ui/FaqAccordion.astro';
+import { ankauf } from '@/data/content';
+import { company } from '@/data/company';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
+
+const crumbs = [{ label: 'Fahrzeug verkaufen', href: '/wohnmobil-ankauf/' }];
+
+const steps = ['Fahrzeugart', 'Hersteller & Modell', 'Fahrzeugdaten', 'Zustand', 'Ausstattung', 'Bilder & Preisvorstellung', 'Kontaktdaten'];
+
+const typeIcons: Record<string, 'truck' | 'sofa' | 'van' | 'drop'> = { Wohnmobil: 'truck', Wohnwagen: 'sofa', Van: 'van', Boot: 'drop' };
+const typeHints: Record<string, string> = {
+  Wohnmobil: 'Alkoven, Teil- oder Vollintegriert',
+  Wohnwagen: 'Caravan zum Anhängen',
+  Van: 'Kastenwagen oder Campingbus',
+  Boot: 'Motor- oder Segelboot',
+};
+const makes = ['EURA MOBIL', 'Challenger', 'Knaus', 'La Strada', 'Panama', 'Adria', 'Bürstner', 'Carado', 'Carthago', 'Chausson', 'Dethleffs', 'Fendt', 'Hobby', 'Hymer', 'LMC', 'Malibu', 'Pössl', 'Rapido', 'Sunlight', 'Tabbert', 'Weinsberg', 'Westfalia'];
+
+const faqs = [
+  {
+    q: 'Wie schnell bekomme ich ein Angebot?',
+    a: 'Innerhalb von 24 Stunden erhältst du ein unverbindliches Angebot – auf Basis von Marktwert, Zustand und Ausstattung.',
+  },
+  {
+    q: 'Muss ich mein Fahrzeug vorbeibringen?',
+    a: 'Nein. Kannst du nicht vorbeikommen, holen wir das Fahrzeug bei dir ab – deutschlandweit.',
+  },
+  {
+    q: 'Wer kümmert sich um Abmeldung und Papiere?',
+    a: 'Auf Wunsch übernehmen wir die Abmeldung und den gesamten Papierkram für dich.',
+  },
+  {
+    q: 'Welche Fahrzeuge kauft ihr an?',
+    a: `Wir kaufen ${ankauf.vehicleTypes.join(', ').replace(/, ([^,]*)$/, ' und $1')} an.`,
+  },
+  {
+    q: 'Ist die Anfrage verbindlich?',
+    a: 'Nein. Das Angebot ist unverbindlich – du entscheidest in Ruhe, ob du verkaufen möchtest.',
+  },
+];
+---
+
+<BaseLayout
+  title="Wohnmobil verkaufen – Ankauf in Overath"
+  description="Wohnmobil, Wohnwagen, Van oder Boot verkaufen: In 7 Schritten zum unverbindlichen Angebot innerhalb von 24 Stunden. Faire Bewertung, deutschlandweite Abholung, Abmeldung inklusive."
+  actionBar={false}
+  jsonLd={[
+    breadcrumbSchema(crumbs, Astro.site),
+    serviceSchema('Ankauf von Wohnmobilen, Wohnwagen, Vans und Booten', ankauf.promise, '/wohnmobil-ankauf/', Astro.site),
+  ]}
+>
+  <section class="page-hero section-dark ak-hero">
+    <div class="container ak-hero-grid">
+      <div>
+        <Breadcrumbs items={crumbs} tone="light" />
+        <p class="eyebrow">Fahrzeug verkaufen</p>
+        <h1>Einfach zum persönlichen Angebot.</h1>
+        <p class="lead">{ankauf.promise} Fair bewertet von Menschen, die selbst campen.</p>
+        <div class="btn-row">
+          <a class="btn btn-accent btn-lg" href="#bewertung" data-track="cta_click" data-track-location="ankauf_hero">
+            Fahrzeug bewerten <Icon name="arrow-right" class="arrow" />
+          </a>
+          <a class="btn btn-light btn-lg" href={company.phone.href} data-track="call_click" data-track-location="ankauf_hero">
+            <Icon name="phone" /> {company.phone.display}
+          </a>
+        </div>
+        <ul class="ak-points">
+          <li><Icon name="clock" /> Angebot in 24 h</li>
+          <li><Icon name="truck" /> Abholung deutschlandweit</li>
+          <li><Icon name="document" /> Abmeldung inklusive</li>
+        </ul>
+      </div>
+      <div class="ak-hero-media">
+        <Photo src="ankauf-couple" alt="Glückliches Paar mit Fahrzeugschlüssel vor einem Wohnmobil" sizes="(min-width: 64em) 40vw, 100vw" widths={[480, 800]} />
+      </div>
+    </div>
+  </section>
+
+  <section id="bewertung" class="section ak-wizard-section" aria-labelledby="wz-title">
+    <div class="container ak-layout">
+      <div class="ak-main">
+        <h2 id="wz-title" class="sr-only">Fahrzeug bewerten lassen</h2>
+
+        <form class="wz" data-form="ankauf" data-wizard data-subject="Ankauf-Anfrage über die Website">
+          <div class="wz-progress" aria-live="polite">
+            <p class="wz-count">
+              <strong>Schritt <span data-wz-current>1</span> von {steps.length}</strong>
+              <span class="wz-step-name" data-wz-name>{steps[0]}</span>
+            </p>
+            <div class="wz-bar" aria-hidden="true"><span data-wz-bar></span></div>
+          </div>
+
+          <!-- 01 Fahrzeugart -->
+          <fieldset class="wz-step" data-wz-step="0" data-wz-title={steps[0]} aria-labelledby="wz-h-0">
+            <legend id="wz-h-0" class="wz-title"><span>01</span> Was möchtest du verkaufen?</legend>
+            <div class="choice-grid wz-type-grid">
+              {
+                ankauf.vehicleTypes.map((t, i) => (
+                  <label class="choice wz-type">
+                    <input type="radio" name="fahrzeugart" value={t} required checked={i === 0} data-label="Fahrzeugart" data-error="Bitte wähle die Fahrzeugart." />
+                    <span class="choice-body">
+                      <Icon name={typeIcons[t] ?? 'truck'} />
+                      <strong>{t}</strong>
+                      <small>{typeHints[t]}</small>
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+            <p class="field-error" aria-live="polite"></p>
+          </fieldset>
+
+          <!-- 02 Hersteller & Modell -->
+          <fieldset class="wz-step" data-wz-step="1" data-wz-title={steps[1]} aria-labelledby="wz-h-1">
+            <legend id="wz-h-1" class="wz-title"><span>02</span> Hersteller & Modell</legend>
+            <Field name="hersteller" label="Hersteller" required autocomplete="off" list="ak-makes" placeholder="z. B. Knaus" />
+            <datalist id="ak-makes">
+              {makes.map((m) => <option value={m} />)}
+            </datalist>
+            <Field name="modell" label="Modell" required autocomplete="off" placeholder="z. B. Van TI 650 MEG" />
+            <Field name="ausfuehrung" label="Grundriss / Ausführung" hint="Zum Beispiel Einzelbetten, Hubbett oder Sondermodell" />
+          </fieldset>
+
+          <!-- 03 Fahrzeugdaten -->
+          <fieldset class="wz-step" data-wz-step="2" data-wz-title={steps[2]} aria-labelledby="wz-h-2">
+            <legend id="wz-h-2" class="wz-title"><span>03</span> Fahrzeugdaten</legend>
+            <div class="field-row">
+              <Field
+                name="erstzulassung"
+                label="Erstzulassung / Baujahr"
+                required
+                inputmode="numeric"
+                placeholder="MM/JJJJ"
+                pattern="(0?[1-9]|1[0-2])/(19|20)\d{2}|(19|20)\d{2}"
+                error="Bitte im Format MM/JJJJ oder JJJJ, z. B. 05/2019."
+              />
+              <div data-show-if="fahrzeugart:Wohnmobil|Van">
+                <Field name="kilometerstand" label="Kilometerstand" required inputmode="numeric" pattern="[\d.\s]{1,9}" placeholder="z. B. 45.000" error="Bitte nur Zahlen eingeben." />
+              </div>
+              <div data-show-if="fahrzeugart:Boot">
+                <Field name="betriebsstunden" label="Betriebsstunden" inputmode="numeric" pattern="[\d.\s]{1,7}" error="Bitte nur Zahlen eingeben." />
+              </div>
+            </div>
+            <div class="field-row">
+              <Field name="laenge" label="Länge in Metern" inputmode="decimal" placeholder="z. B. 6,99" />
+              <div data-show-if="fahrzeugart:Wohnmobil|Van|Wohnwagen">
+                <Field name="gesamtgewicht" label="Zul. Gesamtgewicht in kg" inputmode="numeric" placeholder="z. B. 3500" />
+              </div>
+            </div>
+            <div class="field-row" data-show-if="fahrzeugart:Wohnmobil|Van">
+              <Field
+                name="getriebe"
+                type="select"
+                label="Getriebe"
+                options={[
+                  { value: 'Schaltgetriebe', label: 'Schaltgetriebe' },
+                  { value: 'Automatik', label: 'Automatik' },
+                ]}
+              />
+              <Field name="leistung" label="Leistung in PS" inputmode="numeric" />
+            </div>
+          </fieldset>
+
+          <!-- 04 Zustand -->
+          <fieldset class="wz-step" data-wz-step="3" data-wz-title={steps[3]} aria-labelledby="wz-h-3">
+            <legend id="wz-h-3" class="wz-title"><span>04</span> Wie ist der Zustand?</legend>
+            <fieldset class="fieldset">
+              <legend class="label">Gesamtzustand</legend>
+              <div class="choice-grid">
+                {
+                  [
+                    ['Sehr gut', 'Kaum Gebrauchsspuren'],
+                    ['Gut', 'Normale Gebrauchsspuren'],
+                    ['Befriedigend', 'Deutliche Spuren, voll funktionsfähig'],
+                    ['Reparaturbedürftig', 'Mängel oder Schäden bekannt'],
+                  ].map(([t, d]) => (
+                    <label class="choice">
+                      <input type="radio" name="zustand" value={t} required data-error="Bitte schätze den Zustand ein." />
+                      <span class="choice-body">
+                        <strong>{t}</strong>
+                        <small>{d}</small>
+                      </span>
+                    </label>
+                  ))
+                }
+              </div>
+              <p class="field-error" aria-live="polite"></p>
+            </fieldset>
+            <div class="field-row">
+              <fieldset class="fieldset">
+                <legend class="label">Unfallfrei?</legend>
+                <div class="seg">
+                  {['Ja', 'Nein', 'Weiß nicht'].map((o) => (
+                    <label class="seg-opt">
+                      <input type="radio" name="unfallfrei" value={o} />
+                      <span>{o}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset class="fieldset" data-show-if="fahrzeugart:Wohnmobil|Van|Wohnwagen">
+                <legend class="label">Feuchtigkeitsschäden bekannt?</legend>
+                <div class="seg">
+                  {['Nein', 'Ja', 'Nicht geprüft'].map((o) => (
+                    <label class="seg-opt">
+                      <input type="radio" name="feuchtigkeit" value={o} />
+                      <span>{o}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+            <div class="field-row">
+              <Field name="hu" label="HU gültig bis" inputmode="numeric" placeholder="MM/JJJJ" />
+              <Field
+                name="scheckheft"
+                type="select"
+                label="Service-Nachweise"
+                options={[
+                  { value: 'Scheckheft vollständig', label: 'Scheckheft vollständig' },
+                  { value: 'Teilweise vorhanden', label: 'Teilweise vorhanden' },
+                  { value: 'Keine', label: 'Keine' },
+                ]}
+              />
+            </div>
+          </fieldset>
+
+          <!-- 05 Ausstattung -->
+          <fieldset class="wz-step" data-wz-step="4" data-wz-title={steps[4]} aria-labelledby="wz-h-4">
+            <legend id="wz-h-4" class="wz-title"><span>05</span> Welche Ausstattung ist an Bord?</legend>
+            <p class="hint wz-hint">Alles optional – jedes Extra hilft uns bei einer genauen Bewertung.</p>
+            <div class="choice-grid wz-acc-grid">
+              {
+                ankauf.accessories.map((a) => (
+                  <label class="choice">
+                    <input type="checkbox" name="ausstattung" value={a} data-label="Ausstattung" />
+                    <span class="choice-body">
+                      <strong>{a}</strong>
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+            <Field name="ausstattung_sonstiges" label="Weitere Ausstattung" placeholder="z. B. Rückfahrkamera, Wechselrichter, Hubstützen" />
+          </fieldset>
+
+          <!-- 06 Bilder & Preisvorstellung -->
+          <fieldset class="wz-step" data-wz-step="5" data-wz-title={steps[5]} aria-labelledby="wz-h-5">
+            <legend id="wz-h-5" class="wz-title"><span>06</span> Bilder & Preisvorstellung</legend>
+            <PhotoUploader label="Fotos deines Fahrzeugs" hint="Ideal: je ein Foto von außen (vorne, seitlich, hinten), vom Wohnraum und vom Tacho." max={8} />
+            <Field name="preisvorstellung" label="Deine Preisvorstellung in €" inputmode="numeric" placeholder="z. B. 45.000" pattern="[\d.\s]{1,9}" error="Bitte nur Zahlen eingeben." />
+            <Field name="anmerkungen" type="textarea" label="Anmerkungen" rows={3} placeholder="Was sollten wir noch wissen?" />
+          </fieldset>
+
+          <!-- 07 Kontaktdaten -->
+          <fieldset class="wz-step" data-wz-step="6" data-wz-title={steps[6]} aria-labelledby="wz-h-6">
+            <legend id="wz-h-6" class="wz-title"><span>07</span> Wie erreichen wir dich?</legend>
+            <Field name="name" label="Name" required autocomplete="name" />
+            <div class="field-row">
+              <Field name="email" type="email" label="E-Mail" required autocomplete="email" inputmode="email" />
+              <Field name="telefon" type="tel" label="Telefon" autocomplete="tel" inputmode="tel" />
+            </div>
+            <Field name="plz" label="PLZ und Ort des Fahrzeugs" autocomplete="postal-code" hint="Wichtig, falls wir das Fahrzeug abholen sollen" />
+            <fieldset class="fieldset">
+              <legend class="label">Bevorzugter Kontaktweg</legend>
+              <div class="seg">
+                {['E-Mail', 'Telefon'].map((o, i) => (
+                  <label class="seg-opt">
+                    <input type="radio" name="kontaktweg" value={o} checked={i === 0} />
+                    <span>{o}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <FormEnd submit={false} />
+          </fieldset>
+
+          <div class="wz-nav" data-wz-nav>
+            <button type="button" class="btn btn-ghost wz-back" data-wz-back>
+              <Icon name="arrow-left" /> <span>Zurück</span>
+            </button>
+            <button type="submit" class="btn btn-accent btn-lg wz-next">
+              <span data-submit-label>Weiter</span>
+              <Icon name="arrow-right" class="arrow" />
+            </button>
+          </div>
+        </form>
+
+        <FormSuccess title="Danke! Deine Ankauf-Anfrage ist da." text="Wir prüfen deine Angaben und melden uns innerhalb von 24 Stunden mit einem unverbindlichen Angebot." />
+      </div>
+
+      <aside class="ak-aside" aria-label="So funktioniert der Ankauf">
+        <ol class="ak-process">
+          {
+            ankauf.process.map((p, i) => (
+              <li>
+                <span class="ak-process-num">{i + 1}</span>
+                <div>
+                  <h3>{p.title}</h3>
+                  <p>{p.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="ak-help card card-pad">
+          <p><strong>Lieber persönlich?</strong></p>
+          <p class="muted small">Ruf uns an – wir nehmen die Daten gern telefonisch auf.</p>
+          <a class="link-arrow" href={company.phone.href} data-track="call_click" data-track-location="ankauf_aside">{company.phone.display} <Icon name="arrow-right" /></a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section-paper" aria-labelledby="ak-why">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Warum an uns verkaufen?</p>
+        <h2 id="ak-why">Fair, schnell und von Campern bewertet.</h2>
+      </div>
+      <ul class="grid grid-3" role="list">
+        {
+          ankauf.reasons.map((r) => (
+            <li class="card card-pad reveal">
+              <h3 class="ak-reason-title">{r.title}</h3>
+              <p class="muted">{r.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ak-faq">
+    <div class="container container-narrow">
+      <div class="section-head">
+        <p class="eyebrow">Häufige Fragen</p>
+        <h2 id="ak-faq">Gut zu wissen</h2>
+      </div>
+      <FaqAccordion items={faqs} />
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '@/scripts/forms';
+  import '@/scripts/wizard';
+</script>
+
+<style>
+  .ak-hero {
+    padding-bottom: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  }
+
+  .ak-hero-grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (min-width: 64em) {
+    .ak-hero-grid {
+      grid-template-columns: 1.15fr 1fr;
+      gap: 3.5rem;
+    }
+  }
+
+  .ak-hero-media {
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+  }
+
+  .ak-hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 40%;
+  }
+
+  @media (max-width: 47.99em) {
+    .ak-hero-media {
+      display: none;
+    }
+  }
+
+  .ak-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin-top: 1.75rem;
+    list-style: none;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .ak-points li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .ak-points :global(.icon) {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--brand);
+  }
+
+  .ak-wizard-section {
+    scroll-margin-top: var(--header-h, 4.5rem);
+  }
+
+  .ak-layout {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (min-width: 64em) {
+    .ak-layout {
+      grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 1fr);
+      align-items: start;
+    }
+
+    .ak-aside {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1.5rem);
+    }
+  }
+
+  /* ---------- wizard ---------- */
+  .wz {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .wz-progress {
+    position: sticky;
+    z-index: 4;
+    top: var(--header-h, 4.5rem);
+    display: grid;
+    gap: 0.5rem;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0.75rem var(--gutter);
+    background: rgb(from var(--ivory) r g b / 0.95);
+    backdrop-filter: blur(10px);
+  }
+
+  @media (min-width: 64em) {
+    .wz-progress {
+      position: static;
+      margin: 0;
+      padding: 0;
+      background: none;
+      backdrop-filter: none;
+    }
+  }
+
+  .wz-count {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    font-size: var(--fs-sm);
+  }
+
+  .wz-step-name {
+    color: var(--text-muted);
+  }
+
+  .wz-bar {
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--sand);
+  }
+
+  .wz-bar span {
+    display: block;
+    width: calc(100% / 7);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--brand);
+    transition: width 0.35s var(--ease-out);
+  }
+
+  .wz-step {
+    display: grid;
+    gap: 1.25rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    scroll-margin-top: calc(var(--header-h, 4.5rem) + 5rem);
+  }
+
+  :global(.js) .wz-step:not(.is-active) {
+    display: none;
+  }
+
+  .wz-title {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 0;
+    font-family: var(--font-head);
+    font-size: clamp(1.55rem, 1.25rem + 1.2vw, 2.15rem);
+    line-height: 1.15;
+  }
+
+  .wz-title span {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    font-weight: 750;
+    color: var(--brand-ink);
+  }
+
+  .wz-hint {
+    margin-top: -0.5rem;
+  }
+
+  .wz-type-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 48em) {
+    .wz-type-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .wz-type :global(.choice-body) {
+    align-items: flex-start;
+    min-height: 8.5rem;
+    padding: 1rem;
+    padding-top: 2.75rem;
+  }
+
+  .wz-type :global(.choice-body::before) {
+    top: 1rem;
+    left: auto;
+    right: 1rem;
+    margin-top: 0;
+  }
+
+  .wz-type :global(.choice-body .icon) {
+    position: absolute;
+    top: 0.9rem;
+    left: 1rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    color: var(--brand-ink);
+  }
+
+  .wz-acc-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+  }
+
+  .wz-acc-grid :global(.choice-body) {
+    min-height: 3.5rem;
+  }
+
+  .wz-nav {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .wz-next {
+    margin-left: auto;
+  }
+
+  @media (max-width: 63.99em) {
+    .wz-nav {
+      position: sticky;
+      z-index: 6;
+      bottom: 0;
+      margin-inline: calc(var(--gutter) * -1);
+      padding: 0.75rem var(--gutter) calc(0.75rem + env(safe-area-inset-bottom, 0px));
+      background: rgb(255 255 255 / 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -8px 24px rgb(12 14 16 / 0.06);
+    }
+
+    .wz-next {
+      flex: 1;
+    }
+
+    :global(body.kb-open) .wz-nav {
+      position: static;
+      box-shadow: none;
+    }
+  }
+
+  .wz-back[hidden] {
+    display: none;
+  }
+
+  /* ---------- aside ---------- */
+  .ak-process {
+    display: grid;
+    gap: 1.25rem;
+    list-style: none;
+  }
+
+  .ak-process li {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .ak-process h3 {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .ak-process p {
+    margin-top: 0.2rem;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  .ak-process-num {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--graphite);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .ak-help {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 1.75rem;
+  }
+
+  .ak-reason-title {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+</style>

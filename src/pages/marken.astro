@@ -1,0 +1,207 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { brands, partners } from '@/data/brands';
+import { vehicles } from '@/lib/vehicles';
+import { url } from '@/lib/url';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const crumbs = [{ label: 'Marken', href: '/marken/' }];
+const inStock = (make?: string) => (make ? vehicles.filter((v) => v.make === make).length : 0);
+---
+
+<BaseLayout
+  title="Unsere Marken – Vertragshändler für EURA MOBIL, CHALLENGER, KNAUS, LA STRADA und PANAMA"
+  description="Das Campingcenter Overath ist Vertragshändler für EURA MOBIL, CHALLENGER, KNAUS, LA STRADA und PANAMA – mit herstellerübergreifender, persönlicher Beratung."
+  overlayHeader
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Vertragshändler"
+    title="Starke Marken. Persönliche Beratung."
+    lead="Wir beraten dich herstellerübergreifend – und zeigen dir ehrlich, welches Modell wirklich zu dir passt."
+    image="challenger-bridge"
+    imageAlt="Challenger Wohnmobil auf einer Brücke"
+  />
+
+  <section class="section" aria-labelledby="mk-brands">
+    <div class="container">
+      <h2 id="mk-brands" class="sr-only">Unsere Marken</h2>
+      <ul class="mk-list" role="list">
+        {
+          brands.map((b) => {
+            const n = inStock(b.inventoryMake);
+            return (
+              <li id={b.id} class="mk-brand card reveal">
+                <div class="mk-logo">
+                  <Image src={b.logo} alt="" widths={[200, 400]} sizes="12rem" loading="lazy" />
+                </div>
+                <div class="mk-body">
+                  <h3>{b.name}</h3>
+                  <p class="muted">{b.summary}</p>
+                  <div class="btn-row">
+                    {b.internalHref ? (
+                      <a class="btn btn-accent btn-sm" href={url(b.internalHref)}>
+                        Zur {b.name}-Seite <Icon name="arrow-right" class="arrow" />
+                      </a>
+                    ) : n > 0 ? (
+                      <a class="btn btn-accent btn-sm" href={url(`/wohnmobile/?marke=${encodeURIComponent(b.inventoryMake ?? '')}`)}>
+                        {n} {n === 1 ? 'Fahrzeug' : 'Fahrzeuge'} im Bestand <Icon name="arrow-right" class="arrow" />
+                      </a>
+                    ) : (
+                      <a class="btn btn-accent btn-sm" href={url(`/kontakt/?fahrzeug=${encodeURIComponent(b.name)}#beratung`)}>
+                        Beratung anfragen
+                      </a>
+                    )}
+                    <a class="btn btn-ghost btn-sm" href={b.website} target="_blank" rel="noopener">
+                      Herstellerseite <Icon name="external" />
+                      <span class="sr-only"> (öffnet in neuem Tab)</span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section-sand" aria-labelledby="mk-why">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Warum mehrere Marken?</p>
+        <h2 id="mk-why">Du bekommst Beratung – keine Verkaufsshow.</h2>
+      </div>
+      <ul class="check-list mk-why">
+        <li>Wir vergleichen Grundrisse und Konzepte verschiedener Hersteller für dich.</li>
+        <li>Neu oder gebraucht: Du siehst unseren gesamten Bestand an einem Ort.</li>
+        <li>Unsere Fachwerkstatt betreut dein Fahrzeug auch nach dem Kauf.</li>
+        <li>Dein bisheriges Fahrzeug nehmen wir gern in Zahlung.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="mk-partners">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Zubehör & Service</p>
+        <h2 id="mk-partners">Unsere Partner</h2>
+      </div>
+      <ul class="mk-partners" role="list">
+        {
+          partners.map((p) => (
+            <li>
+              <a href={p.website} target="_blank" rel="noopener">
+                <Image src={p.logo} alt={p.name} widths={[160, 320]} sizes="10rem" loading="lazy" />
+                <span class="sr-only"> (öffnet in neuem Tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  h2 {
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .mk-list {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+  }
+
+  @media (min-width: 60em) {
+    .mk-list {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+  }
+
+  .mk-brand {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    scroll-margin-top: calc(var(--header-h, 4.5rem) + 1rem);
+  }
+
+  .mk-brand:target {
+    outline: 3px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 36em) {
+    .mk-brand {
+      grid-template-columns: 11rem 1fr;
+      align-items: center;
+    }
+  }
+
+  .mk-logo {
+    display: grid;
+    place-items: center;
+    height: 7rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    background: var(--paper);
+  }
+
+  .mk-logo :global(img) {
+    width: auto;
+    max-width: 100%;
+    max-height: 3.5rem;
+    object-fit: contain;
+  }
+
+  .mk-body h3 {
+    font-size: 1.35rem;
+  }
+
+  .mk-body p {
+    margin: 0.35rem 0 1rem;
+  }
+
+  .mk-why li + li {
+    margin-top: 0.4rem;
+  }
+
+  .mk-partners {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    list-style: none;
+  }
+
+  @media (min-width: 48em) {
+    .mk-partners {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .mk-partners a {
+    display: grid;
+    place-items: center;
+    min-height: 7rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+  }
+
+  .mk-partners :global(img) {
+    width: auto;
+    max-width: 100%;
+    height: 3rem;
+    object-fit: contain;
+  }
+</style>

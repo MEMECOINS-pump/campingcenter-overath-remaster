@@ -1,0 +1,179 @@
+---
+import Icon, { type IconName } from '@/components/ui/Icon.astro';
+import { url } from '@/lib/url';
+
+const actions: { title: string; text: string; cta: string; href: string; icon: IconName }[] = [
+  { title: 'Wohnmobil kaufen', text: 'Finde dein nächstes Zuhause auf Rädern.', cta: 'Fahrzeuge entdecken', href: '/wohnmobile/', icon: 'van' },
+  { title: 'Fahrzeug verkaufen', text: 'Einfach zum persönlichen Angebot.', cta: 'Fahrzeug bewerten', href: '/wohnmobil-ankauf/', icon: 'tag' },
+  { title: 'Wohnmobil mieten', text: 'Freiheit erleben, wann du willst.', cta: 'Mietmöglichkeiten entdecken', href: '/vermietung-wohnmobile/', icon: 'key' },
+  { title: 'Werkstatt & Service', text: 'Professioneller Service für deinen Camper.', cta: 'Werkstatt entdecken', href: '/werkstatt-kundendienst/', icon: 'wrench' },
+];
+---
+
+<section class="quick" aria-labelledby="quick-title">
+  <div class="container">
+    <h2 id="quick-title" class="sr-only">Was möchtest du tun?</h2>
+    <ul class="quick-grid">
+      {
+        actions.map((a) => (
+          <li class="quick-card">
+            <span class="quick-icon">
+              <Icon name={a.icon} />
+            </span>
+            <h3>
+              <a href={url(a.href)} data-track="cta_click" data-track-location="quick-actions">
+                {a.title}
+              </a>
+            </h3>
+            <p>{a.text}</p>
+            <span class="quick-cta" aria-hidden="true">
+              {a.cta} <Icon name="arrow-right" />
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .quick {
+    position: relative;
+    z-index: 2;
+    padding-top: 1.25rem;
+  }
+
+  .quick-grid {
+    display: grid;
+    gap: 0.75rem;
+    list-style: none;
+  }
+
+  .quick-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'icon title arrow'
+      'icon text arrow';
+    align-items: center;
+    column-gap: 1rem;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .quick-icon {
+    grid-area: icon;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .quick-card h3 {
+    grid-area: title;
+    font-size: 1.2rem;
+  }
+
+  .quick-card h3 a {
+    text-decoration: none;
+  }
+
+  .quick-card h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .quick-card p {
+    grid-area: text;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  .quick-cta {
+    grid-area: arrow;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0;
+    font-weight: 650;
+    color: var(--graphite);
+  }
+
+  .quick-cta :global(.icon) {
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .quick-card:hover .quick-cta :global(.icon) {
+    transform: translateX(4px);
+  }
+
+  @media (hover: hover) {
+    .quick-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+  }
+
+  .quick-card:has(a:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .quick-card a:focus-visible {
+    outline: none;
+  }
+
+  @media (min-width: 48em) {
+    .quick {
+      margin-top: -4.5rem;
+      padding-top: 0;
+    }
+
+    .quick-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  @media (min-width: 64em) {
+    .quick-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .quick-card {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'icon'
+        'title'
+        'text'
+        'arrow';
+      align-items: start;
+      row-gap: 0.5rem;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .quick-icon {
+      margin-bottom: 0.5rem;
+    }
+
+    .quick-cta {
+      margin-top: 0.75rem;
+      font-size: var(--fs-sm);
+    }
+  }
+</style>

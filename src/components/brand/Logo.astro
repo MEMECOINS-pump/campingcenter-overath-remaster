@@ -1,0 +1,95 @@
+---
+/**
+ * CCO emblem as vector (geometry traced from the original logo, brand orange #D08115)
+ * plus live wordmark text, so it stays crisp and works on light and dark backgrounds.
+ */
+interface Props {
+  tone?: 'dark' | 'light';
+  withClaim?: boolean;
+  class?: string;
+}
+const { tone = 'dark', withClaim = true, class: className } = Astro.props;
+const clipId = `cco-disc-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<span class:list={['logo', `logo-${tone}`, className]}>
+  <svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+    <defs>
+      <clipPath id={clipId}><circle cx="50" cy="50" r="50"></circle></clipPath>
+    </defs>
+    <circle cx="50" cy="50" r="50" fill="#D08115"></circle>
+    <g clip-path={`url(#${clipId})`} fill="#fff">
+      <path d="M3.4 120 47.5 23 98.9 120H87.4L47.5 47 16.1 120Z"></path>
+      <circle cx="78" cy="30" r="8.5"></circle>
+    </g>
+  </svg>
+  <span class="logo-text">
+    <span class="logo-name">Campingcenter Overath</span>
+    {withClaim && <span class="logo-claim">Wir pflegen die Kultur des Campings</span>}
+  </span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    line-height: 1;
+  }
+
+  .logo-mark {
+    width: 2.6rem;
+    height: 2.6rem;
+    flex: none;
+  }
+
+  .logo-text {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  .logo-name {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1.06rem;
+    letter-spacing: -0.01em;
+    color: var(--graphite);
+    white-space: nowrap;
+  }
+
+  .logo-claim {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #676c6d;
+    white-space: nowrap;
+  }
+
+  .logo-light .logo-name {
+    color: #fff;
+  }
+
+  .logo-light .logo-claim {
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  @media (max-width: 22.49em) {
+    .logo-claim {
+      display: none;
+    }
+
+    .logo {
+      gap: 0.5rem;
+    }
+
+    .logo-mark {
+      width: 2.3rem;
+      height: 2.3rem;
+    }
+
+    .logo-name {
+      font-size: 0.98rem;
+      white-space: normal;
+      line-height: 1.1;
+    }
+  }
+</style>

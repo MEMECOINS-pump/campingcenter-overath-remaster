@@ -1,0 +1,150 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import Journey from '@/components/sections/Journey.astro';
+import YouTubeLite from '@/components/embeds/YouTubeLite.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import { story, videos } from '@/data/content';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
+---
+
+<BaseLayout
+  title="Über uns – Von Campern für Camper"
+  description="Das Campingcenter Overath in der Weberstraße: ein erfahrenes Verkaufs- und Werkstatt-Team aus begeisterten Campern, das sich der Kultur des Campings verpflichtet hat."
+  overlayHeader
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Über uns"
+    title="Von Campern für Camper."
+    lead={story.lead}
+    image="team-wide"
+    imageAlt="Das Team des Campingcenter Overath"
+    focus="top"
+  />
+
+  <section class="section" aria-labelledby="ab-story">
+    <div class="container split ab-story">
+      <div class="ab-intro">
+        <p class="eyebrow">Unsere Geschichte</p>
+        <h2 id="ab-story">Camping ist bei uns keine Branche, sondern Leidenschaft.</h2>
+        <p class="ab-stat">
+          <strong>{company.foundedStatement}</strong>
+          <span>Camping-Kompetenz in der Weberstraße</span>
+        </p>
+      </div>
+      <div class="ab-body">
+        {story.body.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="ab-wide" aria-hidden="true">
+    <Photo src="panorama-yard" alt="" sizes="100vw" widths={[640, 1024, 1600, 2200]} />
+  </section>
+
+  <Journey />
+
+  <section class="section" aria-labelledby="ab-videos">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Filme</p>
+        <h2 id="ab-videos">Lern uns kennen</h2>
+        <p class="lead">Wie wir arbeiten – und wohin die Reise mit dem Wohnmobil führen kann.</p>
+      </div>
+      <div class="grid grid-2 ab-video-grid">
+        <YouTubeLite id={videos.culture.id} title={videos.culture.title} />
+        <YouTubeLite id={videos.australia.id} title={videos.australia.title} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark" aria-labelledby="ab-jobs">
+    <div class="container split">
+      <div class="ab-jobs-photo">
+        <Photo src="team" alt="Mitarbeitende des Campingcenter Overath" sizes="(min-width: 60em) 45vw, 92vw" widths={[480, 768, 1080]} />
+      </div>
+      <div>
+        <p class="eyebrow">Karriere</p>
+        <h2 id="ab-jobs">Werde Teil des Teams.</h2>
+        <p class="lead">Du teilst unsere Begeisterung fürs Camping? Schau dir unsere offenen Stellen an.</p>
+        <a class="btn btn-accent btn-lg" href={url('/jobs/')}>
+          Offene Stellen <Icon name="arrow-right" class="arrow" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <ContactSection />
+</BaseLayout>
+
+<style>
+  h2 {
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .ab-story {
+    align-items: start;
+  }
+
+  .ab-stat {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: 1.75rem;
+    padding-left: 1.1rem;
+    border-left: 4px solid var(--brand);
+  }
+
+  .ab-stat strong {
+    font-family: var(--font-head);
+    font-size: var(--fs-2xl);
+    line-height: 1.1;
+  }
+
+  .ab-stat span {
+    color: var(--text-muted);
+  }
+
+  .ab-body {
+    display: grid;
+    gap: 1rem;
+    font-size: var(--fs-lg);
+    line-height: 1.65;
+  }
+
+  .ab-wide :global(img) {
+    width: 100%;
+    height: clamp(14rem, 40vw, 34rem);
+    object-fit: cover;
+  }
+
+  .ab-video-grid {
+    align-items: start;
+  }
+
+  .ab-jobs-photo {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .ab-jobs-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .section-dark h2 {
+    color: #fff;
+  }
+
+  .section-dark .lead {
+    margin-bottom: 1.5rem;
+  }
+</style>

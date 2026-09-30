@@ -1,0 +1,228 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import { company, directionsText } from '@/data/company';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const crumbs = [{ label: 'Kontakt', href: '/kontakt/' }];
+const topics = ['Beratungstermin', 'Fahrzeuganfrage', 'Werkstatt', 'Vermietung', 'Ankauf', 'Sonstiges'];
+const today = new Date().toISOString().slice(0, 10);
+---
+
+<BaseLayout
+  title="Kontakt & Anfahrt"
+  description="So erreichst du das Campingcenter Overath: Weberstraße 12, 51491 Overath. Telefon 02206 95131-0, E-Mail service@ccoverath.de – mit Öffnungszeiten, Anfahrt und Kontaktformular."
+  overlayHeader
+  inquiryHref="#formular"
+  inquiryLabel="Nachricht"
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Kontakt"
+    title="Wir sind für dich da."
+    lead="Ruf an, schreib uns oder komm vorbei – in der Weberstraße in Overath beraten wir dich persönlich."
+    image="sales-advisor"
+    imageAlt="Berater des Campingcenter Overath im Gespräch"
+  >
+    <a class="btn btn-accent btn-lg" href={company.phone.href} data-track="call_click" data-track-location="contact_hero">
+      <Icon name="phone" /> Anrufen
+    </a>
+    <a class="btn btn-glass btn-lg" href="#beratung">Beratung vereinbaren</a>
+  </PageHero>
+
+  <ContactSection title="Besuch uns in Overath." eyebrow="Adresse & Öffnungszeiten" />
+
+  <section id="beratung" class="section ct-form-section" aria-labelledby="ct-form-title">
+    <div class="container ct-grid">
+      <div class="ct-intro">
+        <p class="eyebrow">Nachricht & Beratung</p>
+        <h2 id="ct-form-title">Beratung vereinbaren oder Frage stellen</h2>
+        <p class="lead">Schreib uns, worum es geht. Für einen Beratungstermin nenn uns gern deinen Wunschtermin – wir bestätigen ihn persönlich.</p>
+        <ul class="ct-notes">
+          <li><Icon name="clock" /> Wir antworten in der Regel innerhalb der Öffnungszeiten.</li>
+          <li><Icon name="calendar" /> Termine stimmen wir immer persönlich mit dir ab.</li>
+          <li><Icon name="mail" /> Lieber direkt? <a href={`mailto:${company.email}`}>{company.email}</a></li>
+        </ul>
+      </div>
+
+      <div id="formular" class="card card-pad ct-card">
+        <form class="form-stack" data-form="contact" data-subject="Kontaktanfrage über die Website">
+          <fieldset class="fieldset">
+            <legend class="label">Dein Anliegen</legend>
+            <div class="seg">
+              {
+                topics.map((t, i) => (
+                  <label class="seg-opt">
+                    <input type="radio" name="anliegen" value={t} checked={i === 0} data-label="Anliegen" data-topic={t} />
+                    <span>{t}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+          <Field name="fahrzeug" label="Fahrzeug / Modell" prefill="fahrzeug" placeholder="z. B. Knaus Van TI 640 MEG" />
+          <div class="field-row" data-show-if="anliegen:Beratungstermin">
+            <Field name="wunschtermin" type="date" label="Wunschtermin" min={today} />
+            <Field
+              name="tageszeit"
+              type="select"
+              label="Tageszeit"
+              options={[
+                { value: 'Vormittags', label: 'Vormittags' },
+                { value: 'Nachmittags', label: 'Nachmittags' },
+                { value: 'Egal', label: 'Egal' },
+              ]}
+            />
+          </div>
+          <Field name="nachricht" type="textarea" label="Nachricht" required rows={5} minlength={10} placeholder="Wie können wir dir helfen?" />
+          <Field name="name" label="Name" required autocomplete="name" />
+          <div class="field-row">
+            <Field name="email" type="email" label="E-Mail" required autocomplete="email" inputmode="email" />
+            <Field name="telefon" type="tel" label="Telefon" autocomplete="tel" inputmode="tel" />
+          </div>
+          <fieldset class="fieldset">
+            <legend class="label">Wie sollen wir uns melden?</legend>
+            <div class="seg">
+              {
+                ['E-Mail', 'Telefon'].map((o, i) => (
+                  <label class="seg-opt">
+                    <input type="radio" name="kontaktweg" value={o} checked={i === 0} data-label="Bevorzugter Kontaktweg" />
+                    <span>{o}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+          <FormEnd submitLabel="Nachricht senden" />
+        </form>
+        <FormSuccess />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-paper" aria-labelledby="ct-route">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Anfahrt</p>
+        <h2 id="ct-route">So findest du zu uns</h2>
+      </div>
+      <div class="grid grid-2">
+        {
+          directionsText.map((d) => (
+            <div class="card card-pad">
+              <h3 class="ct-route-title">
+                <Icon name="route" /> {d.from}
+              </h3>
+              <ol class="ct-steps">
+                {d.steps.map((s) => (
+                  <li>{s}</li>
+                ))}
+              </ol>
+            </div>
+          ))
+        }
+      </div>
+      <div class="btn-row ct-route-actions">
+        <a class="btn btn-accent" href={company.directions} target="_blank" rel="noopener" data-track="route_click" data-track-location="contact_directions">
+          <Icon name="route" /> Route planen<span class="sr-only"> (Google Maps, öffnet in neuem Tab)</span>
+        </a>
+        <span class="muted small">Fax: {company.fax.display}</span>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '@/scripts/forms';
+
+  const params = new URLSearchParams(location.search);
+  if (location.hash !== '#beratung' && params.has('fahrzeug')) {
+    const radio = document.querySelector<HTMLInputElement>('input[data-topic="Fahrzeuganfrage"]');
+    if (radio) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+</script>
+
+<style>
+  h2 {
+    margin: 0.5rem 0 0.75rem;
+  }
+
+  .ct-form-section {
+    scroll-margin-top: var(--header-h, 4.5rem);
+  }
+
+  .ct-grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 64em) {
+    .ct-grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    .ct-intro {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1.5rem);
+    }
+  }
+
+  .ct-card {
+    scroll-margin-top: calc(var(--header-h, 4.5rem) + 1rem);
+  }
+
+  .ct-notes {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    list-style: none;
+  }
+
+  .ct-notes li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .ct-notes :global(.icon) {
+    flex: none;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: 0.15rem;
+    color: var(--brand-ink);
+  }
+
+  .ct-route-title {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .ct-route-title :global(.icon) {
+    color: var(--brand-ink);
+  }
+
+  .ct-steps {
+    display: grid;
+    gap: 0.5rem;
+    padding-left: 1.25rem;
+  }
+
+  .ct-route-actions {
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+</style>

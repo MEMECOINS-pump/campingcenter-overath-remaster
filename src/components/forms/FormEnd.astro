@@ -1,0 +1,86 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/url';
+
+interface Props {
+  submitLabel?: string;
+  /** Wizards render their own submit button in the step navigation. */
+  submit?: boolean;
+}
+const { submitLabel = 'Anfrage senden', submit = true } = Astro.props;
+const id = `c-${Math.random().toString(36).slice(2, 7)}`;
+const presentation = !import.meta.env.PUBLIC_FORM_ENDPOINT;
+---
+
+<div class="hp-field" aria-hidden="true">
+  <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+</div>
+
+<div class="consent-field">
+  <label class="consent" for={id}>
+    <input type="checkbox" id={id} name="datenschutz" required aria-describedby={`${id}-err`} />
+    <span>
+      Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verwendet werden. Mehr dazu in der{' '}
+      <a href={url('/datenschutz/')}>Datenschutzerklärung</a>.
+    </span>
+  </label>
+  <p class="field-error" id={`${id}-err`} aria-live="polite"></p>
+</div>
+
+<div class="form-status" data-form-status role="alert" hidden></div>
+
+<div class="form-submit">
+  {
+    submit && (
+      <button type="submit" class="btn btn-accent btn-lg">
+        <span data-submit-label>{submitLabel}</span>
+        <Icon name="arrow-right" class="arrow" />
+      </button>
+    )
+  }
+  {
+    presentation && (
+      <p class="hint form-mode-note">
+        <Icon name="info" /> Präsentationsmodus: Wir bereiten deine Anfrage als E-Mail vor – es wird nichts automatisch übertragen.
+      </p>
+    )
+  }
+</div>
+
+<style>
+  .consent-field {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .consent-field[data-invalid] .consent input {
+    outline: 2px solid var(--danger);
+    outline-offset: 2px;
+  }
+
+  .form-submit {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+
+  .form-mode-note {
+    display: flex;
+    gap: 0.4rem;
+    align-items: flex-start;
+    max-width: 36rem;
+  }
+
+  .form-mode-note :global(.icon) {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.1rem;
+  }
+
+  @media (max-width: 39.99em) {
+    .form-submit :global(.btn) {
+      width: 100%;
+    }
+  }
+</style>

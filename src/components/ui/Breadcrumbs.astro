@@ -1,0 +1,80 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/url';
+
+export interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  items: Crumb[];
+  tone?: 'dark' | 'light';
+}
+const { items, tone = 'dark' } = Astro.props;
+const all: Crumb[] = [{ label: 'Start', href: '/' }, ...items];
+---
+
+<nav class:list={['crumbs', `crumbs-${tone}`]} aria-label="Brotkrumen">
+  <ol>
+    {
+      all.map((c, i) => (
+        <li>
+          {i > 0 && <Icon name="chevron-right" class="crumb-sep" />}
+          {c.href && i < all.length - 1 ? <a href={url(c.href)}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem 0.3rem;
+    list-style: none;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  .crumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    text-decoration: underline;
+    color: var(--text);
+  }
+
+  .crumbs [aria-current] {
+    color: var(--text);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60vw;
+  }
+
+  .crumb-sep {
+    width: 0.9rem;
+    height: 0.9rem;
+    opacity: 0.6;
+  }
+
+  .crumbs-light ol,
+  .crumbs-light a:hover,
+  .crumbs-light [aria-current] {
+    color: rgb(255 255 255 / 0.88);
+  }
+</style>

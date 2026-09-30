@@ -1,0 +1,123 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/url';
+
+interface Props {
+  id: string;
+  title: string;
+  class?: string;
+}
+const { id, title, class: className } = Astro.props;
+---
+
+<figure class:list={['yt', className]} data-yt={id} data-yt-title={title}>
+  <div class="yt-frame">
+    <Photo src={`yt-${id}`} alt="" sizes="(min-width: 64em) 44rem, 100vw" widths={[480, 768, 1280]} class="yt-poster" />
+    <button type="button" class="yt-play" data-yt-play>
+      <span class="yt-play-icon"><Icon name="play" /></span>
+      <span class="yt-play-label">Video abspielen<span class="sr-only">: {title}</span></span>
+    </button>
+  </div>
+  <figcaption class="yt-note">
+    Beim Abspielen wird eine Verbindung zu YouTube (Google) hergestellt.{" "}
+    <a href={url('/datenschutz/#externe-medien')}>Mehr erfahren</a>
+  </figcaption>
+</figure>
+
+<style>
+  .yt {
+    margin: 0;
+  }
+
+  .yt-frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--graphite);
+  }
+
+  .yt-frame :global(img),
+  .yt-frame :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
+  }
+
+  .yt-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: 0;
+    background: linear-gradient(to top, rgb(12 14 16 / 0.55), rgb(12 14 16 / 0.1));
+    color: #fff;
+    font-weight: 650;
+  }
+
+  .yt-play-icon {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--brand);
+    color: var(--graphite);
+    box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.5);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .yt-play-icon :global(.icon) {
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-left: 0.2rem;
+    fill: currentColor;
+  }
+
+  .yt-play:hover .yt-play-icon {
+    transform: scale(1.06);
+  }
+
+  .yt-play-label {
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-pill);
+    background: rgb(12 14 16 / 0.55);
+  }
+
+  .yt-note {
+    margin-top: 0.6rem;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  .yt.is-playing .yt-note {
+    visibility: hidden;
+  }
+</style>
+
+<script>
+  import { track } from '@/lib/analytics';
+
+  document.querySelectorAll<HTMLElement>('[data-yt]').forEach((el) => {
+    el.querySelector('[data-yt-play]')?.addEventListener('click', () => {
+      const id = el.dataset.yt ?? '';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&modestbranding=1`;
+      iframe.title = el.dataset.ytTitle ?? 'YouTube-Video';
+      iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.loading = 'lazy';
+      const frame = el.querySelector('.yt-frame');
+      frame?.replaceChildren(iframe);
+      el.classList.add('is-playing');
+      iframe.focus();
+      track('video_play', { video_id: id });
+    });
+  });
+</script>

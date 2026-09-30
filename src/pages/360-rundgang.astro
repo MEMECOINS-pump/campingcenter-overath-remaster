@@ -1,0 +1,246 @@
+---
+import 'pannellum/build/pannellum.css';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { tourScenes } from '@/data/tour';
+import { url } from '@/lib/url';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const crumbs = [{ label: '360° Rundgang', href: '/360-rundgang/' }];
+const scenes = tourScenes.map((s) => ({ id: s.id, title: s.title, src: url(`/${s.src}`) }));
+---
+
+<BaseLayout
+  title="360° Rundgang durch das Campingcenter Overath"
+  description="Schau dich virtuell bei uns um: 13 Stationen im 360° Rundgang durch Ausstellung und Gelände des Campingcenter Overath."
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <header class="page-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">Virtueller Rundgang</p>
+      <h1>Schau dich bei uns um.</h1>
+      <p class="lead">{tourScenes.length} Stationen rund um unser Gelände in Overath. Der Rundgang lädt erst, wenn du ihn startest.</p>
+    </div>
+  </header>
+
+  <section class="section-tight tour-section" aria-label="360° Rundgang">
+    <div class="container">
+      <div class="tour" data-tour data-scenes={JSON.stringify(scenes)}>
+        <div class="tour-stage">
+          <div class="tour-viewer" data-tour-viewer></div>
+          <div class="tour-poster" data-tour-poster>
+            <Photo src="tour-header" alt="" sizes="(min-width: 80rem) 76rem, 100vw" widths={[640, 1024, 1600]} priority />
+            <div class="tour-poster-inner">
+              <button type="button" class="btn btn-accent btn-lg" data-tour-start>
+                <Icon name="tour" /> 360° Rundgang starten
+              </button>
+              <p class="tour-hint">Ziehen oder wischen zum Umsehen · ca. 1 MB je Station</p>
+            </div>
+          </div>
+          <p class="tour-status" data-tour-status role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="tour-bar">
+          <p class="tour-count"><span data-tour-current>1</span> / {tourScenes.length}</p>
+          <div class="tour-nav">
+            <button type="button" class="icon-btn" data-tour-prev aria-label="Vorherige Station"><Icon name="chevron-left" /></button>
+            <button type="button" class="icon-btn" data-tour-next aria-label="Nächste Station"><Icon name="chevron-right" /></button>
+          </div>
+        </div>
+
+        <ul class="tour-thumbs" role="list" aria-label="Stationen">
+          {
+            tourScenes.map((s, i) => (
+              <li>
+                <button type="button" class="tour-thumb" data-tour-scene={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+                  <img src={url(`/${s.thumb}`)} alt="" width="160" height="80" loading="lazy" decoding="async" />
+                  <span>{s.title}</span>
+                </button>
+              </li>
+            ))
+          }
+        </ul>
+        <noscript>
+          <p class="tour-noscript">Für den 360° Rundgang wird JavaScript benötigt.</p>
+        </noscript>
+      </div>
+      <p class="small muted tour-note">
+        Tastatur: Pfeiltasten zum Umsehen, <kbd>+</kbd> / <kbd>−</kbd> zum Zoomen. Der Viewer basiert auf dem Open-Source-Projekt Pannellum und lädt keine Inhalte von Drittanbietern.
+      </p>
+    </div>
+  </section>
+
+  <CtaSection
+    title="Lieber in echt?"
+    text="Komm vorbei und sieh dir unsere Fahrzeuge vor Ort an – wir nehmen uns Zeit für dich."
+    primary={{ label: 'Anfahrt & Öffnungszeiten', href: '/kontakt/' }}
+    secondary={{ label: 'Fahrzeuge entdecken', href: '/wohnmobile/' }}
+  />
+</BaseLayout>
+
+<script>
+  import '@/scripts/tour';
+</script>
+
+<style>
+  .tour-section {
+    padding-top: 0;
+  }
+
+  .tour-stage {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: #1d1a17;
+    aspect-ratio: 4 / 5;
+    max-height: calc(100svh - var(--header-h, 4.5rem) - 7rem);
+    width: 100%;
+  }
+
+  @media (min-width: 40em) {
+    .tour-stage {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  .tour-viewer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .tour-poster {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+  }
+
+  .tour-poster[hidden] {
+    display: none;
+  }
+
+  .tour-poster :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.62);
+  }
+
+  .tour-poster-inner {
+    position: relative;
+    display: grid;
+    gap: 0.9rem;
+    justify-items: center;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .tour-hint {
+    font-size: var(--fs-sm);
+    color: rgb(255 255 255 / 0.88);
+  }
+
+  .tour-status:empty {
+    display: none;
+  }
+
+  .tour-status {
+    position: absolute;
+    left: 50%;
+    bottom: 1rem;
+    translate: -50% 0;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius-pill);
+    background: rgb(20 18 16 / 0.8);
+    color: #fff;
+    font-size: var(--fs-sm);
+  }
+
+  .tour-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.9rem;
+  }
+
+  .tour-count {
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tour-nav {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .tour-thumbs {
+    display: flex;
+    gap: 0.6rem;
+    overflow-x: auto;
+    margin-top: 0.75rem;
+    padding-bottom: 0.5rem;
+    list-style: none;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+  }
+
+  .tour-thumb {
+    display: grid;
+    gap: 0.35rem;
+    width: 9rem;
+    padding: 0.3rem;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    background: var(--white);
+    font-size: var(--fs-xs);
+    font-weight: 620;
+    text-align: left;
+    cursor: pointer;
+    scroll-snap-align: start;
+  }
+
+  .tour-thumb img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+    border-radius: calc(var(--radius) - 4px);
+    object-fit: cover;
+  }
+
+  .tour-thumb span {
+    padding: 0 0.2rem 0.2rem;
+  }
+
+  .tour-thumb[aria-pressed='true'] {
+    border-color: var(--graphite);
+  }
+
+  .tour-note {
+    margin-top: 1rem;
+  }
+
+  kbd {
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    background: var(--white);
+    font: inherit;
+  }
+
+  .tour-noscript {
+    margin-top: 1rem;
+  }
+
+  .tour-stage :global(.pnlm-container) {
+    background: #1d1a17;
+    font-family: inherit;
+  }
+</style>

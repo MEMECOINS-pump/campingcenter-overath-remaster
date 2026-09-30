@@ -1,0 +1,92 @@
+---
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { snapshotDate, vehicles } from '@/lib/vehicles';
+import { formatDateDE } from '@/lib/format';
+import { url } from '@/lib/url';
+
+const used = vehicles.filter((v) => v.condition === 'gebraucht').slice(0, 3);
+const fresh = vehicles.filter((v) => v.condition === 'neu').slice(0, 3);
+const featured = [...used, ...fresh];
+const usedCount = vehicles.filter((v) => v.condition === 'gebraucht').length;
+const newCount = vehicles.length - usedCount;
+---
+
+<section class="section featured" aria-labelledby="featured-title">
+  <div class="container">
+    <div class="section-head-row">
+      <SectionHeader
+        id="featured-title"
+        eyebrow="Aktuell im Bestand"
+        title="Fahrzeuge, die auf ihre nächste Reise warten."
+        lead={`${usedCount} gebrauchte und ${newCount} neue Wohnmobile im aktuellen Bestand – zum Anschauen, Probesitzen und Beraten-Lassen in Overath.`}
+      />
+      <a class="btn btn-ghost" href={url('/wohnmobile/')}>Alle {vehicles.length} Fahrzeuge <Icon name="arrow-right" class="arrow" /></a>
+    </div>
+
+    <div class="rail" data-rail>
+      <ul class="rail-track" role="list">
+        {
+          featured.map((v, i) => (
+            <li class="rail-item">
+              <VehicleCard vehicle={v} index={i} compare={false} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <p class="featured-note">
+      Stand {formatDateDE(snapshotDate)} · Angaben laut Fahrzeuginserat. Verfügbarkeit bitte telefonisch bestätigen lassen.
+    </p>
+  </div>
+</section>
+
+<style>
+  .rail {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+
+  .rail-track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(82%, 21rem);
+    gap: 1rem;
+    padding: 0.25rem var(--gutter) 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    list-style: none;
+    scrollbar-width: thin;
+  }
+
+  .rail-item {
+    display: flex;
+    scroll-snap-align: start;
+  }
+
+  .rail-item > :global(*) {
+    flex: 1;
+  }
+
+  .featured-note {
+    margin-top: 0.75rem;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 64em) {
+    .rail {
+      margin-inline: 0;
+    }
+
+    .rail-track {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+      padding: 0;
+      overflow: visible;
+    }
+  }
+</style>

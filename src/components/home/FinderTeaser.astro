@@ -1,0 +1,179 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { vehicleTypes } from '@/data/content';
+import { vehicles } from '@/lib/vehicles';
+import { url } from '@/lib/url';
+
+const countFor = (id: string) => vehicles.filter((v) => v.category === id).length;
+const hrefFor = (id: string, title: string) =>
+  id === 'van' ? '/panama/' : countFor(id) > 0 ? `/wohnmobile/?art=${id}` : `/kontakt/?fahrzeug=${encodeURIComponent(title)}#beratung`;
+---
+
+<section class="section section-paper finder" aria-labelledby="finder-title">
+  <div class="container">
+    <div class="section-head-row">
+      <SectionHeader
+        id="finder-title"
+        eyebrow="Camper-Finder"
+        title="Welcher Camper passt zu dir?"
+        lead="Vom wendigen Van bis zum Alkoven für die ganze Familie: Beantworte ein paar kurze Fragen und sieh sofort, welche Fahrzeuge aus unserem Bestand passen."
+      />
+      <a class="btn btn-accent" href={url('/camper-finder/')} data-track="cta_click" data-track-location="finder-teaser">
+        Finder starten <Icon name="arrow-right" class="arrow" />
+      </a>
+    </div>
+
+    <ul class="types" role="list">
+      {
+        vehicleTypes.map((t) => {
+          const count = countFor(t.id);
+          return (
+            <li class="type">
+              <div class="type-media">
+                <Photo src={`type-${t.id}`} alt="" sizes="(min-width: 64em) 15rem, 60vw" widths={[360, 540, 720]} />
+              </div>
+              <div class="type-body">
+                <h3>
+                  <a href={url(hrefFor(t.id, t.title))}>{t.title}</a>
+                </h3>
+                <p class="type-persons">
+                  <Icon name="users" /> {t.persons}
+                </p>
+                <ul class="type-facts">
+                  {t.facts.map((f) => (
+                    <li>{f}</li>
+                  ))}
+                </ul>
+                <p class="type-count">{t.id === 'van' ? 'PANAMA Vans entdecken' : count > 0 ? `${count} im Bestand` : 'Auf Anfrage'}</p>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .types {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(72%, 16rem);
+    gap: 1rem;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0.25rem var(--gutter) 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    list-style: none;
+    scrollbar-width: thin;
+  }
+
+  .type {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    scroll-snap-align: start;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    transition:
+      transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  @media (hover: hover) {
+    .type:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+  }
+
+  .type:has(a:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .type a:focus-visible {
+    outline: none;
+  }
+
+  .type-media {
+    aspect-ratio: 4 / 3;
+    background: var(--sand);
+    overflow: hidden;
+  }
+
+  .type-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .type-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.1rem 1.1rem;
+  }
+
+  .type h3 {
+    font-size: 1.25rem;
+  }
+
+  .type h3 a {
+    text-decoration: none;
+  }
+
+  .type h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .type-persons {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .type-persons :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--brand-ink);
+  }
+
+  .type-facts {
+    display: grid;
+    gap: 0.15rem;
+    list-style: none;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  .type-count {
+    margin-top: auto;
+    padding-top: 0.6rem;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--forest);
+  }
+
+  @media (min-width: 64em) {
+    .types {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-inline: 0;
+      padding: 0;
+      overflow: visible;
+    }
+  }
+</style>

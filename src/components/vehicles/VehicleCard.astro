@@ -1,0 +1,335 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { cardFacts, priceLabel, vehicleImage, vehicleSrcset, type Vehicle } from '@/lib/vehicles';
+import { url } from '@/lib/url';
+
+interface Props {
+  vehicle: Vehicle;
+  index?: number;
+  priority?: boolean;
+  headingLevel?: 2 | 3;
+  compare?: boolean;
+}
+const { vehicle: v, index = 0, priority = false, headingLevel = 3, compare = true } = Astro.props;
+const Heading = headingLevel === 2 ? 'h2' : 'h3';
+const href = url(`/wohnmobile/${v.slug}/`);
+const cover = v.images[0];
+---
+
+<article
+  class="vcard"
+  data-vehicle
+  data-id={v.id}
+  data-order={index}
+  data-condition={v.condition}
+  data-make={v.make}
+  data-category={v.category}
+  data-transmission={v.transmission ?? ''}
+  data-gw={v.grossWeightKg ?? ''}
+  data-price={v.price}
+  data-length={v.lengthMm ?? ''}
+  data-km={v.mileageKm ?? 0}
+>
+  <div class="vcard-media">
+    {
+      cover ? (
+        <img
+          src={vehicleImage(cover, 640)}
+          srcset={vehicleSrcset(cover, 1024)}
+          sizes="(min-width: 80em) 24rem, (min-width: 48em) 45vw, 92vw"
+          width="640"
+          height="480"
+          alt={`${v.title} – Außenansicht`}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : 'auto'}
+          decoding="async"
+        />
+      ) : (
+        <div class="vcard-noimg">Bilder folgen</div>
+      )
+    }
+    <div class="vcard-badges">
+      <span class:list={['badge', v.condition === 'neu' ? 'badge-new' : 'badge-used']}>{v.condition === 'neu' ? 'Neu' : 'Gebraucht'}</span>
+      <span class="badge badge-glass">{v.categoryLabel}</span>
+    </div>
+    <button type="button" class="vcard-fav" data-fav-toggle={v.id} aria-pressed="false" aria-label={`${v.title} merken`}>
+      <Icon name="heart" />
+    </button>
+    {v.images.length > 1 && <span class="vcard-count"><Icon name="image" /> {v.images.length}</span>}
+  </div>
+
+  <div class="vcard-body">
+    <p class="vcard-make">{v.make}</p>
+    <Heading class="vcard-title">
+      <a href={href} data-track="vehicle_card_click" data-track-label={v.id}><span class="sr-only">{v.make}{" "}</span>{v.model}</a>
+    </Heading>
+    <ul class="vcard-facts" aria-label="Eckdaten">
+      {cardFacts(v).map((f) => <li>{f}</li>)}
+    </ul>
+    <div class="vcard-foot">
+      <p class="vcard-price">
+        <span class="sr-only">Preis:</span>
+        {priceLabel(v)}
+        {v.vatDeductible && <small>MwSt. ausweisbar</small>}
+      </p>
+      <span class="vcard-cta" aria-hidden="true">Details ansehen <Icon name="arrow-right" /></span>
+    </div>
+    {
+      compare && (
+        <button type="button" class="vcard-compare" data-compare-toggle={v.id} aria-pressed="false">
+          <Icon name="compare" />
+          <span data-label>Vergleichen</span>
+          <span class="sr-only">: {v.title}</span>
+        </button>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .vcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  @media (hover: hover) {
+    .vcard:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .vcard:hover .vcard-media img {
+      transform: scale(1.035);
+    }
+  }
+
+  .vcard:focus-within {
+    box-shadow: var(--shadow);
+  }
+
+  .vcard-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--sand);
+  }
+
+  .vcard-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .vcard-noimg {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--text-muted);
+  }
+
+  .vcard-badges {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    pointer-events: none;
+  }
+
+  .badge-glass {
+    background: rgb(255 255 255 / 0.9);
+    color: var(--graphite);
+  }
+
+  .vcard-fav {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.92);
+    color: var(--graphite);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s var(--ease);
+  }
+
+  .vcard-fav:active {
+    transform: scale(0.92);
+  }
+
+  .vcard-fav[aria-pressed='true'] {
+    color: #c2410c;
+  }
+
+  .vcard-fav[aria-pressed='true'] :global(.icon) {
+    fill: currentColor;
+  }
+
+  .vcard-count {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-pill);
+    background: rgb(12 14 16 / 0.62);
+    color: #fff;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+  }
+
+  .vcard-count :global(.icon) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .vcard-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 1.1rem 1.15rem 1rem;
+  }
+
+  .vcard-make {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+
+  .vcard-title {
+    font-size: 1.22rem;
+    line-height: 1.2;
+  }
+
+  .vcard-title a {
+    text-decoration: none;
+  }
+
+  .vcard-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .vcard-title a:focus-visible {
+    outline: none;
+  }
+
+  .vcard:has(.vcard-title a:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .vcard-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    list-style: none;
+  }
+
+  .vcard-facts li {
+    padding: 0.15rem 0.55rem;
+    border-radius: 6px;
+    background: var(--ivory);
+    border: 1px solid var(--line);
+    font-size: 0.8rem;
+    font-weight: 550;
+    color: var(--charcoal);
+    white-space: nowrap;
+  }
+
+  .vcard-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-top: auto;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .vcard-price {
+    display: grid;
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .vcard-price small {
+    margin-top: 0.2rem;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .vcard-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+  }
+
+  .vcard-cta :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .vcard:hover .vcard-cta :global(.icon) {
+    transform: translateX(3px);
+  }
+
+  .vcard-compare {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.4rem;
+    min-height: 44px;
+    margin: 0.15rem 0 -0.35rem -0.5rem;
+    padding: 0 0.6rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: none;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .vcard-compare:hover {
+    background: var(--sand);
+    color: var(--text);
+  }
+
+  .vcard-compare[aria-pressed='true'] {
+    background: var(--forest-soft);
+    color: var(--forest);
+  }
+</style>

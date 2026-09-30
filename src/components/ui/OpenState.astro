@@ -1,0 +1,71 @@
+---
+import { openingHours } from '@/data/company';
+
+const schedule = JSON.stringify(
+  openingHours.flatMap((p) =>
+    p.schemaDays.map((d) => ({ d, h: p.hours.map((h) => [h.opens, h.closes]) })),
+  ),
+);
+---
+
+<span class="open-state" data-open-state={schedule} hidden></span>
+
+<style>
+  .open-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    background: var(--sand);
+    color: var(--text-muted);
+  }
+
+  .open-state::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .open-state[data-state='open'] {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+</style>
+
+<script>
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  function berlinNow(): { day: string; minutes: number } {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Berlin',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+    return { day: get('weekday') || days[new Date().getDay()]!, minutes: Number(get('hour')) * 60 + Number(get('minute')) };
+  }
+
+  const toMin = (s: string) => Number(s.slice(0, 2)) * 60 + Number(s.slice(3, 5));
+
+  document.querySelectorAll<HTMLElement>('[data-open-state]').forEach((el) => {
+    try {
+      const schedule = JSON.parse(el.dataset.openState ?? '[]') as { d: string; h: [string, string][] }[];
+      const now = berlinNow();
+      const today = schedule.find((s) => s.d === now.day);
+      const open = today?.h.some(([o, c]) => now.minutes >= toMin(o) && now.minutes < toMin(c));
+      const closesAt = today?.h.find(([o, c]) => now.minutes >= toMin(o) && now.minutes < toMin(c))?.[1];
+      el.dataset.state = open ? 'open' : 'closed';
+      el.textContent = open ? `Jetzt geöffnet · bis ${closesAt} Uhr` : 'Gerade geschlossen';
+      el.hidden = false;
+    } catch {
+      /* keep hidden – static opening hours remain visible */
+    }
+  });
+</script>

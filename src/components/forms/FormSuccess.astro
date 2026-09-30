@@ -1,0 +1,76 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { company } from '@/data/company';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+const { title = 'Danke! Wir melden uns bei dir.', text = 'Wir antworten in der Regel innerhalb der Öffnungszeiten.' } = Astro.props;
+---
+
+<div class="form-success card card-pad" data-form-success hidden tabindex="-1" role="status">
+  <span class="fs-icon"><Icon name="check" /></span>
+
+  <div class="fs-sent">
+    <h3>{title}</h3>
+    <p>{text}</p>
+  </div>
+
+  <div class="fs-prepared">
+    <h3>Deine Anfrage ist vorbereitet.</h3>
+    <p>
+      Diese Website ist eine Redesign-Präsentation und überträgt keine Formulardaten. Öffne die vorbereitete E-Mail mit allen Angaben – oder ruf uns direkt an.
+    </p>
+  </div>
+
+  <div class="btn-row">
+    <a class="btn btn-accent fs-prepared" href={`mailto:${company.email}`} data-success-mailto data-track="email_click" data-track-location="form_success">
+      <Icon name="mail" /> E-Mail öffnen
+    </a>
+    <a class="btn btn-ghost" href={company.phone.href} data-track="call_click" data-track-location="form_success">
+      <Icon name="phone" /> {company.phone.display}
+    </a>
+    <button type="button" class="btn btn-ghost" data-form-again>Weitere Anfrage</button>
+  </div>
+</div>
+
+<style>
+  .form-success {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  .form-success[hidden] {
+    display: none;
+  }
+
+  .form-success:focus {
+    outline: none;
+  }
+
+  .form-success h3 {
+    font-size: 1.4rem;
+  }
+
+  .form-success p {
+    color: var(--text-muted);
+    max-width: 40rem;
+  }
+
+  .form-success[data-mode='sent'] .fs-prepared,
+  .form-success[data-mode='prepared'] .fs-sent {
+    display: none;
+  }
+
+  .fs-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--success-soft);
+    color: var(--success);
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { rental } from '@/data/content';
+import { url } from '@/lib/url';
+---
+
+<section class="section rental" aria-labelledby="rental-title">
+  <div class="container split">
+    <div class="rental-media reveal">
+      <Photo src="rental-header" alt="Mietwohnmobil auf einer Landstraße" sizes="(min-width: 60em) 44vw, 92vw" widths={[480, 768, 1080, 1440]} />
+    </div>
+    <div class="rental-copy">
+      <p class="eyebrow">Wohnmobil mieten</p>
+      <h2 id="rental-title">Freiheit auf Zeit.</h2>
+      <p class="lead">Wir sind Mietstation der ADAC Wohnmobilvermietung in Köln-Ost. Miete bei uns vor Ort – oder buche rund um die Uhr online beim ADAC.</p>
+      <ul class="rental-benefits">
+        {
+          rental.benefits.map((b) => (
+            <li>
+              <Icon name="check" />
+              <span>
+                <strong>{b.title}</strong> – {b.text}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="btn-row">
+        <a class="btn" href={url('/vermietung-wohnmobile/')}>Mietmöglichkeiten entdecken <Icon name="arrow-right" class="arrow" /></a>
+        <a class="btn btn-ghost" href={rental.adacBookingUrl} target="_blank" rel="noopener" data-track="rental_booking_click" data-track-location="home">
+          Beim ADAC buchen <Icon name="external" />
+          <span class="sr-only">(öffnet externe Website des ADAC)</span>
+        </a>
+      </div>
+      <p class="rental-note">Die Online-Buchung erfolgt auf der Website der ADAC Autovermietung.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .rental-media {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    aspect-ratio: 3 / 2;
+  }
+
+  .rental-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .rental-copy {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .rental-benefits {
+    display: grid;
+    gap: 0.65rem;
+    list-style: none;
+  }
+
+  .rental-benefits li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.6rem;
+    font-size: var(--fs-sm);
+  }
+
+  .rental-benefits :global(.icon) {
+    color: var(--forest);
+  }
+
+  .rental-note {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+</style>

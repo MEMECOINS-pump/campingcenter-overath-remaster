@@ -1,0 +1,64 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LegalShell from '@/components/sections/LegalShell.astro';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+---
+
+<BaseLayout title="Erklärung zur Barrierefreiheit" description="Erklärung zur Barrierefreiheit des Campingcenter Overath nach dem Barrierefreiheitsstärkungsgesetz (BFSG).">
+  <LegalShell title="Erklärung zur Barrierefreiheit" path="/barrierefreiheitserklaerung/" original="/barrierefreiheitserklaerung/" updated="30.09.2026">
+    <p>
+      Mit dieser Erklärung geben wir einen Überblick über den Stand der Vereinbarkeit unserer Website mit den Anforderungen der Barrierefreiheit nach dem Barrierefreiheitsstärkungsgesetz (BFSG) und der zugehörigen Verordnung (BFSGV).
+    </p>
+
+    <h2>Angaben zum Dienstleistungserbringer</h2>
+    <address>
+      {company.legalName}<br />
+      {company.address.street}<br />
+      {company.address.postalCode} {company.address.city}<br />
+      E-Mail: <a href={`mailto:${company.email}`}>{company.email}</a><br />
+      Telefon: <a href={company.phone.href}>{company.phone.display}</a><br />
+      <a href={url('/impressum/')}>Zum Impressum</a>
+    </address>
+
+    <h2>Beschreibung der Dienstleistung</h2>
+    <p>
+      Handel und Service von Wohnmobilen in Overath. Auf unserer Website kannst du dich über neue und gebrauchte Wohnmobile informieren, Fahrzeuge merken und vergleichen, eine Anfrage zum Verkauf deines Fahrzeugs stellen, einen Werkstatt-Termin anfragen oder dich bewerben. Bei Bedarf besuchst du uns in Overath und lässt dich persönlich beraten.
+    </p>
+
+    <h2>Stand der Vereinbarkeit mit den Anforderungen</h2>
+    <p>Diese Website orientiert sich an den Web Content Accessibility Guidelines (WCAG) 2.2, Konformitätsstufe AA. Umgesetzt sind unter anderem:</p>
+    <ul>
+      <li>Alle Inhalte und Funktionen – auch Filter, Galerie, Formulare und Dialoge – sind vollständig per Tastatur bedienbar; der Fokus ist jederzeit sichtbar.</li>
+      <li>Eine klare Überschriftenstruktur, Landmarken und ein Link „Zum Inhalt springen“ erleichtern die Nutzung mit Screenreadern.</li>
+      <li>Texte und Bedienelemente erfüllen die Kontrastanforderungen; die Schriftgröße lässt sich über den Browser bis 200 % vergrößern, ohne dass Inhalte verloren gehen.</li>
+      <li>Touch-Ziele sind mindestens 44 × 44 Pixel groß.</li>
+      <li>Formulare haben sichtbare Beschriftungen, verständliche Hinweise und konkrete Fehlermeldungen. Wir verzichten auf Captchas und nutzen stattdessen barrierearme Spam-Schutzverfahren.</li>
+      <li>Animationen werden reduziert, wenn du in deinem Betriebssystem „Bewegung reduzieren“ aktiviert hast.</li>
+      <li>Inhaltlich relevante Bilder haben Alternativtexte; rein dekorative Bilder werden von Screenreadern übersprungen.</li>
+    </ul>
+
+    <h2>Bekannte Einschränkungen</h2>
+    <ul>
+      <li>Der 360° Rundgang ist ein visuelles Angebot und für blinde Nutzerinnen und Nutzer nur eingeschränkt zugänglich. Gern beschreiben wir dir unser Gelände am Telefon.</li>
+      <li>Fahrzeugfotos stammen aus unseren Inseraten; ihre Alternativtexte beschreiben das jeweilige Fahrzeug, nicht jedes einzelne Detail.</li>
+      <li>Untertitel eingebundener YouTube-Videos sind nur verfügbar, soweit sie auf YouTube bereitgestellt werden.</li>
+      <li>Die AGB-Dokumente liegen als PDF vor und sind möglicherweise nicht vollständig barrierefrei. Auf Wunsch senden wir dir die Inhalte in einem anderen Format.</li>
+    </ul>
+
+    <h2>Feedback und Kontakt</h2>
+    <p>
+      Ist dir eine Barriere aufgefallen? Gib uns gern einen Hinweis – per E-Mail an <a href={`mailto:${company.email}`}>{company.email}</a> oder telefonisch unter <a href={company.phone.href}>{company.phone.display}</a>.
+    </p>
+
+    <h2>Zuständige Marktüberwachungsbehörde</h2>
+    <address>
+      Marktüberwachungsstelle der Länder für die Barrierefreiheit von Produkten und Dienstleistungen (MLBF)<br />
+      c/o Ministerium für Arbeit, Soziales, Gesundheit und Gleichstellung Sachsen-Anhalt<br />
+      Postfach 39 11 55<br />
+      39135 Magdeburg<br />
+      Telefon: +49 391 567 6970<br />
+      E-Mail: <a href="mailto:mlbf@ms.sachsen-anhalt.de">mlbf@ms.sachsen-anhalt.de</a>
+    </address>
+  </LegalShell>
+</BaseLayout>

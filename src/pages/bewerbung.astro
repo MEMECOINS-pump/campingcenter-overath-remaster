@@ -1,0 +1,104 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import PhotoUploader from '@/components/forms/PhotoUploader.astro';
+import { jobs, employer } from '@/data/jobs';
+import { company } from '@/data/company';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const crumbs = [
+  { label: 'Jobs', href: '/jobs/' },
+  { label: 'Bewerbung', href: '/bewerbung/' },
+];
+const positions = [
+  { value: 'Quereinsteiger Werkstatt', label: 'Quereinsteiger (m/w/d) Werkstatt' },
+  ...jobs.map((j) => ({ value: j.title, label: j.title })),
+  { value: 'Initiativbewerbung', label: 'Initiativbewerbung' },
+];
+---
+
+<BaseLayout
+  title="Bewerbung"
+  description="Bewirb dich beim Campingcenter Overath – online mit Lebenslauf und Unterlagen oder per Post."
+  inquiryHref="#bewerbung"
+  inquiryLabel="Bewerben"
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <header class="page-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">Bewerbung</p>
+      <h1>Schön, dass du dabei sein willst.</h1>
+      <p class="lead">Ein paar Angaben und dein Lebenslauf genügen. Wir melden uns persönlich bei dir.</p>
+    </div>
+  </header>
+
+  <section id="bewerbung" class="section-tight">
+    <div class="container bw-grid">
+      <div class="card card-pad">
+        <form class="form-stack" data-form="application" data-subject="Bewerbung über die Website">
+          <Field name="stelle" type="select" label="Stelle" required prefill="stelle" options={positions} />
+          <Field name="name" label="Vor- und Nachname" required autocomplete="name" />
+          <div class="field-row">
+            <Field name="email" type="email" label="E-Mail" required autocomplete="email" inputmode="email" />
+            <Field name="telefon" type="tel" label="Telefon" required autocomplete="tel" inputmode="tel" />
+          </div>
+          <Field name="eintritt" label="Frühester Eintritt" placeholder="z. B. ab sofort oder 01.11." />
+          <Field name="nachricht" type="textarea" label="Ein paar Worte zu dir" rows={5} placeholder="Was reizt dich an der Stelle? Was bringst du mit?" />
+          <PhotoUploader name="unterlagen" label="Lebenslauf & Unterlagen" hint="PDF oder Foto, z. B. Lebenslauf und Zeugnisse" max={5} documents />
+          <FormEnd submitLabel="Bewerbung senden" />
+        </form>
+        <FormSuccess title="Danke für deine Bewerbung!" text="Wir sehen uns deine Unterlagen in Ruhe an und melden uns persönlich bei dir." />
+      </div>
+      <aside class="bw-aside">
+        <div class="card card-pad">
+          <h2>Lieber per Post?</h2>
+          <p class="muted">{employer.postalContact}</p>
+          <h2 class="bw-q">Fragen vorab?</h2>
+          <p><a class="btn btn-ghost" href={company.phone.href} data-track="call_click" data-track-location="application"><Icon name="phone" /> {company.phone.display}</a></p>
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '@/scripts/forms';
+</script>
+
+<style>
+  .bw-grid {
+    display: grid;
+    gap: 1.5rem;
+    padding-bottom: 3rem;
+  }
+
+  @media (min-width: 64em) {
+    .bw-grid {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .bw-aside {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1.5rem);
+    }
+  }
+
+  .bw-aside h2 {
+    font-size: 1.2rem;
+  }
+
+  .bw-aside p {
+    margin-top: 0.4rem;
+  }
+
+  .bw-q {
+    margin-top: 1.5rem;
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+
+interface Props {
+  inquiryHref?: string | undefined;
+  inquiryLabel?: string | undefined;
+}
+const { inquiryHref = '/kontakt/#formular', inquiryLabel = 'Anfrage' } = Astro.props;
+---
+
+<nav class="action-bar" aria-label="Schnellaktionen" data-action-bar>
+  <a href={company.phone.href} data-track="call_click" data-track-location="action-bar">
+    <Icon name="phone" />
+    <span>Anrufen</span>
+  </a>
+  <a href={url('/wohnmobile/')} data-track="cta_click" data-track-location="action-bar">
+    <Icon name="van" />
+    <span>Fahrzeuge</span>
+  </a>
+  <a class="ab-primary" href={url(inquiryHref)} data-track="cta_click" data-track-location="action-bar">
+    <Icon name="mail" />
+    <span>{inquiryLabel}</span>
+  </a>
+</nav>
+
+<style>
+  .action-bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.25fr;
+    gap: 0.4rem;
+    padding: 0.45rem 0.6rem calc(0.45rem + var(--safe-bottom));
+    background: rgb(251 249 245 / 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px -16px rgb(28 32 36 / 0.3);
+    transition: transform 0.25s var(--ease);
+  }
+
+  .action-bar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    min-height: 3.25rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 650;
+    text-decoration: none;
+    color: var(--graphite);
+  }
+
+  .action-bar a:active {
+    background: var(--sand);
+  }
+
+  .action-bar .ab-primary {
+    flex-direction: row;
+    gap: 0.45rem;
+    background: var(--brand);
+    font-size: 0.95rem;
+  }
+
+  .action-bar .ab-primary:active {
+    background: var(--brand-strong);
+  }
+
+  :global(body.kb-open) .action-bar,
+  :global(body.bar-hidden) .action-bar {
+    transform: translateY(110%);
+  }
+
+  @media (min-width: 64em) {
+    .action-bar {
+      display: none;
+    }
+  }
+</style>

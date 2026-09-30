@@ -1,0 +1,265 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  name?: string;
+  label?: string;
+  hint?: string;
+  max?: number;
+  /** Also accept PDF documents (e.g. Werkstatt: Serviceheft, Prüfbericht). */
+  documents?: boolean;
+}
+const { name = 'fotos', label = 'Fotos', hint, max = 8, documents = false } = Astro.props;
+const id = `up-${Math.random().toString(36).slice(2, 7)}`;
+const galleryAccept = documents ? 'image/*,application/pdf' : 'image/*';
+---
+
+<div class="uploader" data-uploader data-name={name} data-max={max}>
+  <p class="label" id={`${id}-label`}>{label} <span class="opt">(optional)</span></p>
+  {hint && <p class="hint" id={`${id}-hint`}>{hint}</p>}
+
+  <div class="up-actions" role="group" aria-labelledby={`${id}-label`}>
+    <label class="up-btn up-btn-camera">
+      <input type="file" accept="image/*" capture="environment" data-up-input aria-describedby={hint ? `${id}-hint` : undefined} />
+      <Icon name="camera" />
+      <span>Foto aufnehmen</span>
+    </label>
+    <label class="up-btn">
+      <input type="file" accept={galleryAccept} multiple data-up-input />
+      <Icon name="image" />
+      <span>{documents ? 'Datei wählen' : 'Aus Galerie wählen'}</span>
+    </label>
+  </div>
+
+  <p class="up-meta hint">
+    <span data-up-count>0</span> von {max} · Große Fotos werden automatisch verkleinert{documents ? ' · PDF bis 10 MB' : ''}
+  </p>
+
+  <ul class="up-list" data-up-list aria-label="Ausgewählte Dateien"></ul>
+  <p class="sr-only" aria-live="polite" data-up-live></p>
+
+  <template data-up-template>
+    <li class="up-item" data-state="processing">
+      <div class="up-thumb">
+        <img alt="" data-up-img />
+        <span class="up-doc" data-up-doc hidden><Icon name="document" /></span>
+      </div>
+      <div class="up-info">
+        <p class="up-name" data-up-name></p>
+        <p class="up-status" data-up-status>Wird vorbereitet …</p>
+        <div class="up-progress" aria-hidden="true"><span data-up-bar></span></div>
+      </div>
+      <div class="up-controls">
+        <button type="button" class="up-icon-btn" data-up-retry hidden>
+          <Icon name="refresh" /><span class="sr-only">Erneut versuchen</span>
+        </button>
+        <button type="button" class="up-icon-btn" data-up-remove>
+          <Icon name="trash" /><span class="sr-only">Entfernen</span>
+        </button>
+      </div>
+    </li>
+  </template>
+</div>
+
+<script>
+  import '@/scripts/uploader';
+</script>
+
+<style>
+  .uploader {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .up-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .up-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 6rem;
+    padding: 1rem 0.75rem;
+    border: 1.5px dashed var(--line-strong);
+    border-radius: 14px;
+    background: var(--white);
+    font-weight: 650;
+    text-align: center;
+    cursor: pointer;
+    transition:
+      border-color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .up-btn:hover {
+    border-color: var(--graphite);
+    background: var(--paper);
+  }
+
+  .up-btn:has(input:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .up-btn input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .up-btn :global(.icon) {
+    width: 1.6rem;
+    height: 1.6rem;
+    color: var(--brand-ink);
+  }
+
+  /* Capture only makes sense where a camera is attached to the page (phones, tablets). */
+  @media (hover: hover) and (pointer: fine) {
+    .up-btn-camera {
+      display: none;
+    }
+
+    .up-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .up-btn {
+      flex-direction: row;
+      min-height: 4rem;
+    }
+  }
+
+  .uploader[data-full] .up-btn {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .up-list {
+    display: grid;
+    gap: 0.5rem;
+    list-style: none;
+  }
+
+  .up-list:empty {
+    display: none;
+  }
+
+  .up-item {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+  }
+
+  .up-item[data-state='error'] {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+  }
+
+  .up-thumb {
+    position: relative;
+    width: 3.5rem;
+    height: 3.5rem;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--sand);
+  }
+
+  .up-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .up-thumb img:not([src]) {
+    visibility: hidden;
+  }
+
+  .up-doc {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  .up-doc[hidden] {
+    display: none;
+  }
+
+  .up-name {
+    overflow: hidden;
+    font-size: var(--fs-sm);
+    font-weight: 620;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .up-status {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  .up-item[data-state='error'] .up-status {
+    color: var(--danger);
+    font-weight: 600;
+  }
+
+  .up-progress {
+    height: 4px;
+    margin-top: 0.35rem;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--sand);
+  }
+
+  .up-item[data-state='ready'] .up-progress,
+  .up-item[data-state='error'] .up-progress {
+    display: none;
+  }
+
+  .up-progress span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: var(--forest);
+    transition: width 0.2s linear;
+  }
+
+  .up-controls {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .up-icon-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--text-muted);
+  }
+
+  .up-icon-btn:hover {
+    background: var(--sand);
+    color: var(--text);
+  }
+
+  .up-icon-btn[hidden] {
+    display: none;
+  }
+</style>

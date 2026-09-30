@@ -1,0 +1,445 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import FilterPanel from '@/components/vehicles/FilterPanel.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { snapshotDate, vehicles, inventorySource } from '@/lib/vehicles';
+import { breadcrumbSchema } from '@/lib/schema';
+import { formatDateDE } from '@/lib/format';
+import { url } from '@/lib/url';
+
+const usedCount = vehicles.filter((v) => v.condition === 'gebraucht').length;
+const newCount = vehicles.length - usedCount;
+const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
+---
+
+<BaseLayout
+  compareTray
+  title="Wohnmobile kaufen in Overath – Neu & gebraucht"
+  description={`${vehicles.length} Wohnmobile im Bestand: ${newCount} Neufahrzeuge und ${usedCount} gebrauchte Reisemobile von EURA MOBIL, Challenger, Knaus und mehr. Filtern, merken, vergleichen – persönlich beraten in Overath.`}
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <section class="page-hero section-paper sr-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">Fahrzeuge im Bestand</p>
+      <h1>Wohnmobile in Overath</h1>
+      <p class="lead">
+        {newCount} Neufahrzeuge und {usedCount} gebrauchte Wohnmobile – alle bei uns vor Ort. Filtere nach deinen Wünschen, merke dir Favoriten oder vergleiche bis zu drei Fahrzeuge.
+      </p>
+    </div>
+  </section>
+
+  <section class="section-tight showroom" aria-label="Fahrzeugübersicht">
+    <div class="container sr-layout">
+      <aside class="sr-aside" aria-labelledby="sr-filter-title">
+        <h2 id="sr-filter-title" class="sr-aside-title">Filter</h2>
+        <div data-filter-home>
+          <FilterPanel />
+        </div>
+      </aside>
+
+      <div class="sr-main">
+        <div class="sr-toolbar">
+          <button type="button" class="btn btn-ghost sr-filter-btn" data-filter-open aria-haspopup="dialog" aria-controls="filter-sheet">
+            <Icon name="filter" /> Filter <span class="sr-badge" data-filter-badge hidden></span>
+          </button>
+          <p class="sr-count" role="status" aria-live="polite" aria-atomic="true">
+            <strong data-result-count>{vehicles.length}</strong> <span data-result-noun>Fahrzeuge</span>
+          </p>
+          <div class="sr-sort">
+            <label for="sr-sort">Sortieren</label>
+            <select id="sr-sort" class="select" data-sort>
+              <option value="empfohlen">Empfohlene Reihenfolge</option>
+              <option value="preis-auf">Preis aufsteigend</option>
+              <option value="preis-ab">Preis absteigend</option>
+              <option value="km-auf">Kilometer aufsteigend</option>
+              <option value="laenge-auf">Länge aufsteigend</option>
+            </select>
+          </div>
+        </div>
+
+        <ul class="sr-chips" data-active-chips aria-label="Aktive Filter" hidden></ul>
+
+        <ul class="sr-grid" role="list" data-grid>
+          {
+            vehicles.map((v, i) => (
+              <li data-grid-item={v.id}>
+                <VehicleCard vehicle={v} index={i} priority={i < 2} headingLevel={2} />
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="sr-empty card card-pad" data-empty hidden>
+          <span class="sr-empty-icon"><Icon name="search" /></span>
+          <h2>Kein passendes Fahrzeug gefunden.</h2>
+          <p class="muted">
+            Probiere andere Filter – oder sag uns, wonach du suchst. Wir kennen auch Fahrzeuge, die noch nicht online sind, und suchen gern für dich.
+          </p>
+          <div class="btn-row">
+            <button type="button" class="btn" data-filter-reset>Filter zurücksetzen</button>
+            <a class="btn btn-ghost" href={url('/kontakt/#beratung')} data-track="consultation_click" data-track-location="showroom_empty">
+              Beratung anfragen
+            </a>
+          </div>
+        </div>
+
+        <p class="sr-note small muted">
+          Stand {formatDateDE(snapshotDate)} · Angaben laut Fahrzeuginserat, Irrtümer und Zwischenverkauf vorbehalten. Tagesaktueller Bestand auch bei{' '}
+          <a href={inventorySource} rel="noopener" target="_blank">mobile.de<span class="sr-only"> (öffnet in neuem Tab)</span></a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <CtaSection
+    title="Nicht das Richtige dabei?"
+    text="Erzähl uns von deinem Traum-Camper. Wir beraten ehrlich – und finden gemeinsam das Fahrzeug, das wirklich zu dir passt."
+  />
+
+  <dialog id="filter-sheet" class="fsheet" data-filter-sheet aria-labelledby="fsheet-title">
+    <div class="fsheet-head">
+      <h2 id="fsheet-title">Filter</h2>
+      <button type="button" class="fsheet-reset" data-filter-reset>Zurücksetzen</button>
+      <button type="button" class="fsheet-close" data-filter-close aria-label="Filter schließen">
+        <Icon name="close" />
+      </button>
+    </div>
+    <div class="fsheet-body" data-filter-sheet-body></div>
+    <div class="fsheet-foot">
+      <button type="button" class="btn btn-accent btn-block btn-lg" data-filter-close data-filter-apply>
+        <span data-apply-label>{vehicles.length} Fahrzeuge anzeigen</span>
+      </button>
+    </div>
+  </dialog>
+</BaseLayout>
+
+<script>
+  import '@/scripts/showroom';
+</script>
+
+<style>
+  .sr-hero {
+    padding-bottom: 1.5rem;
+  }
+
+  .sr-layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .sr-aside {
+    display: none;
+  }
+
+  @media (min-width: 64em) {
+    .sr-layout {
+      grid-template-columns: 16.5rem minmax(0, 1fr);
+      align-items: start;
+      gap: 2.5rem;
+    }
+
+    .sr-aside {
+      position: sticky;
+      top: calc(var(--header-h, 4.5rem) + 1rem);
+      display: block;
+      max-height: calc(100dvh - var(--header-h, 4.5rem) - 2rem);
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      scrollbar-width: thin;
+    }
+
+    .sr-filter-btn {
+      display: none;
+    }
+  }
+
+  .sr-aside-title {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+  }
+
+  .sr-toolbar {
+    position: sticky;
+    z-index: 5;
+    top: var(--header-h, 4.5rem);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0.75rem var(--gutter);
+    background: rgb(from var(--ivory) r g b / 0.94);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 64em) {
+    .sr-toolbar {
+      position: static;
+      margin: 0 0 0.5rem;
+      padding: 0 0 1rem;
+      background: none;
+      backdrop-filter: none;
+    }
+  }
+
+  .sr-filter-btn {
+    min-height: 44px;
+  }
+
+  .sr-badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    padding-inline: 0.3rem;
+    border-radius: var(--radius-pill);
+    background: var(--brand);
+    color: var(--graphite);
+    font-size: 0.75rem;
+    font-weight: 750;
+  }
+
+  .sr-count {
+    margin-right: auto;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  .sr-count strong {
+    color: var(--text);
+    font-size: 1.05rem;
+  }
+
+  .sr-sort {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sr-sort label {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .sr-sort .select {
+    width: auto;
+    min-height: 44px;
+    padding-block: 0.45rem;
+  }
+
+  @media (max-width: 63.99em) {
+    .sr-toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 0.6rem;
+    }
+
+    .sr-filter-btn {
+      justify-content: center;
+    }
+
+    .sr-sort label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .sr-sort .select {
+      width: 100%;
+    }
+
+    .sr-count {
+      grid-column: 1 / -1;
+      order: 3;
+    }
+  }
+
+  .sr-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    list-style: none;
+  }
+
+  .sr-chips[hidden] {
+    display: none;
+  }
+
+  .sr-chips :global(button) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 36px;
+    padding: 0.25rem 0.65rem 0.25rem 0.8rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--white);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .sr-chips :global(button:hover) {
+    border-color: var(--graphite);
+  }
+
+  .sr-chips :global(.icon) {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .sr-grid {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr));
+  }
+
+  .sr-grid > li {
+    display: grid;
+  }
+
+  .sr-grid > li[hidden] {
+    display: none;
+  }
+
+  .sr-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-block: 3rem;
+    text-align: center;
+  }
+
+  .sr-empty[hidden] {
+    display: none;
+  }
+
+  .sr-empty h2 {
+    font-size: 1.5rem;
+  }
+
+  .sr-empty p {
+    max-width: 34rem;
+  }
+
+  .sr-empty .btn-row {
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .sr-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--sand);
+  }
+
+  .sr-note {
+    margin-top: 2rem;
+  }
+
+  /* ---------- mobile filter sheet ---------- */
+  .fsheet {
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--ivory);
+    color: var(--text);
+  }
+
+  .fsheet[open] {
+    display: flex;
+    flex-direction: column;
+    animation: fsheet-in 0.28s var(--ease-out);
+  }
+
+  .fsheet::backdrop {
+    background: rgb(12 14 16 / 0.5);
+  }
+
+  @media (min-width: 40em) {
+    .fsheet {
+      width: min(28rem, 100%);
+      margin-left: auto;
+    }
+  }
+
+  .fsheet-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: max(0.75rem, env(safe-area-inset-top)) var(--gutter) 0.75rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fsheet-head h2 {
+    margin-right: auto;
+    font-size: 1.35rem;
+  }
+
+  .fsheet-reset {
+    min-height: 44px;
+    padding: 0 0.75rem;
+    border: 0;
+    background: none;
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .fsheet-close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--sand);
+  }
+
+  .fsheet-body {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.25rem var(--gutter) 2rem;
+  }
+
+  .fsheet-body :global(.fpanel-reset) {
+    display: none;
+  }
+
+  .fsheet-foot {
+    padding: 0.75rem var(--gutter) max(0.75rem, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    background: var(--white);
+  }
+
+  @keyframes fsheet-in {
+    from {
+      transform: translateY(4%);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fsheet[open] {
+      animation: none;
+    }
+  }
+</style>

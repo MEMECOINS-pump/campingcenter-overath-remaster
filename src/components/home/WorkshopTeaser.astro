@@ -1,0 +1,153 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { serviceGroups, workshopHighlights } from '@/data/services';
+import { url } from '@/lib/url';
+---
+
+<section class="section workshop" aria-labelledby="workshop-title">
+  <div class="container">
+    <div class="ws-grid">
+      <div class="ws-copy">
+        <SectionHeader
+          id="workshop-title"
+          eyebrow="Werkstatt & Kundendienst"
+          title="Dein Camper verdient den besten Service."
+          lead="Vom Sicherheitscheck bis zur Nachrüstung: Unsere Fachwerkstatt kümmert sich um Wohnmobile und Wohnwagen – spezialisiert auf Nässe- und GFK-Schäden."
+        />
+        <ul class="ws-highlights">
+          {
+            workshopHighlights.map((h) => (
+              <li>
+                <Icon name="check" />
+                <div>
+                  <h3>{h.title}</h3>
+                  <p>{h.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="btn-row">
+          <a class="btn btn-accent" href={url('/werkstatt-kundendienst/#termin')} data-track="cta_click" data-track-location="workshop-teaser">
+            Werkstatt-Termin anfragen
+          </a>
+          <a class="btn btn-ghost" href={url('/werkstatt-kundendienst/')}>Werkstatt entdecken <Icon name="arrow-right" class="arrow" /></a>
+        </div>
+      </div>
+      <div class="ws-media reveal">
+        <Photo src="workshop-interior" alt="Blick in die Werkstatt des Campingcenter Overath" sizes="(min-width: 64em) 36vw, 92vw" widths={[480, 768, 1080]} />
+      </div>
+    </div>
+
+    <ul class="ws-groups" role="list">
+      {
+        serviceGroups.map((g) => (
+          <li>
+            <a href={url(`/werkstatt-kundendienst/#${g.id}`)}>
+              <Icon name={g.icon} />
+              <span>{g.title}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ws-grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .ws-copy .section-head {
+    margin-bottom: 1.5rem;
+  }
+
+  .ws-highlights {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    list-style: none;
+  }
+
+  .ws-highlights li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+  }
+
+  .ws-highlights > li > :global(.icon) {
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0.3rem;
+    border-radius: 50%;
+    background: var(--forest-soft);
+    color: var(--forest);
+  }
+
+  .ws-highlights h3 {
+    font-family: var(--font-body);
+    font-size: 1.02rem;
+    font-weight: 700;
+  }
+
+  .ws-highlights p {
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+  }
+
+  .ws-media {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    aspect-ratio: 4 / 3;
+  }
+
+  .ws-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ws-groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    list-style: none;
+  }
+
+  .ws-groups a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .ws-groups a:hover {
+    border-color: var(--graphite);
+  }
+
+  .ws-groups :global(.icon) {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--brand-ink);
+  }
+
+  @media (min-width: 64em) {
+    .ws-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 5rem;
+    }
+  }
+</style>

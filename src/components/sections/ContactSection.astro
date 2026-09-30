@@ -1,0 +1,165 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import MapPreview from '@/components/embeds/MapPreview.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import OpenState from '@/components/ui/OpenState.astro';
+import { company, openingHours, formatHours } from '@/data/company';
+
+interface Props {
+  title?: string;
+  eyebrow?: string;
+}
+const { title = 'Wir freuen uns auf deinen Besuch.', eyebrow = 'Kontakt & Anfahrt' } = Astro.props;
+---
+
+<section class="section section-sand contact" aria-labelledby="contact-title">
+  <div class="container contact-grid">
+    <div class="contact-info">
+      <SectionHeader id="contact-title" eyebrow={eyebrow} title={title} />
+      <address class="contact-address">
+        <strong>{company.legalName}</strong><br />
+        {company.address.street}<br />
+        {company.address.postalCode} {company.address.city}
+      </address>
+
+      <div class="contact-actions">
+        <a class="btn btn-accent btn-lg" href={company.phone.href} data-track="call_click" data-track-location="contact-section">
+          <Icon name="phone" /> Anrufen
+        </a>
+        <a class="btn btn-lg" href={`mailto:${company.email}`} data-track="email_click" data-track-location="contact-section">
+          <Icon name="mail" /> E-Mail schreiben
+        </a>
+        <a class="btn btn-ghost btn-lg" href={company.directions} target="_blank" rel="noopener" data-track="route_click" data-track-location="contact-section">
+          <Icon name="route" /> Route planen
+        </a>
+      </div>
+      <p class="contact-lines">
+        Telefon <a href={company.phone.href}>{company.phone.display}</a> · E-Mail <a href={`mailto:${company.email}`}>{company.email}</a>
+      </p>
+
+      <div class="hours">
+        <div class="hours-head">
+          <h3>Öffnungszeiten</h3>
+          <OpenState />
+        </div>
+        <dl>
+          {
+            openingHours.map((p) => (
+              <div>
+                <dt>{p.days}</dt>
+                <dd>{formatHours(p)}</dd>
+              </div>
+            ))
+          }
+          <div>
+            <dt>Sonntag</dt>
+            <dd>geschlossen</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    <MapPreview />
+  </div>
+</section>
+
+<style>
+  .contact-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .contact-info .section-head {
+    margin-bottom: 1.25rem;
+  }
+
+  .contact-address {
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  .contact-actions {
+    display: grid;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+  }
+
+  .contact-lines {
+    margin-top: 1rem;
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .contact-lines a {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .hours {
+    margin-top: 1.75rem;
+    padding: 1.25rem 1.35rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .hours-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .hours h3 {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .hours dl {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .hours dl div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--line);
+    font-size: var(--fs-sm);
+  }
+
+  .hours dl div:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .hours dt {
+    font-weight: 600;
+  }
+
+  .hours dd {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 36em) {
+    .contact-actions {
+      grid-template-columns: repeat(3, auto);
+      justify-content: start;
+    }
+  }
+
+  @media (min-width: 64em) {
+    .contact-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 4rem;
+      align-items: stretch;
+    }
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+import '@/styles/global.css';
+import SeoHead, { type SeoProps } from '@/components/layout/SeoHead.astro';
+import Header from '@/components/layout/Header.astro';
+import MobileMenu from '@/components/layout/MobileMenu.astro';
+import MobileActionBar from '@/components/layout/MobileActionBar.astro';
+import Footer from '@/components/layout/Footer.astro';
+import CookieConsent from '@/components/layout/CookieConsent.astro';
+import CompareTray from '@/components/vehicles/CompareTray.astro';
+import { organizationSchema } from '@/lib/schema';
+
+interface Props extends SeoProps {
+  /** Transparent header over a full-bleed hero. */
+  overlayHeader?: boolean;
+  /** Show the generic mobile action bar (pages with their own sticky CTA pass false). */
+  actionBar?: boolean;
+  inquiryHref?: string;
+  inquiryLabel?: string;
+  bodyClass?: string;
+  /** Floating "X von 3 im Vergleich" pill – only where vehicles are listed. */
+  compareTray?: boolean;
+}
+
+const {
+  overlayHeader = false,
+  actionBar = true,
+  inquiryHref,
+  inquiryLabel,
+  bodyClass,
+  compareTray = false,
+  jsonLd = [],
+  ...seo
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="de-DE">
+  <head>
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <SeoHead {...seo} jsonLd={[organizationSchema(Astro.site), ...jsonLd]} />
+    <slot name="head" />
+  </head>
+  <body class={bodyClass} data-actionbar={actionBar || Astro.slots.has('sticky') ? '' : undefined}>
+    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+    <Header overlay={overlayHeader} />
+    <MobileMenu />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    {actionBar && <MobileActionBar inquiryHref={inquiryHref} inquiryLabel={inquiryLabel} />}
+    <slot name="sticky" />
+    {compareTray && <CompareTray />}
+    <CookieConsent />
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <script>
+      import '@/scripts/site';
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

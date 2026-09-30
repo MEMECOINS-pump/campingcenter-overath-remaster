@@ -1,0 +1,194 @@
+---
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { company } from '@/data/company';
+
+const stages = [
+  { no: '01', title: 'Entdecken', text: 'Stöbere online im aktuellen Bestand – oder schau dich direkt bei uns in der Weberstraße um.' },
+  { no: '02', title: 'Beraten', text: 'Wir nehmen uns Zeit für deine Fragen. Ehrlich und von Menschen, die selbst campen.' },
+  { no: '03', title: 'Auswählen', text: 'Probesitzen, vergleichen, entscheiden. Dein altes Wohnmobil nehmen wir gern in Zahlung, Finanzierung ist möglich.' },
+  { no: '04', title: 'Losfahren', text: 'Du holst dein Fahrzeug bei uns in Overath ab – und die erste Reise kann beginnen.' },
+  { no: '05', title: 'Betreut bleiben', text: 'TÜV-Abnahme, Gasprüfung, Reparatur oder Nachrüstung: Unsere Werkstatt bleibt an deiner Seite.' },
+];
+
+const trust = [
+  { value: company.foundedStatement, label: 'Erfahrung rund ums Camping' },
+  { value: '5 Marken', label: 'als Vertragshändler' },
+  { value: 'ADAC', label: 'Mietstation Köln-Ost' },
+  { value: 'Fachwerkstatt', label: 'für Wohnmobile & Wohnwagen' },
+];
+---
+
+<section class="section section-paper journey" aria-labelledby="journey-title">
+  <div class="container">
+    <SectionHeader
+      id="journey-title"
+      eyebrow="Alles aus einer Hand"
+      title="Von der ersten Idee bis zur ersten Reise."
+      lead="Kaufen, mieten, warten lassen, verkaufen – im Campingcenter Overath begleitet dich ein Team über das ganze Camperleben."
+      center
+    />
+
+    <ol class="stages">
+      {
+        stages.map((s, i) => (
+          <li class="stage reveal" data-delay={i}>
+            <span class="stage-no">{s.no}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <ul class="trust" role="list">
+      {
+        trust.map((t) => (
+          <li>
+            <strong>{t.value}</strong>
+            <span>{t.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .stages {
+    position: relative;
+    display: grid;
+    gap: 0;
+    list-style: none;
+    counter-reset: stage;
+  }
+
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3.25rem 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 1rem;
+    padding-bottom: 1.75rem;
+  }
+
+  .stage::before {
+    content: '';
+    position: absolute;
+    top: 3.25rem;
+    bottom: 0.25rem;
+    left: 1.6rem;
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  .stage:last-child::before {
+    display: none;
+  }
+
+  .stage-no {
+    grid-row: 1 / 3;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--graphite);
+    color: #ffc778;
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .stage h3 {
+    align-self: end;
+    font-size: 1.3rem;
+    padding-top: 0.2rem;
+  }
+
+  .stage p {
+    margin-top: 0.3rem;
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .stage[data-delay='1'] {
+    --delay: 80ms;
+  }
+
+  .stage[data-delay='2'] {
+    --delay: 160ms;
+  }
+
+  .stage[data-delay='3'] {
+    --delay: 240ms;
+  }
+
+  .stage[data-delay='4'] {
+    --delay: 320ms;
+  }
+
+  @media (min-width: 64em) {
+    .stages {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stage {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      padding-bottom: 0;
+    }
+
+    .stage-no {
+      grid-row: auto;
+      margin-bottom: 1.1rem;
+    }
+
+    .stage::before {
+      top: 1.6rem;
+      left: 3.25rem;
+      right: -1.5rem;
+      bottom: auto;
+      width: auto;
+      height: 1px;
+    }
+  }
+
+  .trust {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background: var(--line);
+    list-style: none;
+  }
+
+  .trust li {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1.25rem 1.1rem;
+    background: var(--surface);
+    text-align: center;
+  }
+
+  .trust strong {
+    font-family: var(--font-head);
+    font-size: var(--fs-xl);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .trust span {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 48em) {
+    .trust {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>
