@@ -1,0 +1,23 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# asset download cache (re-creatable via `npm run assets`)
+.asset-cache/
+
+# environment / secrets
+.env
+.env.*
+!.env.example
+
+# logs & OS
+npm-debug.log*
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__pycache__/
