@@ -13,109 +13,115 @@ export interface CampingAssistResult {
 
 const hoursText = openingHours.map((p) => `${p.days}: ${formatHours(p)}`).join(' · ');
 
+type TopicId =
+  | 'verkauf'
+  | 'finder'
+  | 'vermietung'
+  | 'ankauf'
+  | 'werkstatt'
+  | 'marken'
+  | 'oeffnung'
+  | 'kontakt'
+  | 'camping-tipps';
+
 type Topic = {
-  id: string;
+  id: TopicId;
   title: string;
+  /** Higher weight = preferred when several topics match. */
+  weight: number;
   patterns: RegExp[];
   summary: string;
   bullets?: string[];
-  ctaLabel?: string;
-  ctaHref?: string;
+  ctaLabel: string;
+  ctaHref: string;
   disclaimer?: string;
 };
 
 const TOPICS: Topic[] = [
   {
-    id: 'verkauf',
-    title: 'Wohnmobil kaufen',
-    patterns: [/kauf|verkauf|neu|gebraucht|bestand|fahrzeug|preis|finanz|angebot|welches wohnmobil|camper finden|marke/i],
-    summary:
-      'Beim Campingcenter Overath findest du neue und gebrauchte Wohnmobile vor Ort – mit ehrlicher Beratung von Campern für Camper.',
-    bullets: [
-      'Vertragspartner: Challenger, LA STRADA und Eura Mobil',
-      'Gebrauchte Fahrzeuge geprüft und transparent erklärt',
-      'Camper-Finder hilft bei Länge, Betten und Ausstattung',
+    id: 'oeffnung',
+    title: 'Öffnungszeiten & Feiertage',
+    weight: 12,
+    patterns: [
+      /öffnungs|oeffnungs|geöffnet|geoeffnet|habt ihr offen|wann offen|geschlossen|feiertag|wann habt|uhrzeit|öffnungszeit/i,
     ],
-    ctaLabel: 'Fahrzeuge ansehen',
-    ctaHref: '/wohnmobile/',
-  },
-  {
-    id: 'finder',
-    title: 'Camper-Finder',
-    patterns: [/finder|welcher camper|welches modell|passend|personen|schlafplatz|bettlänge|bettlange|fahrzeuglänge/i],
-    summary:
-      'Mit dem Camper-Finder filterst du in wenigen Fragen passende Wohnmobile nach Personen, Schlafplätzen, Bettlänge und Fahrzeuglänge.',
-    bullets: ['Kurze Fragen', 'Treffer aus dem aktuellen Bestand', 'Danach unverbindlich anfragen'],
-    ctaLabel: 'Camper-Finder starten',
-    ctaHref: '/camper-finder/',
+    summary: `Unsere Zeiten: ${hoursText}. Sonntags und an gesetzlichen Feiertagen in NRW sind wir geschlossen.`,
+    bullets: [
+      `${company.address.street}, ${company.address.postalCode} ${company.address.city}`,
+      `Telefon ${company.phone.display}`,
+    ],
+    ctaLabel: 'Kontakt & Anfahrt',
+    ctaHref: '/kontakt/',
   },
   {
     id: 'vermietung',
     title: 'Wohnmobil mieten',
-    patterns: [/miet|verleih|urlaub|reise|adac|mieten|vermiet/i],
+    weight: 11,
+    patterns: [/mieten|mietwagen|vermiet|verleih|mietstation|\badac\b|urlaub mieten|camper mieten|wohnmobil mieten/i],
     summary:
-      'Wir sind ADAC-Mietstation Köln-Ost. Für die Vermietung beraten wir dich zu Fahrzeugklasse, Zeitraum und Ausstattung.',
-    bullets: [
-      'Anfragen am besten mit Reisezeitraum und Personenzahl',
-      'E-Mail Vermietung: ' + company.emails.rental,
-    ],
+      'Als ADAC-Mietstation Köln-Ost vermieten wir Wohnmobile für deinen Urlaub. Am besten mit Zeitraum und Personenzahl anfragen – dann finden wir die passende Klasse.',
+    bullets: [`E-Mail: ${company.emails.rental}`, 'Beratung zu Größe, Ausstattung und Reisezeit'],
     ctaLabel: 'Zur Vermietung',
     ctaHref: '/vermietung-wohnmobile/',
   },
   {
     id: 'ankauf',
     title: 'Fahrzeug verkaufen / Ankauf',
-    patterns: [/ankauf|verkaufen|inzahlung|ankaufen|mein wohnmobil verkaufen|bewertung/i],
+    weight: 11,
+    patterns: [/ankauf|ankaufen|inzahlung|mein (wohnmobil|camper|wohnwagen) verkaufen|fahrzeug verkaufen|bewertung.*fahrzeug|ankaufs/i],
     summary:
-      'Wir kaufen Wohnmobile, Wohnwagen, Vans und Boote an – mit fairer Bewertung und Angebot in der Regel innerhalb von 24 Stunden.',
-    bullets: ['Online-Formular mit Fotos', 'Auf Wunsch Abholung und Abmeldung', 'Unverbindlich und transparent'],
+      'Wir kaufen Wohnmobile, Wohnwagen, Vans und Boote an. Mit Fotos und Angaben erhältst du in der Regel innerhalb von 24 Stunden ein unverbindliches Angebot.',
+    bullets: ['Online-Formular mit Fotos', 'Optional Abholung & Abmeldung', 'Transparent und unverbindlich'],
     ctaLabel: 'Ankauf starten',
     ctaHref: '/wohnmobil-ankauf/',
   },
   {
-    id: 'werkstatt',
-    title: 'Werkstatt & Service',
+    id: 'finder',
+    title: 'Passenden Camper finden',
+    weight: 10,
     patterns: [
-      /werkstatt|reparatur|heizung|truma|batter|solar|nässe|naesse|feucht|undicht|gfk|unfall|tüv|tuv|gasprüfung|service|fehlercode|e5\d{2}/i,
+      /finder|welcher camper|welches (wohnmobil|modell)|was passt|für \d person|personen|schlafplatz|bettlänge|bettlange|fahrzeuglänge|familie.*camper|camper.*familie/i,
     ],
     summary:
-      'Unsere Fachwerkstatt kümmert sich um Wohnmobile und Wohnwagen – von Prüfung über Technik bis Nässe- und GFK-Schäden. Keine Ferndiagnose: Wir ordnen dein Anliegen ein und vereinbaren einen Termin.',
-    bullets: [
-      'Sicherheitscheck mit Siegel, Gasprüfung, HU/SP',
-      'Heizung, Elektro, Solar, Wasser, Fahrwerk',
-      'Nässe- und GFK-Reparaturen',
+      'Sag uns grob Personen, Schlafplätze, Bettlänge und gewünschte Fahrzeuglänge – der Camper-Finder zeigt passende Modelle aus unserem Bestand.',
+    bullets: ['Wenige kurze Fragen', 'Treffer aus dem aktuellen Bestand', 'Danach unverbindlich anfragen'],
+    ctaLabel: 'Camper-Finder starten',
+    ctaHref: '/camper-finder/',
+  },
+  {
+    id: 'verkauf',
+    title: 'Wohnmobil kaufen',
+    weight: 9,
+    patterns: [
+      /kaufen|kaufinteresse|neu(fahrzeug|wagen)?|gebraucht|im bestand|preis|finanz|raten|welches wohnmobil kaufen|camper kaufen|wohnmobil suchen|fahrzeuge ansehen/i,
     ],
-    ctaLabel: 'Werkstatt-Termin anfragen',
-    ctaHref: '/werkstatt-kundendienst/#termin',
-    disclaimer: 'Keine verbindliche Ferndiagnose – die genaue Ursache prüft ein Techniker vor Ort.',
+    summary:
+      'Bei uns siehst du neue und gebrauchte Wohnmobile vor Ort – Challenger, LA STRADA, Eura Mobil und geprüfte Gebrauchte. Beratung von Campern für Camper, ohne Druck.',
+    bullets: [
+      'Bestand vor Ort in Overath ansehen',
+      'Camper-Finder für die Vorauswahl',
+      'Finanzierung und Inzahlungnahme möglich',
+    ],
+    ctaLabel: 'Fahrzeuge ansehen',
+    ctaHref: '/wohnmobile/',
   },
   {
     id: 'marken',
     title: 'Marken & Partner',
-    patterns: [/challenger|la\s*strada|eura|marke|vertragspartner|hersteller|konfigurator/i],
+    weight: 8,
+    patterns: [/challenger|la\s*strada|eura\s*mobil|\beura\b|vertragspartner|konfigurator|markenpartner/i],
     summary:
-      'Offizielle Vertragspartner: Challenger, LA STRADA und Eura Mobil. Für LA STRADA gibt es zusätzlich den Konfigurator mit anschließender Angebotsanfrage bei uns.',
-    bullets: ['Persönliche Beratung in Overath', 'Aktuelle Modelle und Ausstattungen', 'LA STRADA online konfigurieren'],
+      'Wir sind Vertragspartner von Challenger, LA STRADA und Eura Mobil. LA STRADA kannst du online konfigurieren und das Ergebnis bei uns anfragen.',
+    bullets: ['Persönliche Beratung in Overath', 'Aktuelle Modelle im Bestand', 'LA STRADA Konfigurator'],
     ctaLabel: 'Marken ansehen',
     ctaHref: '/marken/',
   },
   {
-    id: 'oeffnung',
-    title: 'Öffnungszeiten & Feiertage',
-    patterns: [/öffnungs|oeffnungs|geöffnet|geoeffnet|offen|geschlossen|feiertag|wann habt|uhrzeit|samstag|sonntag/i],
-    summary: `Unsere Öffnungszeiten (Europe/Berlin): ${hoursText}. Sonntags und an gesetzlichen Feiertagen in NRW haben wir geschlossen.`,
-    bullets: [
-      'Adresse: ' + `${company.address.street}, ${company.address.postalCode} ${company.address.city}`,
-      'Telefon: ' + company.phone.display,
-    ],
-    ctaLabel: 'Kontakt & Anfahrt',
-    ctaHref: '/kontakt/',
-  },
-  {
     id: 'kontakt',
     title: 'Kontakt & Anfahrt',
-    patterns: [/kontakt|anfahr|adresse|telefon|anrufen|route|wo seid|überath|overath|mail|e-mail/i],
-    summary: `Du findest uns in der ${company.address.street}, ${company.address.postalCode} ${company.address.city}. Ruf uns an unter ${company.phone.display} oder schreib an ${company.email}.`,
+    weight: 8,
+    patterns: [/kontakt|anfahr|adresse|telefon|anrufen|route planen|wo seid ihr|e-?mail schreiben|nachricht schreiben/i],
+    summary: `Campingcenter Overath, ${company.address.street}, ${company.address.postalCode} ${company.address.city}. Tel. ${company.phone.display}, E-Mail ${company.email}.`,
     bullets: ['Persönliche Beratung vor Ort', 'Route und Karte auf der Kontaktseite'],
     ctaLabel: 'Zur Kontaktseite',
     ctaHref: '/kontakt/',
@@ -123,35 +129,91 @@ const TOPICS: Topic[] = [
   {
     id: 'camping-tipps',
     title: 'Camping-Wissen',
+    weight: 6,
     patterns: [
-      /camping|stellplatz|wohnwagen|alkoven|teilintegriert|vollintegriert|van|kastenwagen|führerschein|fuehrerschein|b96|gewicht|zuladung|wintercamping|campingplatz/i,
+      /alkoven|teilintegriert|vollintegriert|kastenwagen|\bvan\b|führerschein|fuehrerschein|\bb96\b|zuladung|stellplatz|wintercamping|campingplatz|bauform|reisemobil tipp/i,
     ],
     summary:
-      'Kurz und praxisnah: Beim Camper-Kauf zählen Personenanzahl, Schlafplätze, Bettlänge, Fahrzeuglänge, Zuladung und Führerschein-Klasse. Wir helfen dir, das passende Fahrzeug im Bestand zu finden – ohne Fachchinesisch.',
+      'Praxis-Tipp: Wichtig sind Personen, Schlafplätze, Bettlänge, Länge, Zuladung und Führerschein. Wir helfen dir, daraus das passende Fahrzeug im Bestand zu machen.',
     bullets: [
-      'Kastenwagen/Van: wendig, oft Führerschein B',
-      'Teilintegriert: guter Alltagskompromiss',
-      'Alkoven: viel Schlafplatz für Familien',
-      'Vor dem Kauf: Bettlänge und Zuladung prüfen',
+      'Kastenwagen/Van: wendig, oft Klasse B',
+      'Teilintegriert: starker Alltagskompromiss',
+      'Alkoven: viel Platz für Familien',
     ],
-    ctaLabel: 'Passenden Camper finden',
+    ctaLabel: 'Camper-Finder starten',
     ctaHref: '/camper-finder/',
+  },
+  {
+    id: 'werkstatt',
+    title: 'Werkstatt & Service',
+    weight: 5,
+    // Only clear repair / workshop intent – not generic “solar”, “service”, “battery” in a buying context
+    patterns: [
+      /werkstatt|reparatur|kundendienst|termin.*werkstatt|werkstatt.*termin/i,
+      /heizung.*(defekt|kaputt|geht nicht|fehler)|truma|fehlercode|e5\d{2}/i,
+      /n[aä]sse(schaden)?|undicht|schimmel|gfk|unfallschaden/i,
+      /gasprüfung|tüv|tuv|\bhu\b|\bsp\b|dichtigkeit/i,
+      /(batterie|solar|elektro).*(defekt|kaputt|problem|ladet nicht)|ladeger/i,
+    ],
+    summary:
+      'Unsere Fachwerkstatt hilft bei Prüfung, Technik, Nässe- und GFK-Schäden. Beschreib kurz das Problem – wir ordnen es ein und finden einen Termin. Keine Ferndiagnose.',
+    bullets: ['HU/SP, Gas- und Dichtigkeitsprüfung', 'Heizung, Elektro, Wasser, Fahrwerk', 'Nässe- & GFK-Reparatur'],
+    ctaLabel: 'Werkstatt-Termin anfragen',
+    ctaHref: '/werkstatt-kundendienst/#termin',
+    disclaimer: 'Keine verbindliche Ferndiagnose – Prüfung erfolgt vor Ort.',
   },
 ];
 
 const OFF_TOPIC =
   /politik|wahl|crypto|aktie|bitcoin|hack|waffe|drog|medizin|rezept|sex|porno|gambling|casino|chatgpt jailbreak|ignore previous/i;
 
+function scoreTopic(text: string, topic: Topic): number {
+  let hits = 0;
+  for (const p of topic.patterns) {
+    if (p.test(text)) hits += 1;
+  }
+  if (!hits) return 0;
+  return hits * topic.weight;
+}
+
+function pickTopic(text: string): Topic {
+  let best: Topic | null = null;
+  let bestScore = 0;
+  for (const topic of TOPICS) {
+    const score = scoreTopic(text, topic);
+    if (score > bestScore) {
+      best = topic;
+      bestScore = score;
+    }
+  }
+  if (best) return best;
+
+  // Camping-related but no sharp intent → Verkauf/Beratung, never Werkstatt by default
+  return {
+    id: 'verkauf',
+    title: 'Wie kann ich helfen?',
+    weight: 1,
+    patterns: [],
+    summary:
+      'Am Campingcenter Overath geht’s um Wohnmobile: kaufen, mieten, Ankauf, Markenberatung oder Werkstatt. Sag mir kurz, was du brauchst – dann leite ich dich passend weiter.',
+    bullets: ['Wohnmobil kaufen / finden', 'Mieten (ADAC)', 'Ankauf deines Fahrzeugs', 'Öffnungszeiten & Kontakt'],
+    ctaLabel: 'Fahrzeuge ansehen',
+    ctaHref: '/wohnmobile/',
+  };
+}
+
 /**
  * Camping-only assistant for Campingcenter Overath.
- * Prefers concrete, local answers; never invents prices or diagnoses.
+ * Intent-based: Kauf, Miete, Ankauf, Öffnung, … – Werkstatt only on clear repair intent.
  */
 export function assistCamping(message: string): CampingAssistResult {
   const text = message.trim();
   if (text.length < 4) {
     return {
       title: 'Kurze Frage',
-      summary: 'Schreib kurz, worum es geht – z. B. kaufen, mieten, Werkstatt, Öffnungszeiten oder Ankauf.',
+      summary: 'Schreib kurz, worum es geht – z. B. kaufen, mieten, Ankauf, Öffnungszeiten oder ein Werkstatt-Problem.',
+      ctaLabel: 'Fahrzeuge ansehen',
+      ctaHref: '/wohnmobile/',
       provider: 'rules',
     };
   }
@@ -160,8 +222,8 @@ export function assistCamping(message: string): CampingAssistResult {
     return {
       title: 'Nur Camping-Themen',
       summary:
-        'Ich helfe dir bei allem rund ums Campingcenter Overath: Wohnmobile kaufen & mieten, Ankauf, Werkstatt, Marken, Öffnungszeiten und praxisnahe Camping-Fragen.',
-      bullets: ['Verkauf & Camper-Finder', 'Vermietung (ADAC)', 'Werkstatt & Service', 'Ankauf', 'Öffnung & Kontakt'],
+        'Ich bleibe bei Camping & Campingcenter Overath: Fahrzeuge kaufen oder mieten, Ankauf, Marken, Öffnungszeiten und Werkstatt-Fragen.',
+      bullets: ['Verkauf & Camper-Finder', 'Vermietung (ADAC)', 'Ankauf', 'Öffnung & Kontakt', 'Werkstatt bei Defekten'],
       ctaLabel: 'Fahrzeuge entdecken',
       ctaHref: '/wohnmobile/',
       provider: 'rules',
@@ -169,22 +231,21 @@ export function assistCamping(message: string): CampingAssistResult {
     };
   }
 
-  const hit = TOPICS.find((t) => t.patterns.some((p) => p.test(text))) ?? TOPICS.find((t) => t.id === 'camping-tipps')!;
-
+  const hit = pickTopic(text);
   return {
     title: hit.title,
     summary: hit.summary,
     ...(hit.bullets ? { bullets: hit.bullets } : {}),
-    ...(hit.ctaLabel ? { ctaLabel: hit.ctaLabel } : {}),
-    ...(hit.ctaHref ? { ctaHref: hit.ctaHref } : {}),
+    ctaLabel: hit.ctaLabel,
+    ctaHref: hit.ctaHref,
     ...(hit.disclaimer ? { disclaimer: hit.disclaimer } : {}),
     provider: 'rules',
   };
 }
 
 function isCampingRelated(text: string): boolean {
-  if (TOPICS.some((t) => t.patterns.some((p) => p.test(text)))) return true;
-  return /camping|camper|wohnmobil|wohnwagen|reisemobil|overath|ccoverath|stellplatz|urlaub|werkstatt|mieten|kaufen|ankauf|van|alkoven/i.test(
+  if (TOPICS.some((t) => scoreTopic(text, t) > 0)) return true;
+  return /camping|camper|wohnmobil|wohnwagen|reisemobil|overath|ccoverath|stellplatz|urlaub|mieten|kaufen|ankauf|van|alkoven|marke|öffnung|oeffnung|kontakt|beratung/i.test(
     text,
   );
 }
@@ -192,6 +253,6 @@ function isCampingRelated(text: string): boolean {
 export const CAMPING_QUICK_PROMPTS = [
   { label: 'Kaufen', text: 'Ich suche ein passendes Wohnmobil zum Kaufen.' },
   { label: 'Mieten', text: 'Ich möchte ein Wohnmobil mieten.' },
-  { label: 'Werkstatt', text: 'Ich brauche Hilfe von der Werkstatt.' },
+  { label: 'Ankauf', text: 'Ich möchte mein Wohnmobil verkaufen / anbieten.' },
   { label: 'Öffnung', text: 'Wann habt ihr heute geöffnet?' },
 ] as const;
