@@ -331,7 +331,7 @@ export function assistCamping(message: string): CampingAssistResult {
     return {
       title: 'Gern – worum geht’s beim Camping?',
       summary:
-        'Ich helfe bei Challenger & Co., Kauf, Miete, Ankauf und Öffnungszeiten. Tippe z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“ – oder öffne den Reiter Wartungshefte.',
+        'Ich helfe bei Challenger & Co., Kauf, Miete, Ankauf und Öffnungszeiten. Tippe z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“ – oder öffne den Reiter Wartungshefte.',
       ctaLabel: 'Fahrzeuge entdecken',
       ctaHref: '/wohnmobile/',
       provider: 'rules',
