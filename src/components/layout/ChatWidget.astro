@@ -1,78 +1,138 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
 import { CAMPING_QUICK_PROMPTS } from '@/lib/camping-assist';
+import { challengerManualHighlights, challengerManuals } from '@/data/challenger-manuals';
 import { url } from '@/lib/url';
 ---
 
 <div class="chatw" data-chat-widget>
-  <div class="chatw-panel" data-chat-panel hidden id="chatw-panel">
+  <div class="chatw-panel" data-chat-panel hidden id="chatw-panel" role="dialog" aria-labelledby="chatw-title">
     <header class="chatw-head">
       <div class="chatw-brand">
         <span class="chatw-avatar" aria-hidden="true"><Icon name="van" /></span>
-        <div>
-          <p class="chatw-kicker">Camping-Hilfe</p>
-          <p class="chatw-title">Fragen zu Kauf, Miete & Service</p>
+        <div class="chatw-brand-text">
+          <p class="chatw-kicker">Campingcenter Overath</p>
+          <h2 class="chatw-title" id="chatw-title">Camping-Assistent</h2>
         </div>
       </div>
-      <button type="button" class="chatw-x" data-chat-close aria-label="Camping-Hilfe schließen">
+      <button type="button" class="chatw-x" data-chat-close aria-label="Assistent schließen">
         <Icon name="close" />
       </button>
     </header>
 
-    <div class="chatw-body" data-chat-body>
-      <div class="chatw-msg chatw-msg-bot">
-        Hallo! Ich helfe dir bei <strong>Wohnmobilen, Camping und unserem Service in Overath</strong> – Kauf, Miete, Ankauf, Werkstatt, Marken und Öffnungszeiten.
-      </div>
-      <div class="chatw-chips" data-chat-chips>
-        {
-          CAMPING_QUICK_PROMPTS.map((q) => (
-            <button type="button" class="chatw-chip" data-chat-chip data-text={q.text}>
-              {q.label}
-            </button>
-          ))
-        }
-      </div>
+    <div class="chatw-tabs" role="tablist" aria-label="Assistent-Bereiche">
+      <button type="button" class="chatw-tab is-active" role="tab" aria-selected="true" data-chat-tab="chat" id="chatw-tab-chat">
+        Chat
+      </button>
+      <button type="button" class="chatw-tab" role="tab" aria-selected="false" data-chat-tab="manuals" id="chatw-tab-manuals">
+        Wartungshefte
+      </button>
     </div>
 
-    <form class="chatw-form" data-chat-form>
-      <label class="sr-only" for="chatw-input">Nachricht</label>
-      <textarea
-        id="chatw-input"
-        name="message"
-        rows="2"
-        placeholder="z. B. Welcher Camper passt für 4 Personen?"
-        data-chat-input
-        required
-        minlength="4"></textarea>
-      <button type="submit" class="btn btn-accent btn-sm" data-chat-send>
-        Fragen <Icon name="arrow-right" class="arrow" />
-      </button>
-    </form>
+    <!-- TAB: Chat -->
+    <div class="chatw-pane" data-chat-pane="chat" role="tabpanel" aria-labelledby="chatw-tab-chat">
+      <div class="chatw-body" data-chat-body>
+        <div class="chatw-msg chatw-msg-bot">
+          <p class="chatw-msg-lead">Hallo – wie kann ich helfen?</p>
+          <p>
+            Fragen zu <strong>Challenger</strong>, Kauf, Miete, Ankauf, Öffnungszeiten oder Service. Kurze Stichworte reichen.
+          </p>
+        </div>
+        <div class="chatw-chips" data-chat-chips>
+          {
+            CAMPING_QUICK_PROMPTS.map((q) => (
+              <button type="button" class="chatw-chip" data-chat-chip data-text={q.text}>
+                {q.label}
+              </button>
+            ))
+          }
+        </div>
+      </div>
 
-    <p class="chatw-foot">
-      <a href={url('/wohnmobile/')}>Verkauf</a>
-      ·
-      <a href={url('/vermietung-wohnmobile/')}>Mieten</a>
-      ·
-      <a href={url('/wohnmobil-ankauf/')}>Ankauf</a>
-      ·
-      <a href={url('/kontakt/')}>Kontakt</a>
-    </p>
+      <form class="chatw-composer" data-chat-form>
+        <label class="sr-only" for="chatw-input">Nachricht</label>
+        <div class="chatw-input-wrap">
+          <textarea
+            id="chatw-input"
+            name="message"
+            rows="1"
+            placeholder="Nachricht schreiben …"
+            data-chat-input
+            maxlength="800"></textarea>
+          <button type="submit" class="chatw-send" data-chat-send aria-label="Senden">
+            <Icon name="arrow-right" />
+          </button>
+        </div>
+        <p class="chatw-hint">Enter zum Senden · Shift+Enter für neue Zeile</p>
+      </form>
+    </div>
+
+    <!-- TAB: Wartungshefte -->
+    <div class="chatw-pane" data-chat-pane="manuals" role="tabpanel" aria-labelledby="chatw-tab-manuals" hidden>
+      <div class="chatw-manuals">
+        <div class="chatw-manual-intro">
+          <p class="chatw-manual-kicker">Challenger · Trigano VDL</p>
+          <p class="chatw-manual-lead">Offizielle Wartungshefte & Ergänzungen – zum Lesen und Herunterladen.</p>
+        </div>
+
+        <ul class="chatw-highlights">
+          {
+            challengerManualHighlights.map((h) => (
+              <li>
+                <strong>{h.title}</strong>
+                <span>{h.text}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <ul class="chatw-docs">
+          {
+            challengerManuals.map((m) => (
+              <li class="chatw-doc">
+                <div class="chatw-doc-main">
+                  <span class="chatw-doc-badge" data-kind={m.kind}>
+                    {m.kind === 'wartungsheft' ? 'Wartung' : m.kind === 'ergaenzung' ? 'Ergänzung' : 'Service'}
+                  </span>
+                  <p class="chatw-doc-title">{m.title}</p>
+                  <p class="chatw-doc-sub">{m.subtitle}</p>
+                  <p class="chatw-doc-meta">
+                    {m.year} · PDF · {m.sizeLabel}
+                  </p>
+                  <ul class="chatw-doc-topics">
+                    {m.topics.map((t) => (
+                      <li>{t}</li>
+                    ))}
+                  </ul>
+                </div>
+                <a
+                  class="chatw-doc-btn"
+                  href={url(`/downloads/challenger/${m.file}`)}
+                  target="_blank"
+                  rel="noopener"
+                  data-track="cta_click"
+                  data-track-location="chat-manual"
+                >
+                  PDF öffnen
+                  <Icon name="external" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="chatw-manual-note">
+          Profiles-Kataloge (große Dateien) auf Anfrage. Bei Garantiefragen hilft auch unser Chat oder die
+          <a href={url('/werkstatt-kundendienst/')}>Werkstatt</a>.
+        </p>
+      </div>
+    </div>
   </div>
 
-  <button
-    type="button"
-    class="chatw-fab"
-    data-chat-toggle
-    aria-expanded="false"
-    aria-controls="chatw-panel"
-  >
-    <span class="chatw-fab-ring" aria-hidden="true"></span>
-    <span class="chatw-fab-icon" aria-hidden="true">
-      <Icon name="van" />
-    </span>
+  <button type="button" class="chatw-fab" data-chat-toggle aria-expanded="false" aria-controls="chatw-panel">
+    <span class="chatw-fab-icon" aria-hidden="true"><Icon name="van" /></span>
     <span class="chatw-fab-copy">
-      <span class="chatw-fab-eyebrow">Hilfe</span>
+      <span class="chatw-fab-eyebrow">Assistent</span>
       <span class="chatw-fab-label">Camping-KI</span>
     </span>
   </button>
@@ -80,96 +140,64 @@ import { url } from '@/lib/url';
 
 <style>
   .chatw {
+    --cw-radius: 1.25rem;
+    --cw-pad: 1rem;
     position: fixed;
     right: 1rem;
     bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + 1rem);
     z-index: 70;
     display: grid;
     justify-items: end;
-    gap: 0.7rem;
-    max-width: min(calc(100vw - 1.5rem), 22.5rem);
+    gap: 0.75rem;
+    width: min(calc(100vw - 1.25rem), 23.5rem);
+    font-family: var(--font-body);
   }
 
+  /* FAB */
   .chatw-fab {
-    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.65rem;
-    min-height: 3.4rem;
-    padding: 0.45rem 1.05rem 0.45rem 0.45rem;
-    border: 1px solid rgb(138 82 8 / 0.28);
+    min-height: 3.35rem;
+    padding: 0.4rem 1.1rem 0.4rem 0.4rem;
+    border: 0;
     border-radius: 999px;
-    background: linear-gradient(135deg, #f0b45a 0%, var(--brand) 42%, var(--brand-strong) 100%);
-    color: var(--graphite);
+    background: var(--graphite);
+    color: #fff;
     font: inherit;
     cursor: pointer;
-    box-shadow:
-      0 10px 28px -12px rgb(184 111 12 / 0.7),
-      0 0 0 1px rgb(255 255 255 / 0.25) inset;
-    transition:
-      transform 0.18s var(--ease-out),
-      box-shadow 0.18s var(--ease-out);
+    box-shadow: 0 12px 32px -14px rgb(28 32 36 / 0.55);
+    transition: transform 0.18s ease, background 0.18s ease;
   }
 
   .chatw-fab:hover {
     transform: translateY(-2px);
-    box-shadow:
-      0 14px 32px -12px rgb(184 111 12 / 0.75),
-      0 0 0 1px rgb(255 255 255 / 0.3) inset;
+    background: #2a3036;
   }
 
   .chatw-fab[aria-expanded='true'] {
-    background: var(--graphite);
-    color: #fff;
-    border-color: transparent;
-  }
-
-  .chatw-fab[aria-expanded='true'] .chatw-fab-icon {
-    background: rgb(255 255 255 / 0.12);
-    color: #fff;
-  }
-
-  .chatw-fab-ring {
-    position: absolute;
-    inset: -4px;
-    border-radius: inherit;
-    border: 2px solid rgb(208 129 21 / 0.35);
-    animation: chatw-pulse 2.4s ease-out infinite;
-    pointer-events: none;
-  }
-
-  .chatw-fab[aria-expanded='true'] .chatw-fab-ring {
-    display: none;
-  }
-
-  @keyframes chatw-pulse {
-    0% {
-      transform: scale(1);
-      opacity: 0.7;
-    }
-    70% {
-      transform: scale(1.08);
-      opacity: 0;
-    }
-    100% {
-      opacity: 0;
-    }
+    background: var(--brand);
+    color: var(--graphite);
   }
 
   .chatw-fab-icon {
     display: grid;
     place-items: center;
-    width: 2.55rem;
-    height: 2.55rem;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
-    background: rgb(255 255 255 / 0.55);
+    background: var(--brand);
     color: var(--graphite);
     flex: none;
   }
 
+  .chatw-fab[aria-expanded='true'] .chatw-fab-icon {
+    background: rgb(28 32 36 / 0.12);
+  }
+
   .chatw-fab-icon :global(.icon) {
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.3rem;
+    height: 1.3rem;
   }
 
   .chatw-fab-copy {
@@ -177,15 +205,14 @@ import { url } from '@/lib/url';
     gap: 0.05rem;
     text-align: left;
     line-height: 1.15;
-    padding-right: 0.15rem;
   }
 
   .chatw-fab-eyebrow {
-    font-size: 0.65rem;
-    font-weight: 800;
+    font-size: 0.62rem;
+    font-weight: 750;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    opacity: 0.8;
+    opacity: 0.75;
   }
 
   .chatw-fab-label {
@@ -193,17 +220,20 @@ import { url } from '@/lib/url';
     font-weight: 800;
   }
 
+  /* Panel */
   .chatw-panel {
-    width: min(calc(100vw - 1.5rem), 22.5rem);
-    max-height: min(72vh, 34rem);
+    width: 100%;
+    max-height: min(78vh, 38rem);
     display: grid;
-    grid-template-rows: auto 1fr auto auto;
+    grid-template-rows: auto auto minmax(0, 1fr);
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 1.15rem;
-    background: var(--paper);
+    border: 1px solid rgb(28 32 36 / 0.08);
+    border-radius: var(--cw-radius);
+    background: #fff;
     color: var(--text);
-    box-shadow: var(--shadow-lg);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.6) inset,
+      0 24px 48px -20px rgb(28 32 36 / 0.35);
   }
 
   .chatw-panel[hidden] {
@@ -212,12 +242,11 @@ import { url } from '@/lib/url';
 
   .chatw-head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.95rem 1rem 0.8rem;
-    border-bottom: 1px solid var(--line);
-    background: linear-gradient(180deg, var(--brand-soft), var(--sand));
+    padding: 0.95rem var(--cw-pad) 0.75rem;
+    background: linear-gradient(165deg, #f8efe0 0%, #fbf9f5 70%);
   }
 
   .chatw-brand {
@@ -230,64 +259,209 @@ import { url } from '@/lib/url';
   .chatw-avatar {
     display: grid;
     place-items: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 50%;
+    width: 2.55rem;
+    height: 2.55rem;
+    border-radius: 0.85rem;
     background: var(--brand);
     color: var(--graphite);
     flex: none;
   }
 
+  .chatw-avatar :global(.icon) {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
   .chatw-kicker {
     margin: 0;
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-weight: 800;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--brand-ink);
   }
 
   .chatw-title {
-    margin: 0.15rem 0 0;
-    font-size: var(--fs-sm);
-    font-weight: 750;
+    margin: 0.1rem 0 0;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
   }
 
   .chatw-x {
     display: grid;
     place-items: center;
-    width: 36px;
-    height: 36px;
+    width: 2.25rem;
+    height: 2.25rem;
     border: 0;
-    border-radius: var(--radius-pill);
-    background: rgb(255 255 255 / 0.75);
+    border-radius: 50%;
+    background: rgb(28 32 36 / 0.06);
+    cursor: pointer;
+    flex: none;
+  }
+
+  .chatw-x:hover {
+    background: rgb(28 32 36 / 0.1);
+  }
+
+  /* Tabs */
+  .chatw-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+    padding: 0 var(--cw-pad) 0.65rem;
+    background: linear-gradient(165deg, #fbf9f5 0%, #fff 100%);
+    border-bottom: 1px solid rgb(28 32 36 / 0.06);
+  }
+
+  .chatw-tab {
+    min-height: 2.35rem;
+    border: 0;
+    border-radius: 0.7rem;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 750;
     cursor: pointer;
   }
 
-  .chatw-body {
+  .chatw-tab:hover {
+    background: rgb(28 32 36 / 0.04);
+    color: var(--text);
+  }
+
+  .chatw-tab.is-active {
+    background: var(--graphite);
+    color: #fff;
+  }
+
+  /* Panes */
+  .chatw-pane {
+    min-height: 0;
     display: grid;
-    gap: 0.65rem;
-    padding: 0.9rem;
+    grid-template-rows: minmax(0, 1fr) auto;
+    overflow: hidden;
+  }
+
+  .chatw-pane[hidden] {
+    display: none !important;
+  }
+
+  .chatw-pane[data-chat-pane='manuals'] {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .chatw-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.9rem var(--cw-pad);
     overflow: auto;
-    align-content: start;
+    overscroll-behavior: contain;
+    background: #fff;
   }
 
   .chatw-msg {
-    max-width: 95%;
-    padding: 0.7rem 0.85rem;
-    border-radius: 0.85rem;
-    font-size: var(--fs-sm);
+    max-width: 100%;
+    padding: 0.85rem 0.95rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
     line-height: 1.45;
   }
 
+  .chatw-msg p {
+    margin: 0;
+  }
+
+  .chatw-msg p + p {
+    margin-top: 0.4rem;
+  }
+
+  .chatw-msg-lead {
+    font-weight: 750;
+  }
+
   .chatw-msg-bot {
-    background: var(--sand);
+    background: #f4f1ea;
+    color: var(--text);
+    border-bottom-left-radius: 0.35rem;
   }
 
   .chatw-msg-user {
-    justify-self: end;
+    align-self: flex-end;
+    max-width: 92%;
     background: var(--graphite);
     color: #fff;
+    border-bottom-right-radius: 0.35rem;
+  }
+
+  .chatw-msg-title {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .chatw-points {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0.65rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chatw-points li {
+    position: relative;
+    padding: 0.45rem 0.6rem 0.45rem 1.55rem;
+    border-radius: 0.55rem;
+    background: rgb(255 255 255 / 0.65);
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+
+  .chatw-msg-bot .chatw-points li {
+    background: rgb(255 255 255 / 0.72);
+  }
+
+  .chatw-points li::before {
+    content: '';
+    position: absolute;
+    left: 0.55rem;
+    top: 0.75rem;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--brand);
+  }
+
+  .chatw-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+  }
+
+  .chatw-actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.15rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    background: var(--brand);
+    color: var(--graphite);
+    font-size: 0.82rem;
+    font-weight: 750;
+    text-decoration: none;
+  }
+
+  .chatw-disclaimer {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: 0.75rem;
+    opacity: 0.78;
   }
 
   .chatw-chips {
@@ -297,14 +471,17 @@ import { url } from '@/lib/url';
   }
 
   .chatw-chip {
-    border: 1px solid var(--line-strong);
+    border: 1px solid rgb(28 32 36 / 0.12);
     border-radius: 999px;
     background: #fff;
-    padding: 0.35rem 0.7rem;
+    padding: 0.4rem 0.75rem;
     font: inherit;
     font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease;
   }
 
   .chatw-chip:hover {
@@ -312,52 +489,226 @@ import { url } from '@/lib/url';
     background: var(--brand-soft);
   }
 
-  .chatw-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.55rem;
+  /* Composer */
+  .chatw-composer {
+    padding: 0.65rem var(--cw-pad) 0.85rem;
+    border-top: 1px solid rgb(28 32 36 / 0.06);
+    background: #fbf9f5;
   }
 
-  .chatw-bullets {
-    margin: 0.45rem 0 0;
-    padding-left: 1.1rem;
-  }
-
-  .chatw-form {
+  .chatw-input-wrap {
     display: grid;
-    gap: 0.55rem;
-    padding: 0 0.9rem 0.75rem;
-  }
-
-  .chatw-form textarea {
-    width: 100%;
-    min-height: 3.4rem;
-    resize: vertical;
-    padding: 0.65rem 0.75rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 0.45rem;
+    padding: 0.35rem 0.35rem 0.35rem 0.75rem;
+    border: 1px solid rgb(28 32 36 / 0.12);
+    border-radius: 1rem;
     background: #fff;
-    font: inherit;
-    font-size: var(--fs-sm);
   }
 
-  .chatw-foot {
-    margin: 0;
-    padding: 0 0.9rem 0.85rem;
-    font-size: 0.72rem;
+  .chatw-input-wrap:focus-within {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgb(208 129 21 / 0.18);
+  }
+
+  .chatw-composer textarea {
+    width: 100%;
+    min-height: 2.5rem;
+    max-height: 6.5rem;
+    resize: none;
+    border: 0;
+    padding: 0.55rem 0;
+    background: transparent;
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    outline: none;
+  }
+
+  .chatw-send {
+    display: grid;
+    place-items: center;
+    width: 2.45rem;
+    height: 2.45rem;
+    border: 0;
+    border-radius: 0.8rem;
+    background: var(--brand);
+    color: var(--graphite);
+    cursor: pointer;
+    flex: none;
+  }
+
+  .chatw-send:hover {
+    filter: brightness(1.05);
+  }
+
+  .chatw-send :global(.icon) {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .chatw-hint {
+    margin: 0.4rem 0 0;
+    font-size: 0.68rem;
     color: var(--text-muted);
   }
 
-  .chatw-foot a {
-    color: inherit;
-    font-weight: 700;
+  /* Manuals tab */
+  .chatw-manuals {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 0.85rem var(--cw-pad) 1rem;
+    background: #fff;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .chatw-fab-ring {
-      animation: none;
-    }
+  .chatw-manual-kicker {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+
+  .chatw-manual-lead {
+    margin: 0.3rem 0 0;
+    font-size: 0.92rem;
+    font-weight: 650;
+    line-height: 1.4;
+  }
+
+  .chatw-highlights {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0.85rem 0 1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chatw-highlights li {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: 0.75rem;
+    background: #f4f1ea;
+  }
+
+  .chatw-highlights strong {
+    font-size: 0.82rem;
+  }
+
+  .chatw-highlights span {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .chatw-docs {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chatw-doc {
+    display: grid;
+    gap: 0.7rem;
+    padding: 0.85rem;
+    border: 1px solid rgb(28 32 36 / 0.08);
+    border-radius: 0.9rem;
+    background: linear-gradient(180deg, #fff 0%, #fbf9f5 100%);
+  }
+
+  .chatw-doc-badge {
+    display: inline-flex;
+    width: fit-content;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .chatw-doc-badge[data-kind='ergaenzung'] {
+    background: #e8eef6;
+    color: #2a4a6e;
+  }
+
+  .chatw-doc-badge[data-kind='service'] {
+    background: #eceae4;
+    color: #3d3a32;
+  }
+
+  .chatw-doc-title {
+    margin: 0.4rem 0 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .chatw-doc-sub,
+  .chatw-doc-meta {
+    margin: 0.15rem 0 0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .chatw-doc-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0.55rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chatw-doc-topics li {
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.4rem;
+    background: rgb(28 32 36 / 0.05);
+    font-size: 0.7rem;
+    font-weight: 650;
+  }
+
+  .chatw-doc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 0.7rem;
+    background: var(--graphite);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 750;
+    text-decoration: none;
+  }
+
+  .chatw-doc-btn:hover {
+    background: #2a3036;
+  }
+
+  .chatw-doc-btn :global(.icon) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .chatw-manual-note {
+    margin: 1rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .chatw-manual-note a {
+    color: inherit;
+    font-weight: 750;
   }
 </style>
 
@@ -368,19 +719,27 @@ import { url } from '@/lib/url';
 
   const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
 
+  function escapeHtml(s: string) {
+    return s
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+  }
+
   function renderResult(data: CampingAssistResult): string {
     const bullets = data.bullets?.length
-      ? `<ul class="chatw-bullets">${data.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>`
+      ? `<ul class="chatw-points">${data.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`
       : '';
     const href = data.ctaHref ? (data.ctaHref.startsWith('http') ? data.ctaHref : url(data.ctaHref)) : '';
     const cta =
       data.ctaLabel && href
-        ? `<span class="chatw-actions"><a class="btn btn-accent btn-sm" href="${href}">${data.ctaLabel}</a></span>`
+        ? `<span class="chatw-actions"><a href="${href}">${escapeHtml(data.ctaLabel)}</a></span>`
         : '';
     const disclaimer = data.disclaimer
-      ? `<span class="muted" style="display:block;margin-top:.45rem;font-size:.78em">${data.disclaimer}</span>`
+      ? `<span class="chatw-disclaimer">${escapeHtml(data.disclaimer)}</span>`
       : '';
-    return `<strong>${data.title}</strong><br />${data.summary}${bullets}${disclaimer}${cta}`;
+    return `<span class="chatw-msg-title">${escapeHtml(data.title)}</span><p>${escapeHtml(data.summary)}</p>${bullets}${disclaimer}${cta}`;
   }
 
   function appendMsg(body: HTMLElement, text: string, who: 'bot' | 'user', asHtml = false) {
@@ -405,9 +764,14 @@ import { url } from '@/lib/url';
         if (res.ok) data = (await res.json()) as CampingAssistResult;
       }
     } catch {
-      /* local rules */
+      /* local */
     }
     return data;
+  }
+
+  function autosize(ta: HTMLTextAreaElement) {
+    ta.style.height = 'auto';
+    ta.style.height = `${Math.min(ta.scrollHeight, 104)}px`;
   }
 
   document.querySelectorAll<HTMLElement>('[data-chat-widget]').forEach((root) => {
@@ -418,6 +782,8 @@ import { url } from '@/lib/url';
     const input = root.querySelector<HTMLTextAreaElement>('[data-chat-input]');
     const body = root.querySelector<HTMLElement>('[data-chat-body]');
     const chips = root.querySelector('[data-chat-chips]');
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-chat-tab]');
+    const panes = root.querySelectorAll<HTMLElement>('[data-chat-pane]');
     if (!panel || !toggle || !form || !input || !body) return;
 
     const setOpen = (open: boolean) => {
@@ -425,21 +791,39 @@ import { url } from '@/lib/url';
       toggle.setAttribute('aria-expanded', String(open));
       if (open) {
         track('chat_widget_open');
-        input.focus();
+        const chatPane = root.querySelector<HTMLElement>('[data-chat-pane="chat"]');
+        if (!chatPane?.hidden) input.focus();
       }
     };
 
+    const setTab = (name: string) => {
+      tabs.forEach((t) => {
+        const on = t.dataset.chatTab === name;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', String(on));
+      });
+      panes.forEach((p) => {
+        p.hidden = p.dataset.chatPane !== name;
+      });
+      if (name === 'manuals') track('chat_manuals_open');
+      if (name === 'chat') input.focus();
+    };
+
     const run = async (message: string) => {
-      if (message.length < 4) {
-        appendMsg(body, 'Bitte etwas genauer – z. B. „Wohnmobil mieten“ oder „Öffnungszeiten“.', 'bot');
+      const cleaned = message.trim();
+      if (cleaned.length < 2) return;
+      if (cleaned.length < 4) {
+        appendMsg(body, 'Schreib bitte etwas genauer – z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“.', 'bot');
         return;
       }
+      setTab('chat');
       chips?.setAttribute('hidden', '');
-      appendMsg(body, message, 'user');
+      appendMsg(body, cleaned, 'user');
       input.value = '';
+      autosize(input);
       track('camping_assistant_start', { source: 'chat_widget' });
       const thinking = appendMsg(body, 'Einen Moment …', 'bot');
-      const data = await ask(message);
+      const data = await ask(cleaned);
       thinking.innerHTML = renderResult(data);
       track('camping_assistant_complete', { provider: data.provider, off_topic: data.offTopic ? 1 : 0 });
       body.scrollTop = body.scrollHeight;
@@ -447,10 +831,21 @@ import { url } from '@/lib/url';
 
     toggle.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
     close?.addEventListener('click', () => setOpen(false));
+    tabs.forEach((t) => t.addEventListener('click', () => setTab(t.dataset.chatTab || 'chat')));
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      void run(input.value.trim());
+      void run(input.value);
     });
+
+    input.addEventListener('input', () => autosize(input));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        void run(input.value);
+      }
+    });
+
     root.querySelectorAll<HTMLButtonElement>('[data-chat-chip]').forEach((chip) => {
       chip.addEventListener('click', () => {
         void run(chip.dataset.text || chip.textContent || '');

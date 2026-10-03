@@ -329,10 +329,9 @@ export function assistCamping(message: string): CampingAssistResult {
 
   if (OFF_TOPIC.test(text) || !isCampingRelated(text)) {
     return {
-      title: 'Nur Camping-Themen',
+      title: 'Gern – worum geht’s beim Camping?',
       summary:
-        'Ich bleibe bei Camping & Campingcenter Overath: Challenger & andere Marken, kaufen/mieten, Ankauf, Öffnungszeiten und Werkstatt bei Defekten.',
-      bullets: ['Challenger-Modelle & Bestand', 'Verkauf & Camper-Finder', 'Vermietung (ADAC)', 'Ankauf', 'Öffnung & Kontakt'],
+        'Ich helfe bei Challenger & Co., Kauf, Miete, Ankauf und Öffnungszeiten. Tippe z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“ – oder öffne den Reiter Wartungshefte.',
       ctaLabel: 'Fahrzeuge entdecken',
       ctaHref: '/wohnmobile/',
       provider: 'rules',
