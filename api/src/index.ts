@@ -5,6 +5,7 @@ import { getActiveVehicles, runVehicleSync } from './sync';
 import { formatFinderReport, sendMail } from './mail';
 import { getJson, putJson, rateLimit, KEYS } from './store';
 import { assistWorkshop } from './workshop-ai';
+import { assistCampingAi, assistCampingRules } from './camping-ai';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -159,6 +160,18 @@ app.post('/api/workshop-assistant', async (c) => {
     faultCode: body.faultCode ? String(body.faultCode) : undefined,
     since: body.since ? String(body.since) : undefined,
   });
+  return c.json(result);
+});
+
+app.post('/api/camping-assistant', async (c) => {
+  const ip = c.req.header('cf-connecting-ip') || 'anon';
+  if (!(await rateLimit(c.env, ip, 'camp-ai', 40, 3600))) return c.json({ error: 'rate_limited' }, 429);
+  const body = await c.req.json<Record<string, unknown>>().catch(() => null);
+  const message = String(body?.message ?? '').trim();
+  if (!message) return c.json({ error: 'validation' }, 400);
+
+  const rules = assistCampingRules(message);
+  const result = await assistCampingAi(c.env, message, rules);
   return c.json(result);
 });
 

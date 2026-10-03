@@ -1,46 +1,78 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
+import { CAMPING_QUICK_PROMPTS } from '@/lib/camping-assist';
 import { url } from '@/lib/url';
 ---
 
 <div class="chatw" data-chat-widget>
-  <div class="chatw-panel" data-chat-panel hidden>
+  <div class="chatw-panel" data-chat-panel hidden id="chatw-panel">
     <header class="chatw-head">
-      <div>
-        <p class="chatw-kicker">Werkstatt-Assistent</p>
-        <p class="chatw-title">Kurz beschreiben – wir ordnen ein</p>
+      <div class="chatw-brand">
+        <span class="chatw-avatar" aria-hidden="true"><Icon name="van" /></span>
+        <div>
+          <p class="chatw-kicker">Camping-Hilfe</p>
+          <p class="chatw-title">Fragen zu Kauf, Miete & Service</p>
+        </div>
       </div>
-      <button type="button" class="chatw-x" data-chat-close aria-label="Assistent schließen">
+      <button type="button" class="chatw-x" data-chat-close aria-label="Camping-Hilfe schließen">
         <Icon name="close" />
       </button>
     </header>
 
     <div class="chatw-body" data-chat-body>
       <div class="chatw-msg chatw-msg-bot">
-        Beschreibe kurz dein Anliegen (z.&nbsp;B. Heizung, Batterie, Nässe). Keine Ferndiagnose – nur eine sinnvolle Einordnung für die Werkstatt.
+        Hallo! Ich helfe dir bei <strong>Wohnmobilen, Camping und unserem Service in Overath</strong> – Kauf, Miete, Ankauf, Werkstatt, Marken und Öffnungszeiten.
+      </div>
+      <div class="chatw-chips" data-chat-chips>
+        {
+          CAMPING_QUICK_PROMPTS.map((q) => (
+            <button type="button" class="chatw-chip" data-chat-chip data-text={q.text}>
+              {q.label}
+            </button>
+          ))
+        }
       </div>
     </div>
 
     <form class="chatw-form" data-chat-form>
       <label class="sr-only" for="chatw-input">Nachricht</label>
-      <textarea id="chatw-input" name="message" rows="2" placeholder="Was ist das Problem?" data-chat-input required minlength="8"></textarea>
+      <textarea
+        id="chatw-input"
+        name="message"
+        rows="2"
+        placeholder="z. B. Welcher Camper passt für 4 Personen?"
+        data-chat-input
+        required
+        minlength="4"></textarea>
       <button type="submit" class="btn btn-accent btn-sm" data-chat-send>
-        Senden <Icon name="arrow-right" class="arrow" />
+        Fragen <Icon name="arrow-right" class="arrow" />
       </button>
     </form>
 
     <p class="chatw-foot">
-      <a href={url('/werkstatt-kundendienst/#termin')}>Direkt Termin anfragen</a>
+      <a href={url('/wohnmobile/')}>Verkauf</a>
+      ·
+      <a href={url('/werkstatt-kundendienst/')}>Werkstatt</a>
       ·
       <a href={url('/kontakt/')}>Kontakt</a>
     </p>
   </div>
 
-  <button type="button" class="chatw-fab" data-chat-toggle aria-expanded="false" aria-controls="chatw-panel-id">
-    <span class="chatw-fab-icon" data-chat-fab-icon aria-hidden="true">
-      <Icon name="sparkle" />
+  <button
+    type="button"
+    class="chatw-fab"
+    data-chat-toggle
+    aria-expanded="false"
+    aria-controls="chatw-panel"
+  >
+    <span class="chatw-fab-ring" aria-hidden="true"></span>
+    <span class="chatw-fab-icon" aria-hidden="true">
+      <Icon name="van" />
     </span>
-    <span class="chatw-fab-label">Assistent</span>
+    <span class="chatw-fab-copy">
+      <span class="chatw-fab-eyebrow">Hilfe</span>
+      <span class="chatw-fab-label">Camping-KI</span>
+    </span>
   </button>
 </div>
 
@@ -52,57 +84,121 @@ import { url } from '@/lib/url';
     z-index: 70;
     display: grid;
     justify-items: end;
-    gap: 0.65rem;
-    max-width: min(calc(100vw - 1.5rem), 22rem);
+    gap: 0.7rem;
+    max-width: min(calc(100vw - 1.5rem), 22.5rem);
   }
 
   .chatw-fab {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    min-height: 48px;
-    padding: 0.65rem 1rem 0.65rem 0.75rem;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: var(--graphite);
-    color: #fff;
+    gap: 0.65rem;
+    min-height: 3.4rem;
+    padding: 0.45rem 1.05rem 0.45rem 0.45rem;
+    border: 1px solid rgb(138 82 8 / 0.28);
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f0b45a 0%, var(--brand) 42%, var(--brand-strong) 100%);
+    color: var(--graphite);
     font: inherit;
-    font-size: var(--fs-sm);
-    font-weight: 750;
     cursor: pointer;
-    box-shadow: var(--shadow-lg);
+    box-shadow:
+      0 10px 28px -12px rgb(184 111 12 / 0.7),
+      0 0 0 1px rgb(255 255 255 / 0.25) inset;
+    transition:
+      transform 0.18s var(--ease-out),
+      box-shadow 0.18s var(--ease-out);
   }
 
   .chatw-fab:hover {
-    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow:
+      0 14px 32px -12px rgb(184 111 12 / 0.75),
+      0 0 0 1px rgb(255 255 255 / 0.3) inset;
   }
 
   .chatw-fab[aria-expanded='true'] {
-    background: var(--accent, #c2410c);
+    background: var(--graphite);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  .chatw-fab[aria-expanded='true'] .chatw-fab-icon {
+    background: rgb(255 255 255 / 0.12);
+    color: #fff;
+  }
+
+  .chatw-fab-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    border: 2px solid rgb(208 129 21 / 0.35);
+    animation: chatw-pulse 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+
+  .chatw-fab[aria-expanded='true'] .chatw-fab-ring {
+    display: none;
+  }
+
+  @keyframes chatw-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    70% {
+      transform: scale(1.08);
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 
   .chatw-fab-icon {
     display: grid;
     place-items: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.55rem;
+    height: 2.55rem;
     border-radius: 50%;
-    background: rgb(255 255 255 / 0.12);
+    background: rgb(255 255 255 / 0.55);
+    color: var(--graphite);
+    flex: none;
   }
 
   .chatw-fab-icon :global(.icon) {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .chatw-fab-copy {
+    display: grid;
+    gap: 0.05rem;
+    text-align: left;
+    line-height: 1.15;
+    padding-right: 0.15rem;
+  }
+
+  .chatw-fab-eyebrow {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .chatw-fab-label {
+    font-size: 0.95rem;
+    font-weight: 800;
   }
 
   .chatw-panel {
-    width: min(calc(100vw - 1.5rem), 22rem);
-    max-height: min(70vh, 32rem);
+    width: min(calc(100vw - 1.5rem), 22.5rem);
+    max-height: min(72vh, 34rem);
     display: grid;
     grid-template-rows: auto 1fr auto auto;
     overflow: hidden;
     border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
+    border-radius: 1.15rem;
     background: var(--paper);
     color: var(--text);
     box-shadow: var(--shadow-lg);
@@ -117,22 +213,40 @@ import { url } from '@/lib/url';
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.9rem 0.95rem 0.75rem;
+    padding: 0.95rem 1rem 0.8rem;
     border-bottom: 1px solid var(--line);
-    background: var(--sand);
+    background: linear-gradient(180deg, var(--brand-soft), var(--sand));
+  }
+
+  .chatw-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+  }
+
+  .chatw-avatar {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    background: var(--brand);
+    color: var(--graphite);
+    flex: none;
   }
 
   .chatw-kicker {
     margin: 0;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 800;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--brand-ink);
   }
 
   .chatw-title {
-    margin: 0.2rem 0 0;
+    margin: 0.15rem 0 0;
     font-size: var(--fs-sm);
     font-weight: 750;
   }
@@ -144,7 +258,7 @@ import { url } from '@/lib/url';
     height: 36px;
     border: 0;
     border-radius: var(--radius-pill);
-    background: rgb(255 255 255 / 0.7);
+    background: rgb(255 255 255 / 0.75);
     cursor: pointer;
   }
 
@@ -159,7 +273,7 @@ import { url } from '@/lib/url';
   .chatw-msg {
     max-width: 95%;
     padding: 0.7rem 0.85rem;
-    border-radius: var(--radius);
+    border-radius: 0.85rem;
     font-size: var(--fs-sm);
     line-height: 1.45;
   }
@@ -174,11 +288,38 @@ import { url } from '@/lib/url';
     color: #fff;
   }
 
+  .chatw-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .chatw-chip {
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: #fff;
+    padding: 0.35rem 0.7rem;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .chatw-chip:hover {
+    border-color: var(--brand);
+    background: var(--brand-soft);
+  }
+
   .chatw-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-top: 0.55rem;
+  }
+
+  .chatw-bullets {
+    margin: 0.45rem 0 0;
+    padding-left: 1.1rem;
   }
 
   .chatw-form {
@@ -211,38 +352,60 @@ import { url } from '@/lib/url';
     font-weight: 700;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .chatw-fab-ring {
+      animation: none;
+    }
+  }
 </style>
 
 <script>
   import { track } from '@/lib/analytics';
+  import { assistCamping, type CampingAssistResult } from '@/lib/camping-assist';
   import { url } from '@/lib/url';
 
   const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
-  const workshopUrl = url('/werkstatt-kundendienst/#termin');
 
-  function localAssist(message: string) {
-    const text = message.toLowerCase();
-    let categoryLabel = 'Allgemeine Werkstatt-Anfrage';
-    if (/heizung|truma|alde|e517|klima/.test(text)) categoryLabel = 'Komfort / Heizung';
-    else if (/batter|strom|solar|lithium|inverter/.test(text)) categoryLabel = 'Technik / Elektro';
-    else if (/nässe|feucht|undicht|schimmel/.test(text)) categoryLabel = 'Reparatur / Nässeschaden';
-    else if (/unfall|gfk|schaden|beule/.test(text)) categoryLabel = 'Reparatur / Unfall-GFK';
-    else if (/brems|fahrwerk|reifen|achse/.test(text)) categoryLabel = 'Fahrwerk / Sicherheit';
-    return {
-      summary: `Die Angaben deuten auf ein Anliegen im Bereich „${categoryLabel}“ hin. Die genaue Ursache sollte durch die Werkstatt geprüft werden.`,
-      categoryLabel,
-      disclaimer: 'Hinweis: Keine verbindliche Ferndiagnose. Ein Fachtechniker prüft Fahrzeug und Ursache vor Ort.',
-      provider: 'rules' as const,
-    };
+  function renderResult(data: CampingAssistResult): string {
+    const bullets = data.bullets?.length
+      ? `<ul class="chatw-bullets">${data.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>`
+      : '';
+    const href = data.ctaHref ? (data.ctaHref.startsWith('http') ? data.ctaHref : url(data.ctaHref)) : '';
+    const cta =
+      data.ctaLabel && href
+        ? `<span class="chatw-actions"><a class="btn btn-accent btn-sm" href="${href}">${data.ctaLabel}</a></span>`
+        : '';
+    const disclaimer = data.disclaimer
+      ? `<span class="muted" style="display:block;margin-top:.45rem;font-size:.78em">${data.disclaimer}</span>`
+      : '';
+    return `<strong>${data.title}</strong><br />${data.summary}${bullets}${disclaimer}${cta}`;
   }
 
-  function appendMsg(body: HTMLElement, text: string, who: 'bot' | 'user', extraHtml = '') {
+  function appendMsg(body: HTMLElement, text: string, who: 'bot' | 'user', asHtml = false) {
     const el = document.createElement('div');
     el.className = `chatw-msg chatw-msg-${who}`;
-    el.innerHTML = `${text}${extraHtml}`;
+    if (asHtml) el.innerHTML = text;
+    else el.textContent = text;
     body.appendChild(el);
     body.scrollTop = body.scrollHeight;
     return el;
+  }
+
+  async function ask(message: string): Promise<CampingAssistResult> {
+    let data = assistCamping(message);
+    try {
+      if (API) {
+        const res = await fetch(`${API}/api/camping-assistant`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        });
+        if (res.ok) data = (await res.json()) as CampingAssistResult;
+      }
+    } catch {
+      /* local rules */
+    }
+    return data;
   }
 
   document.querySelectorAll<HTMLElement>('[data-chat-widget]').forEach((root) => {
@@ -252,6 +415,7 @@ import { url } from '@/lib/url';
     const form = root.querySelector<HTMLFormElement>('[data-chat-form]');
     const input = root.querySelector<HTMLTextAreaElement>('[data-chat-input]');
     const body = root.querySelector<HTMLElement>('[data-chat-body]');
+    const chips = root.querySelector('[data-chat-chips]');
     if (!panel || !toggle || !form || !input || !body) return;
 
     const setOpen = (open: boolean) => {
@@ -263,46 +427,32 @@ import { url } from '@/lib/url';
       }
     };
 
-    toggle.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
-    close?.addEventListener('click', () => setOpen(false));
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (message.length < 8) {
-        appendMsg(body, 'Bitte beschreibe das Problem etwas genauer (mind. ein kurzer Satz).', 'bot');
+    const run = async (message: string) => {
+      if (message.length < 4) {
+        appendMsg(body, 'Bitte etwas genauer – z. B. „Wohnmobil mieten“ oder „Öffnungszeiten“.', 'bot');
         return;
       }
-
+      chips?.setAttribute('hidden', '');
       appendMsg(body, message, 'user');
       input.value = '';
-      track('workshop_assistant_start', { source: 'chat_widget' });
-
-      const thinking = appendMsg(body, 'Wird eingeordnet …', 'bot');
-      let data = localAssist(message);
-      try {
-        if (API) {
-          const res = await fetch(`${API}/api/workshop-assistant`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message }),
-          });
-          if (res.ok) data = await res.json();
-        }
-      } catch {
-        /* local fallback */
-      }
-
-      thinking.innerHTML = `
-        <strong>${data.categoryLabel}</strong><br />
-        ${data.summary}
-        <span class="muted" style="display:block;margin-top:.45rem;font-size:.78em">${data.disclaimer}</span>
-        <span class="chatw-actions">
-          <a class="btn btn-accent btn-sm" href="${workshopUrl}">Werkstatt anfragen</a>
-        </span>
-      `;
-      track('workshop_assistant_complete', { provider: data.provider || 'rules', source: 'chat_widget' });
+      track('camping_assistant_start', { source: 'chat_widget' });
+      const thinking = appendMsg(body, 'Einen Moment …', 'bot');
+      const data = await ask(message);
+      thinking.innerHTML = renderResult(data);
+      track('camping_assistant_complete', { provider: data.provider, off_topic: data.offTopic ? 1 : 0 });
       body.scrollTop = body.scrollHeight;
+    };
+
+    toggle.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
+    close?.addEventListener('click', () => setOpen(false));
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      void run(input.value.trim());
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-chat-chip]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        void run(chip.dataset.text || chip.textContent || '');
+      });
     });
   });
 </script>

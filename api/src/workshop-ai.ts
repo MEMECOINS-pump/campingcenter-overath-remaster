@@ -96,7 +96,7 @@ async function callOptionalAi(env: Env, input: WorkshopAssistInput, fallback: Wo
         {
           role: 'system',
           content:
-            'Du bist ein vorsichtiger Werkstatt-Assistent für Wohnmobile. Klassifiziere Anfragen, stelle gezielte Rückfragen, stelle NIE eine definitive Diagnose. Antworte auf Deutsch als JSON mit keys summary, categoryLabel, followUps (array).',
+            'Du bist der vorsichtige Werkstatt-Assistent des Campingcenter Overath. Nur Wohnmobil-/Wohnwagen-Service. Klassifiziere Anfragen, stelle gezielte Rückfragen, stelle NIE eine definitive Diagnose oder Preise. Antworte auf Deutsch als JSON mit keys summary, categoryLabel, followUps (array).',
         },
         {
           role: 'user',
