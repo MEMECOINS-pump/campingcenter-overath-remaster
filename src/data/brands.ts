@@ -26,7 +26,8 @@ export const brands: Brand[] = [
     inventoryMake: 'Challenger',
     logo: challenger,
     website: 'https://www.reisemobile-challenger.de/',
-    summary: 'Vertragspartner für Challenger Reisemobile – aktuelle Modelle und persönliche Beratung in Overath.',
+    summary:
+      'Vertragspartner für Challenger (Trigano): Vans, Teilintegrierte, Gamme X, Alkoven und Vollintegrierte – Beratung, Bestand und Service in Overath.',
   },
   {
     id: 'la-strada',

@@ -1,4 +1,14 @@
 import { company, formatHours, openingHours } from '@/data/company';
+import {
+  challengerFamilies,
+  challengerTips,
+  challengerWarranty,
+  findCatalogModel,
+  findStockForQuery,
+  formatChallengerPrice,
+  getChallengerStock,
+  isChallengerQuery,
+} from '@/data/challenger-knowledge';
 
 export interface CampingAssistResult {
   title: string;
@@ -202,16 +212,115 @@ function pickTopic(text: string): Topic {
   };
 }
 
+const WORKSHOP_INTENT =
+  /werkstatt|reparatur|kundendienst|fehlercode|e5\d{2}|truma|n[aä]sse|undicht|gfk|unfallschaden|gasprüfung|tüv|tuv|(heizung|batterie|solar).*(defekt|kaputt|geht nicht|problem)/i;
+
+function answerChallenger(text: string): CampingAssistResult {
+  const stockAll = getChallengerStock();
+  const catalog = findCatalogModel(text);
+  const stockHits = findStockForQuery(text);
+  const wantsWarranty = /garantie|dichtheit|wartung|serviceheft|garantiebedingungen/i.test(text);
+  const wantsFamily = /van|alkoven|teilintegriert|vollintegriert|integral|profile|gamme|unterschied|welche serie|baureihe/i.test(
+    text,
+  );
+
+  if (wantsWarranty) {
+    return {
+      title: 'Challenger Garantie & Wartung',
+      summary: `Als Challenger-Vertragspartner begleiten wir dich auch nach dem Kauf. Herstellerseitig (Trigano VDL): ${challengerWarranty.buildYears} Jahre Aufbau-Garantie und ${challengerWarranty.watertightYears} Jahre Dichtheitsgarantie, ${challengerWarranty.mileageLimit}, Start ${challengerWarranty.start}.`,
+      bullets: [...challengerWarranty.notes],
+      ctaLabel: 'Werkstatt / Service fragen',
+      ctaHref: '/werkstatt-kundendienst/#termin',
+      disclaimer: 'Details stehen im jeweiligen Serviceheft; Basisfahrzeug Fiat/Ford hat eigene Herstellergarantie.',
+      provider: 'rules',
+    };
+  }
+
+  if (catalog) {
+    const dims = [
+      catalog.lengthM ? `Länge ca. ${catalog.lengthM.toFixed(2).replace('.', ',')} m` : null,
+      catalog.widthM ? `Breite ca. ${catalog.widthM.toFixed(2).replace('.', ',')} m` : null,
+      catalog.heightM ? `Höhe ca. ${catalog.heightM.toFixed(2).replace('.', ',')} m` : null,
+      `Basisfahrzeug ${catalog.base}`,
+      catalog.seriesLabel,
+    ].filter(Boolean) as string[];
+
+    const stockLines = (stockHits.length ? stockHits : stockAll.filter((s) => s.title.toLowerCase().includes(catalog.code.toLowerCase())))
+      .slice(0, 4)
+      .map((s) => {
+        const bits = [
+          s.condition === 'neu' ? 'Neu' : 'Gebraucht',
+          s.lengthM ? `${s.lengthM.toFixed(2).replace('.', ',')} m` : null,
+          formatChallengerPrice(s.price),
+        ].filter(Boolean);
+        return `${s.title} – ${bits.join(' · ')}`;
+      });
+
+    return {
+      title: `Challenger ${catalog.code}`,
+      summary:
+        catalog.note ||
+        `Der Challenger ${catalog.code} gehört zur Serie „${catalog.seriesLabel}“. Maße laut Hersteller-Tabelle (Richtwerte): ${dims.join(', ')}. Bei uns als Vertragspartner siehst du aktuelle Fahrzeuge und Ausstattungen live.`,
+      bullets: [
+        ...dims.map((d) => String(d)),
+        ...(stockLines.length ? ['Aktuell bei uns:', ...stockLines] : ['Aktuell kein exakter Treffer im Online-Bestand – wir prüfen Verfügbarkeit gerne persönlich.']),
+        challengerTips[0],
+      ],
+      ctaLabel: stockLines.length ? 'Challenger im Bestand' : 'Alle Fahrzeuge',
+      ctaHref: stockHits[0] ? `/wohnmobile/${stockHits[0].slug}/` : '/wohnmobile/?marke=Challenger',
+      disclaimer: 'Katalogmaße ≈ Herstellerangaben; verbindlich sind Fahrzeugpapiere und Beratung vor Ort. Preise laut aktuellem Bestand.',
+      provider: 'rules',
+    };
+  }
+
+  if (wantsFamily) {
+    return {
+      title: 'Challenger Baureihen',
+      summary:
+        'Challenger (Trigano) baut klar getrennte Welten: Vans, Teilintegrierte/Profiles, Gamme X, Alkoven und Vollintegrierte/Integral – auf Fiat- oder Ford-Basis. Wir zeigen dir, welche Linie zu deinem Reise-Stil passt.',
+      bullets: challengerFamilies.map((f) => `${f.label}: ${f.blurb}`),
+      ctaLabel: 'Challenger bei uns ansehen',
+      ctaHref: '/wohnmobile/?marke=Challenger',
+      provider: 'rules',
+    };
+  }
+
+  // Default Challenger overview + live stock
+  const stockLines = (stockHits.length ? stockHits : stockAll).slice(0, 5).map((s) => {
+    const bits = [
+      s.condition === 'neu' ? 'Neu' : 'Gebraucht',
+      s.categoryLabel,
+      s.lengthM ? `${s.lengthM.toFixed(2).replace('.', ',')} m` : null,
+      formatChallengerPrice(s.price),
+    ].filter(Boolean);
+    return `${s.title} – ${bits.join(' · ')}`;
+  });
+
+  return {
+    title: 'Challenger bei Campingcenter Overath',
+    summary: `Wir sind Challenger-Vertragspartner. ${stockAll.length} Challenger aktuell im Bestand – von Alkoven bis Teilintegriert, oft mit Solar, Lithium, Markise oder Arctic-Paket. Frag gezielt nach einem Modell (z. B. 240, 250, X250, C256) oder einer Serie.`,
+    bullets: [
+      ...stockLines,
+      `Garantie-Kern: ${challengerWarranty.buildYears} Jahre Aufbau + ${challengerWarranty.watertightYears} Jahre Dichtheit (${challengerWarranty.mileageLimit}).`,
+      challengerTips[2],
+    ],
+    ctaLabel: 'Challenger-Fahrzeuge öffnen',
+    ctaHref: '/wohnmobile/?marke=Challenger',
+    disclaimer: 'Bestand und Preise können sich ändern – wir beraten dich verbindlich vor Ort in Overath.',
+    provider: 'rules',
+  };
+}
+
 /**
  * Camping-only assistant for Campingcenter Overath.
- * Intent-based: Kauf, Miete, Ankauf, Öffnung, … – Werkstatt only on clear repair intent.
+ * Intent-based: Kauf, Miete, Ankauf, Öffnung, Challenger-Wissen … – Werkstatt only on clear repair intent.
  */
 export function assistCamping(message: string): CampingAssistResult {
   const text = message.trim();
   if (text.length < 4) {
     return {
       title: 'Kurze Frage',
-      summary: 'Schreib kurz, worum es geht – z. B. kaufen, mieten, Ankauf, Öffnungszeiten oder ein Werkstatt-Problem.',
+      summary: 'Schreib kurz, worum es geht – z. B. Challenger 240, kaufen, mieten, Ankauf oder Öffnungszeiten.',
       ctaLabel: 'Fahrzeuge ansehen',
       ctaHref: '/wohnmobile/',
       provider: 'rules',
@@ -222,13 +331,18 @@ export function assistCamping(message: string): CampingAssistResult {
     return {
       title: 'Nur Camping-Themen',
       summary:
-        'Ich bleibe bei Camping & Campingcenter Overath: Fahrzeuge kaufen oder mieten, Ankauf, Marken, Öffnungszeiten und Werkstatt-Fragen.',
-      bullets: ['Verkauf & Camper-Finder', 'Vermietung (ADAC)', 'Ankauf', 'Öffnung & Kontakt', 'Werkstatt bei Defekten'],
+        'Ich bleibe bei Camping & Campingcenter Overath: Challenger & andere Marken, kaufen/mieten, Ankauf, Öffnungszeiten und Werkstatt bei Defekten.',
+      bullets: ['Challenger-Modelle & Bestand', 'Verkauf & Camper-Finder', 'Vermietung (ADAC)', 'Ankauf', 'Öffnung & Kontakt'],
       ctaLabel: 'Fahrzeuge entdecken',
       ctaHref: '/wohnmobile/',
       provider: 'rules',
       offTopic: true,
     };
+  }
+
+  // Challenger product knowledge (unless user clearly needs workshop)
+  if (isChallengerQuery(text) && !WORKSHOP_INTENT.test(text)) {
+    return answerChallenger(text);
   }
 
   const hit = pickTopic(text);
@@ -244,6 +358,7 @@ export function assistCamping(message: string): CampingAssistResult {
 }
 
 function isCampingRelated(text: string): boolean {
+  if (isChallengerQuery(text)) return true;
   if (TOPICS.some((t) => scoreTopic(text, t) > 0)) return true;
   return /camping|camper|wohnmobil|wohnwagen|reisemobil|overath|ccoverath|stellplatz|urlaub|mieten|kaufen|ankauf|van|alkoven|marke|öffnung|oeffnung|kontakt|beratung/i.test(
     text,
@@ -251,8 +366,8 @@ function isCampingRelated(text: string): boolean {
 }
 
 export const CAMPING_QUICK_PROMPTS = [
+  { label: 'Challenger', text: 'Erzähl mir von Challenger und was ihr aktuell im Bestand habt.' },
+  { label: 'Challenger 240', text: 'Was kannst du zum Challenger 240 sagen?' },
   { label: 'Kaufen', text: 'Ich suche ein passendes Wohnmobil zum Kaufen.' },
-  { label: 'Mieten', text: 'Ich möchte ein Wohnmobil mieten.' },
-  { label: 'Ankauf', text: 'Ich möchte mein Wohnmobil verkaufen / anbieten.' },
   { label: 'Öffnung', text: 'Wann habt ihr heute geöffnet?' },
 ] as const;
