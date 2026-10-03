@@ -7,7 +7,7 @@ export interface NavItem {
 
 export const mainNav: NavItem[] = [
   {
-    label: 'Wohnmobile',
+    label: 'Verkauf',
     href: '/wohnmobile/',
     hint: 'Fahrzeuge entdecken',
     children: [

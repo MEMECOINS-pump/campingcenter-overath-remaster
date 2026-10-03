@@ -7,14 +7,14 @@ import { stripBase, url } from '@/lib/url';
 
 const current = stripBase(Astro.url.pathname);
 const primary = [
-  { label: 'Wohnmobile', href: '/wohnmobile/', hint: 'Fahrzeuge entdecken', icon: 'van' as const },
+  { label: 'Verkauf', href: '/wohnmobile/', hint: 'Fahrzeuge entdecken', icon: 'van' as const },
   { label: 'Fahrzeug verkaufen', href: '/wohnmobil-ankauf/', hint: 'Ankauf starten', icon: 'tag' as const },
   { label: 'Vermietung', href: '/vermietung-wohnmobile/', hint: 'Wohnmobil mieten', icon: 'key' as const },
   { label: 'Werkstatt', href: '/werkstatt-kundendienst/', hint: 'Service & Terminanfrage', icon: 'wrench' as const },
 ];
 const secondary = [
   ...mainNav.filter((i) => i.href === '/ueber-uns/'),
-  ...(mainNav.find((i) => i.label === 'Wohnmobile')?.children ?? []).filter((c) => c.href !== '/wohnmobile/'),
+  ...(mainNav.find((i) => i.label === 'Verkauf')?.children ?? []).filter((c) => c.href !== '/wohnmobile/'),
   ...moreNav,
 ];
 ---
