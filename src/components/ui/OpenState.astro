@@ -1,24 +1,28 @@
 ---
-import { openingHours } from '@/data/company';
+import { computeOpenStatus } from '@/lib/opening-hours';
 
-const schedule = JSON.stringify(
-  openingHours.flatMap((p) =>
-    p.schemaDays.map((d) => ({ d, h: p.hours.map((h) => [h.opens, h.closes]) })),
-  ),
-);
+/** Compact badge – same calculation as header (Europe/Berlin + NRW-Feiertage). */
+const initial = computeOpenStatus();
 ---
 
-<span class="open-state" data-open-state={schedule} hidden></span>
+<span
+  class="open-state"
+  data-open-state
+  data-state={initial.state}
+  data-reason={initial.reason}
+>
+  {initial.label}
+</span>
 
 <style>
   .open-state {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.2rem 0.65rem;
+    padding: 0.25rem 0.7rem;
     border-radius: var(--radius-pill);
     font-size: var(--fs-xs);
-    font-weight: 700;
+    font-weight: 750;
     background: var(--sand);
     color: var(--text-muted);
   }
@@ -35,37 +39,33 @@ const schedule = JSON.stringify(
     background: var(--success-soft);
     color: var(--success);
   }
+
+  .open-state[data-state='closed'] {
+    background: #fdecea;
+    color: #7a1f14;
+  }
+
+  .open-state[data-reason='holiday'] {
+    background: #fff7ed;
+    color: #7c2d12;
+  }
 </style>
 
 <script>
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  import { computeOpenStatus } from '@/lib/opening-hours';
 
-  function berlinNow(): { day: string; minutes: number } {
-    const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Europe/Berlin',
-      weekday: 'long',
-      hour: '2-digit',
-      minute: '2-digit',
-      hourCycle: 'h23',
-    }).formatToParts(new Date());
-    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
-    return { day: get('weekday') || days[new Date().getDay()]!, minutes: Number(get('hour')) * 60 + Number(get('minute')) };
+  function tick() {
+    document.querySelectorAll<HTMLElement>('[data-open-state]').forEach((el) => {
+      const status = computeOpenStatus();
+      el.dataset.state = status.state;
+      el.dataset.reason = status.reason;
+      el.textContent = status.label;
+    });
   }
 
-  const toMin = (s: string) => Number(s.slice(0, 2)) * 60 + Number(s.slice(3, 5));
-
-  document.querySelectorAll<HTMLElement>('[data-open-state]').forEach((el) => {
-    try {
-      const schedule = JSON.parse(el.dataset.openState ?? '[]') as { d: string; h: [string, string][] }[];
-      const now = berlinNow();
-      const today = schedule.find((s) => s.d === now.day);
-      const open = today?.h.some(([o, c]) => now.minutes >= toMin(o) && now.minutes < toMin(c));
-      const closesAt = today?.h.find(([o, c]) => now.minutes >= toMin(o) && now.minutes < toMin(c))?.[1];
-      el.dataset.state = open ? 'open' : 'closed';
-      el.textContent = open ? `Jetzt geöffnet · bis ${closesAt} Uhr` : 'Gerade geschlossen';
-      el.hidden = false;
-    } catch {
-      /* keep hidden – static opening hours remain visible */
-    }
+  tick();
+  window.setInterval(tick, 30_000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') tick();
   });
 </script>
