@@ -5,19 +5,27 @@ import { challengerManualHighlights, challengerManuals } from '@/data/challenger
 import { url } from '@/lib/url';
 ---
 
-<div class="chatw" data-chat-widget>
+<div class="chatw" data-chat-widget data-size="md">
   <div class="chatw-panel" data-chat-panel hidden id="chatw-panel" role="dialog" aria-labelledby="chatw-title">
     <header class="chatw-head">
       <div class="chatw-brand">
         <span class="chatw-avatar" aria-hidden="true"><Icon name="van" /></span>
         <div class="chatw-brand-text">
-          <p class="chatw-kicker">Campingcenter Overath</p>
+          <p class="chatw-kicker">ccoverath KI</p>
           <h2 class="chatw-title" id="chatw-title">Camping-Assistent</h2>
         </div>
       </div>
-      <button type="button" class="chatw-x" data-chat-close aria-label="Assistent schließen">
-        <Icon name="close" />
-      </button>
+      <div class="chatw-tools">
+        <div class="chatw-sizes" role="group" aria-label="Fenstergröße">
+          <button type="button" class="chatw-size-btn" data-chat-size="sm" aria-label="Klein" title="Klein">S</button>
+          <button type="button" class="chatw-size-btn is-active" data-chat-size="md" aria-label="Mittel" title="Mittel">M</button>
+          <button type="button" class="chatw-size-btn" data-chat-size="lg" aria-label="Groß" title="Groß">L</button>
+          <button type="button" class="chatw-size-btn" data-chat-size="xl" aria-label="Sehr groß" title="Sehr groß">XL</button>
+        </div>
+        <button type="button" class="chatw-x" data-chat-close aria-label="Assistent schließen">
+          <Icon name="close" />
+        </button>
+      </div>
     </header>
 
     <div class="chatw-tabs" role="tablist" aria-label="Assistent-Bereiche">
@@ -29,10 +37,9 @@ import { url } from '@/lib/url';
       </button>
     </div>
 
-    <!-- TAB: Chat -->
     <div class="chatw-pane" data-chat-pane="chat" role="tabpanel" aria-labelledby="chatw-tab-chat">
       <div class="chatw-body" data-chat-body>
-        <div class="chatw-msg chatw-msg-bot">
+        <div class="chatw-msg chatw-msg-bot is-latest" data-chat-msg>
           <p class="chatw-msg-lead">Hallo – wie kann ich helfen?</p>
           <p>
             Fragen zu <strong>Challenger</strong>, Kauf, Miete, Ankauf, Öffnungszeiten oder Service. Kurze Stichworte reichen.
@@ -47,6 +54,7 @@ import { url } from '@/lib/url';
             ))
           }
         </div>
+        <div class="chatw-anchor" data-chat-anchor aria-hidden="true"></div>
       </div>
 
       <form class="chatw-composer" data-chat-form>
@@ -56,18 +64,17 @@ import { url } from '@/lib/url';
             id="chatw-input"
             name="message"
             rows="1"
-            placeholder="Nachricht schreiben …"
+            placeholder="Nachricht an ccoverath KI …"
             data-chat-input
             maxlength="800"></textarea>
           <button type="submit" class="chatw-send" data-chat-send aria-label="Senden">
             <Icon name="arrow-right" />
           </button>
         </div>
-        <p class="chatw-hint">Enter zum Senden · Shift+Enter für neue Zeile</p>
+        <p class="chatw-hint">Enter senden · Shift+Enter neue Zeile · Größe oben mit S–XL</p>
       </form>
     </div>
 
-    <!-- TAB: Wartungshefte -->
     <div class="chatw-pane" data-chat-pane="manuals" role="tabpanel" aria-labelledby="chatw-tab-manuals" hidden>
       <div class="chatw-manuals">
         <div class="chatw-manual-intro">
@@ -127,12 +134,14 @@ import { url } from '@/lib/url';
         </p>
       </div>
     </div>
+
+    <div class="chatw-resize" data-chat-resize title="Ziehen zum Vergrößern" aria-hidden="true"></div>
   </div>
 
   <button type="button" class="chatw-fab" data-chat-toggle aria-expanded="false" aria-controls="chatw-panel">
     <span class="chatw-fab-icon" aria-hidden="true"><Icon name="van" /></span>
     <span class="chatw-fab-copy">
-      <span class="chatw-fab-eyebrow">Assistent</span>
+      <span class="chatw-fab-eyebrow">ccoverath</span>
       <span class="chatw-fab-label">Camping-KI</span>
     </span>
   </button>
@@ -142,6 +151,8 @@ import { url } from '@/lib/url';
   .chatw {
     --cw-radius: 1.25rem;
     --cw-pad: 1rem;
+    --cw-w: min(calc(100vw - 1.25rem), 23.5rem);
+    --cw-h: min(78vh, 38rem);
     position: fixed;
     right: 1rem;
     bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + 1rem);
@@ -149,11 +160,30 @@ import { url } from '@/lib/url';
     display: grid;
     justify-items: end;
     gap: 0.75rem;
-    width: min(calc(100vw - 1.25rem), 23.5rem);
+    width: var(--cw-w);
     font-family: var(--font-body);
   }
 
-  /* FAB */
+  .chatw[data-size='sm'] {
+    --cw-w: min(calc(100vw - 1.25rem), 20rem);
+    --cw-h: min(62vh, 28rem);
+  }
+
+  .chatw[data-size='md'] {
+    --cw-w: min(calc(100vw - 1.25rem), 23.5rem);
+    --cw-h: min(78vh, 38rem);
+  }
+
+  .chatw[data-size='lg'] {
+    --cw-w: min(calc(100vw - 1.25rem), 30rem);
+    --cw-h: min(84vh, 46rem);
+  }
+
+  .chatw[data-size='xl'] {
+    --cw-w: min(calc(100vw - 1.25rem), 40rem);
+    --cw-h: min(90vh, 56rem);
+  }
+
   .chatw-fab {
     display: inline-flex;
     align-items: center;
@@ -167,7 +197,9 @@ import { url } from '@/lib/url';
     font: inherit;
     cursor: pointer;
     box-shadow: 0 12px 32px -14px rgb(28 32 36 / 0.55);
-    transition: transform 0.18s ease, background 0.18s ease;
+    transition:
+      transform 0.18s ease,
+      background 0.18s ease;
   }
 
   .chatw-fab:hover {
@@ -220,10 +252,10 @@ import { url } from '@/lib/url';
     font-weight: 800;
   }
 
-  /* Panel */
   .chatw-panel {
+    position: relative;
     width: 100%;
-    max-height: min(78vh, 38rem);
+    height: var(--cw-h);
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr);
     overflow: hidden;
@@ -244,23 +276,23 @@ import { url } from '@/lib/url';
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.95rem var(--cw-pad) 0.75rem;
+    gap: 0.6rem;
+    padding: 0.85rem var(--cw-pad) 0.65rem;
     background: linear-gradient(165deg, #f8efe0 0%, #fbf9f5 70%);
   }
 
   .chatw-brand {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.65rem;
     min-width: 0;
   }
 
   .chatw-avatar {
     display: grid;
     place-items: center;
-    width: 2.55rem;
-    height: 2.55rem;
+    width: 2.45rem;
+    height: 2.45rem;
     border-radius: 0.85rem;
     background: var(--brand);
     color: var(--graphite);
@@ -268,8 +300,8 @@ import { url } from '@/lib/url';
   }
 
   .chatw-avatar :global(.icon) {
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.3rem;
+    height: 1.3rem;
   }
 
   .chatw-kicker {
@@ -284,29 +316,64 @@ import { url } from '@/lib/url';
   .chatw-title {
     margin: 0.1rem 0 0;
     font-family: var(--font-body);
-    font-size: 1.05rem;
+    font-size: 1.02rem;
     font-weight: 800;
     letter-spacing: -0.01em;
     line-height: 1.2;
   }
 
+  .chatw-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: none;
+  }
+
+  .chatw-sizes {
+    display: inline-flex;
+    gap: 0.15rem;
+    padding: 0.15rem;
+    border-radius: 999px;
+    background: rgb(28 32 36 / 0.06);
+  }
+
+  .chatw-size-btn {
+    min-width: 1.7rem;
+    height: 1.7rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .chatw-size-btn:hover {
+    color: var(--text);
+  }
+
+  .chatw-size-btn.is-active {
+    background: var(--graphite);
+    color: #fff;
+  }
+
   .chatw-x {
     display: grid;
     place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 2.15rem;
+    height: 2.15rem;
     border: 0;
     border-radius: 50%;
     background: rgb(28 32 36 / 0.06);
     cursor: pointer;
-    flex: none;
   }
 
   .chatw-x:hover {
     background: rgb(28 32 36 / 0.1);
   }
 
-  /* Tabs */
   .chatw-tabs {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -317,7 +384,7 @@ import { url } from '@/lib/url';
   }
 
   .chatw-tab {
-    min-height: 2.35rem;
+    min-height: 2.3rem;
     border: 0;
     border-radius: 0.7rem;
     background: transparent;
@@ -338,7 +405,6 @@ import { url } from '@/lib/url';
     color: #fff;
   }
 
-  /* Panes */
   .chatw-pane {
     min-height: 0;
     display: grid;
@@ -358,10 +424,17 @@ import { url } from '@/lib/url';
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    padding: 0.9rem var(--cw-pad);
+    padding: 0.9rem var(--cw-pad) 1.1rem;
     overflow: auto;
     overscroll-behavior: contain;
+    scroll-behavior: smooth;
     background: #fff;
+  }
+
+  .chatw-anchor {
+    height: 1px;
+    width: 100%;
+    flex: none;
   }
 
   .chatw-msg {
@@ -370,6 +443,7 @@ import { url } from '@/lib/url';
     border-radius: 1rem;
     font-size: 0.9rem;
     line-height: 1.45;
+    flex: none;
   }
 
   .chatw-msg p {
@@ -398,11 +472,61 @@ import { url } from '@/lib/url';
     border-bottom-right-radius: 0.35rem;
   }
 
+  .chatw-msg.is-latest {
+    box-shadow: 0 0 0 2px rgb(208 129 21 / 0.45);
+  }
+
+  .chatw-msg.is-latest.chatw-msg-bot {
+    background: linear-gradient(180deg, #fff7eb 0%, #f4f1ea 100%);
+  }
+
   .chatw-msg-title {
     display: block;
     margin-bottom: 0.35rem;
     font-size: 0.95rem;
     font-weight: 800;
+  }
+
+  .chatw-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-weight: 700;
+    color: var(--brand-ink);
+  }
+
+  .chatw-thinking-dots {
+    display: inline-flex;
+    gap: 0.22rem;
+  }
+
+  .chatw-thinking-dots span {
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: var(--brand);
+    animation: chatw-dot 1s ease-in-out infinite;
+  }
+
+  .chatw-thinking-dots span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .chatw-thinking-dots span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes chatw-dot {
+    0%,
+    80%,
+    100% {
+      opacity: 0.25;
+      transform: translateY(0);
+    }
+    40% {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
   }
 
   .chatw-points {
@@ -417,13 +541,9 @@ import { url } from '@/lib/url';
     position: relative;
     padding: 0.45rem 0.6rem 0.45rem 1.55rem;
     border-radius: 0.55rem;
-    background: rgb(255 255 255 / 0.65);
+    background: rgb(255 255 255 / 0.72);
     font-size: 0.84rem;
     font-weight: 600;
-  }
-
-  .chatw-msg-bot .chatw-points li {
-    background: rgb(255 255 255 / 0.72);
   }
 
   .chatw-points li::before {
@@ -479,9 +599,6 @@ import { url } from '@/lib/url';
     font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease;
   }
 
   .chatw-chip:hover {
@@ -489,7 +606,6 @@ import { url } from '@/lib/url';
     background: var(--brand-soft);
   }
 
-  /* Composer */
   .chatw-composer {
     padding: 0.65rem var(--cw-pad) 0.85rem;
     border-top: 1px solid rgb(28 32 36 / 0.06);
@@ -536,7 +652,6 @@ import { url } from '@/lib/url';
     background: var(--brand);
     color: var(--graphite);
     cursor: pointer;
-    flex: none;
   }
 
   .chatw-send:hover {
@@ -554,7 +669,18 @@ import { url } from '@/lib/url';
     color: var(--text-muted);
   }
 
-  /* Manuals tab */
+  .chatw-resize {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: nwse-resize;
+    background:
+      linear-gradient(135deg, transparent 45%, rgb(28 32 36 / 0.2) 46%, rgb(28 32 36 / 0.2) 54%, transparent 55%),
+      linear-gradient(135deg, transparent 60%, rgb(28 32 36 / 0.18) 61%, rgb(28 32 36 / 0.18) 69%, transparent 70%);
+  }
+
   .chatw-manuals {
     min-height: 0;
     overflow: auto;
@@ -710,6 +836,29 @@ import { url } from '@/lib/url';
     color: inherit;
     font-weight: 750;
   }
+
+  @media (max-width: 40em) {
+    .chatw-sizes {
+      display: none;
+    }
+
+    .chatw[data-size='xl'],
+    .chatw[data-size='lg'] {
+      --cw-w: min(calc(100vw - 1.25rem), 23.5rem);
+      --cw-h: min(78vh, 38rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chatw-thinking-dots span {
+      animation: none;
+      opacity: 0.7;
+    }
+
+    .chatw-body {
+      scroll-behavior: auto;
+    }
+  }
 </style>
 
 <script>
@@ -718,6 +867,8 @@ import { url } from '@/lib/url';
   import { url } from '@/lib/url';
 
   const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
+  const SIZE_KEY = 'cco-chat-size';
+  const THINK_MS = 700;
 
   function escapeHtml(s: string) {
     return s
@@ -742,36 +893,12 @@ import { url } from '@/lib/url';
     return `<span class="chatw-msg-title">${escapeHtml(data.title)}</span><p>${escapeHtml(data.summary)}</p>${bullets}${disclaimer}${cta}`;
   }
 
-  function appendMsg(body: HTMLElement, text: string, who: 'bot' | 'user', asHtml = false) {
-    const el = document.createElement('div');
-    el.className = `chatw-msg chatw-msg-${who}`;
-    if (asHtml) el.innerHTML = text;
-    else el.textContent = text;
-    body.appendChild(el);
-    body.scrollTop = body.scrollHeight;
-    return el;
+  function thinkingHtml() {
+    return `<span class="chatw-thinking" aria-live="polite"><span>ccoverath KI denkt</span><span class="chatw-thinking-dots" aria-hidden="true"><span></span><span></span><span></span></span></span>`;
   }
 
-  async function ask(message: string): Promise<CampingAssistResult> {
-    let data = assistCamping(message);
-    try {
-      if (API) {
-        const res = await fetch(`${API}/api/camping-assistant`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message }),
-        });
-        if (res.ok) data = (await res.json()) as CampingAssistResult;
-      }
-    } catch {
-      /* local */
-    }
-    return data;
-  }
-
-  function autosize(ta: HTMLTextAreaElement) {
-    ta.style.height = 'auto';
-    ta.style.height = `${Math.min(ta.scrollHeight, 104)}px`;
+  function wait(ms: number) {
+    return new Promise((r) => window.setTimeout(r, ms));
   }
 
   document.querySelectorAll<HTMLElement>('[data-chat-widget]').forEach((root) => {
@@ -782,9 +909,59 @@ import { url } from '@/lib/url';
     const input = root.querySelector<HTMLTextAreaElement>('[data-chat-input]');
     const body = root.querySelector<HTMLElement>('[data-chat-body]');
     const chips = root.querySelector('[data-chat-chips]');
+    const anchor = root.querySelector<HTMLElement>('[data-chat-anchor]');
+    const resizeHandle = root.querySelector<HTMLElement>('[data-chat-resize]');
     const tabs = root.querySelectorAll<HTMLButtonElement>('[data-chat-tab]');
     const panes = root.querySelectorAll<HTMLElement>('[data-chat-pane]');
+    const sizeBtns = root.querySelectorAll<HTMLButtonElement>('[data-chat-size]');
     if (!panel || !toggle || !form || !input || !body) return;
+
+    const scrollToLatest = () => {
+      requestAnimationFrame(() => {
+        if (anchor) anchor.scrollIntoView({ block: 'end', behavior: 'smooth' });
+        else body.scrollTop = body.scrollHeight;
+      });
+    };
+
+    const markLatest = (el: HTMLElement) => {
+      body.querySelectorAll('.is-latest').forEach((n) => n.classList.remove('is-latest'));
+      el.classList.add('is-latest');
+      scrollToLatest();
+    };
+
+    const appendMsg = (text: string, who: 'bot' | 'user', asHtml = false) => {
+      const el = document.createElement('div');
+      el.className = `chatw-msg chatw-msg-${who}`;
+      el.dataset.chatMsg = '';
+      if (asHtml) el.innerHTML = text;
+      else el.textContent = text;
+      if (anchor) body.insertBefore(el, anchor);
+      else body.appendChild(el);
+      markLatest(el);
+      return el;
+    };
+
+    const setSize = (size: string) => {
+      const allowed = ['sm', 'md', 'lg', 'xl'];
+      const next = allowed.includes(size) ? size : 'md';
+      root.dataset.size = next;
+      root.style.removeProperty('--cw-w');
+      root.style.removeProperty('--cw-h');
+      sizeBtns.forEach((b) => b.classList.toggle('is-active', b.dataset.chatSize === next));
+      try {
+        localStorage.setItem(SIZE_KEY, next);
+      } catch {
+        /* ignore */
+      }
+      scrollToLatest();
+    };
+
+    try {
+      const saved = localStorage.getItem(SIZE_KEY);
+      if (saved) setSize(saved);
+    } catch {
+      /* ignore */
+    }
 
     const setOpen = (open: boolean) => {
       panel.hidden = !open;
@@ -793,6 +970,7 @@ import { url } from '@/lib/url';
         track('chat_widget_open');
         const chatPane = root.querySelector<HTMLElement>('[data-chat-pane="chat"]');
         if (!chatPane?.hidden) input.focus();
+        scrollToLatest();
       }
     };
 
@@ -806,32 +984,65 @@ import { url } from '@/lib/url';
         p.hidden = p.dataset.chatPane !== name;
       });
       if (name === 'manuals') track('chat_manuals_open');
-      if (name === 'chat') input.focus();
+      if (name === 'chat') {
+        input.focus();
+        scrollToLatest();
+      }
+    };
+
+    const ask = async (message: string): Promise<CampingAssistResult> => {
+      let data = assistCamping(message);
+      try {
+        if (API) {
+          const res = await fetch(`${API}/api/camping-assistant`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message }),
+          });
+          if (res.ok) data = (await res.json()) as CampingAssistResult;
+        }
+      } catch {
+        /* local */
+      }
+      return data;
+    };
+
+    const autosize = (ta: HTMLTextAreaElement) => {
+      ta.style.height = 'auto';
+      ta.style.height = `${Math.min(ta.scrollHeight, 104)}px`;
     };
 
     const run = async (message: string) => {
       const cleaned = message.trim();
       if (cleaned.length < 2) return;
       if (cleaned.length < 4) {
-        appendMsg(body, 'Schreib bitte etwas genauer – z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“.', 'bot');
+        appendMsg('Schreib bitte etwas genauer – z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“.', 'bot');
         return;
       }
       setTab('chat');
       chips?.setAttribute('hidden', '');
-      appendMsg(body, cleaned, 'user');
+      appendMsg(cleaned, 'user');
       input.value = '';
       autosize(input);
       track('camping_assistant_start', { source: 'chat_widget' });
-      const thinking = appendMsg(body, 'Einen Moment …', 'bot');
+
+      const thinking = appendMsg(thinkingHtml(), 'bot', true);
+      thinking.classList.add('is-thinking');
+      const started = Date.now();
       const data = await ask(cleaned);
+      const left = THINK_MS - (Date.now() - started);
+      if (left > 0) await wait(left);
+
+      thinking.classList.remove('is-thinking');
       thinking.innerHTML = renderResult(data);
+      markLatest(thinking);
       track('camping_assistant_complete', { provider: data.provider, off_topic: data.offTopic ? 1 : 0 });
-      body.scrollTop = body.scrollHeight;
     };
 
     toggle.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
     close?.addEventListener('click', () => setOpen(false));
     tabs.forEach((t) => t.addEventListener('click', () => setTab(t.dataset.chatTab || 'chat')));
+    sizeBtns.forEach((b) => b.addEventListener('click', () => setSize(b.dataset.chatSize || 'md')));
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -851,5 +1062,47 @@ import { url } from '@/lib/url';
         void run(chip.dataset.text || chip.textContent || '');
       });
     });
+
+    // Drag resize from top-left corner
+    if (resizeHandle) {
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      let startW = 0;
+      let startH = 0;
+
+      const onMove = (e: PointerEvent) => {
+        if (!dragging) return;
+        const dx = startX - e.clientX;
+        const dy = startY - e.clientY;
+        const maxW = Math.min(window.innerWidth - 24, 720);
+        const maxH = Math.min(window.innerHeight - 24, 900);
+        const w = Math.max(300, Math.min(maxW, startW + dx));
+        const h = Math.max(360, Math.min(maxH, startH + dy));
+        root.style.setProperty('--cw-w', `${w}px`);
+        root.style.setProperty('--cw-h', `${h}px`);
+        root.dataset.size = 'custom';
+        sizeBtns.forEach((b) => b.classList.remove('is-active'));
+      };
+
+      const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        scrollToLatest();
+      };
+
+      resizeHandle.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        dragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startW = panel.getBoundingClientRect().width;
+        startH = panel.getBoundingClientRect().height;
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+      });
+    }
   });
 </script>
