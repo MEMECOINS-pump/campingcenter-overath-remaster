@@ -61,6 +61,7 @@ describe('computeOpenStatus with holidays', () => {
     expect(s.reason).toBe('holiday');
     expect(s.holiday?.name).toBe('Neujahr');
     expect(s.label).toContain('Neujahr');
+    expect(s.label).toMatch(/Feiertag/i);
     expect(s.todayLabel).toContain('Feiertag');
   });
 
@@ -69,7 +70,15 @@ describe('computeOpenStatus with holidays', () => {
     expect(s.state).toBe('closed');
     expect(s.reason).toBe('holiday');
     expect(s.holiday?.name).toBe('1. Weihnachtstag');
-    expect(s.shortLabel).toBe('Geschlossen');
+    expect(s.shortLabel).toMatch(/FEIERTAG/i);
+    expect(s.label).toContain('1. Weihnachtstag');
+  });
+
+  it('marks German Unity Day 2026 as holiday', () => {
+    const s = computeOpenStatus(berlinDate('2026-10-03', 14, 0));
+    expect(s.reason).toBe('holiday');
+    expect(s.holiday?.name).toBe('Tag der Deutschen Einheit');
+    expect(s.label).toContain('Tag der Deutschen Einheit');
   });
 
   it('opens on a normal weekday morning', () => {

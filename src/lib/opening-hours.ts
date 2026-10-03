@@ -121,9 +121,9 @@ export function computeOpenStatus(date = new Date(), schedule: OpeningPeriod[] =
       reason: 'holiday',
       holiday,
       opensNext,
-      shortLabel: 'Geschlossen',
-      todayLabel: `Heute Feiertag: ${holiday.name} – geschlossen`,
-      label: `Geschlossen · Feiertag: ${holiday.name}`,
+      shortLabel: `FEIERTAG · Geschlossen`,
+      todayLabel: `Heute Feiertag: ${holiday.name} – wir haben geschlossen`,
+      label: `Geschlossen wegen Feiertag: ${holiday.name}`,
     };
   }
 
