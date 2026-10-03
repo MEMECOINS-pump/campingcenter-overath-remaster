@@ -15,20 +15,20 @@ import Icon from '@/components/ui/Icon.astro';
     <div class="wa-panel card card-pad" data-workshop-assistant>
       <label class="field">
         <span class="field-label">Was ist das Problem?</span>
-        <textarea name="message" rows="4" placeholder="z. B. Meine Heizung funktioniert nicht mehr und zeigt Fehlercode E517." data-wa-message></textarea>
+        <textarea class="textarea" name="message" rows="4" placeholder="z. B. Meine Heizung funktioniert nicht mehr und zeigt Fehlercode E517." data-wa-message></textarea>
       </label>
       <div class="wa-grid">
         <label class="field">
           <span class="field-label">Hersteller</span>
-          <input type="text" data-wa-make placeholder="optional" />
+          <input class="input" type="text" data-wa-make placeholder="optional" />
         </label>
         <label class="field">
           <span class="field-label">Modell</span>
-          <input type="text" data-wa-model placeholder="optional" />
+          <input class="input" type="text" data-wa-model placeholder="optional" />
         </label>
         <label class="field">
           <span class="field-label">Fehlercode</span>
-          <input type="text" data-wa-code placeholder="optional" />
+          <input class="input" type="text" data-wa-code placeholder="optional" />
         </label>
       </div>
       <button type="button" class="btn btn-accent" data-wa-run>
@@ -66,6 +66,7 @@ import Icon from '@/components/ui/Icon.astro';
   .wa-grid {
     display: grid;
     gap: 0.75rem;
+    min-width: 0;
   }
 
   @media (min-width: 40em) {
@@ -77,6 +78,18 @@ import Icon from '@/components/ui/Icon.astro';
   .wa-panel {
     display: grid;
     gap: 1rem;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .wa-grid .field {
+    min-width: 0;
+  }
+
+  .wa-grid .input {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .wa-result {
