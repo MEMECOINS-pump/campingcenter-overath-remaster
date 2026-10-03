@@ -1,0 +1,308 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/url';
+---
+
+<div class="chatw" data-chat-widget>
+  <div class="chatw-panel" data-chat-panel hidden>
+    <header class="chatw-head">
+      <div>
+        <p class="chatw-kicker">Werkstatt-Assistent</p>
+        <p class="chatw-title">Kurz beschreiben – wir ordnen ein</p>
+      </div>
+      <button type="button" class="chatw-x" data-chat-close aria-label="Assistent schließen">
+        <Icon name="close" />
+      </button>
+    </header>
+
+    <div class="chatw-body" data-chat-body>
+      <div class="chatw-msg chatw-msg-bot">
+        Beschreibe kurz dein Anliegen (z.&nbsp;B. Heizung, Batterie, Nässe). Keine Ferndiagnose – nur eine sinnvolle Einordnung für die Werkstatt.
+      </div>
+    </div>
+
+    <form class="chatw-form" data-chat-form>
+      <label class="sr-only" for="chatw-input">Nachricht</label>
+      <textarea id="chatw-input" name="message" rows="2" placeholder="Was ist das Problem?" data-chat-input required minlength="8"></textarea>
+      <button type="submit" class="btn btn-accent btn-sm" data-chat-send>
+        Senden <Icon name="arrow-right" class="arrow" />
+      </button>
+    </form>
+
+    <p class="chatw-foot">
+      <a href={url('/werkstatt-kundendienst/#termin')}>Direkt Termin anfragen</a>
+      ·
+      <a href={url('/kontakt/')}>Kontakt</a>
+    </p>
+  </div>
+
+  <button type="button" class="chatw-fab" data-chat-toggle aria-expanded="false" aria-controls="chatw-panel-id">
+    <span class="chatw-fab-icon" data-chat-fab-icon aria-hidden="true">
+      <Icon name="sparkle" />
+    </span>
+    <span class="chatw-fab-label">Assistent</span>
+  </button>
+</div>
+
+<style>
+  .chatw {
+    position: fixed;
+    right: 1rem;
+    bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + 1rem);
+    z-index: 55;
+    display: grid;
+    justify-items: end;
+    gap: 0.65rem;
+    max-width: min(calc(100vw - 1.5rem), 22rem);
+  }
+
+  .chatw-fab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0.65rem 1rem 0.65rem 0.75rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--graphite);
+    color: #fff;
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .chatw-fab:hover {
+    filter: brightness(1.08);
+  }
+
+  .chatw-fab[aria-expanded='true'] {
+    background: var(--accent, #c2410c);
+  }
+
+  .chatw-fab-icon {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  .chatw-fab-icon :global(.icon) {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .chatw-panel {
+    width: min(calc(100vw - 1.5rem), 22rem);
+    max-height: min(70vh, 32rem);
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    color: var(--text);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .chatw-panel[hidden] {
+    display: none !important;
+  }
+
+  .chatw-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 0.95rem 0.75rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--sand);
+  }
+
+  .chatw-kicker {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .chatw-title {
+    margin: 0.2rem 0 0;
+    font-size: var(--fs-sm);
+    font-weight: 750;
+  }
+
+  .chatw-x {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: rgb(255 255 255 / 0.7);
+    cursor: pointer;
+  }
+
+  .chatw-body {
+    display: grid;
+    gap: 0.65rem;
+    padding: 0.9rem;
+    overflow: auto;
+    align-content: start;
+  }
+
+  .chatw-msg {
+    max-width: 95%;
+    padding: 0.7rem 0.85rem;
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+    line-height: 1.45;
+  }
+
+  .chatw-msg-bot {
+    background: var(--sand);
+  }
+
+  .chatw-msg-user {
+    justify-self: end;
+    background: var(--graphite);
+    color: #fff;
+  }
+
+  .chatw-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.55rem;
+  }
+
+  .chatw-form {
+    display: grid;
+    gap: 0.55rem;
+    padding: 0 0.9rem 0.75rem;
+  }
+
+  .chatw-form textarea {
+    width: 100%;
+    min-height: 3.4rem;
+    resize: vertical;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    font: inherit;
+    font-size: var(--fs-sm);
+  }
+
+  .chatw-foot {
+    margin: 0;
+    padding: 0 0.9rem 0.85rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .chatw-foot a {
+    color: inherit;
+    font-weight: 700;
+  }
+
+</style>
+
+<script>
+  import { track } from '@/lib/analytics';
+  import { url } from '@/lib/url';
+
+  const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
+  const workshopUrl = url('/werkstatt-kundendienst/#termin');
+
+  function localAssist(message: string) {
+    const text = message.toLowerCase();
+    let categoryLabel = 'Allgemeine Werkstatt-Anfrage';
+    if (/heizung|truma|alde|e517|klima/.test(text)) categoryLabel = 'Komfort / Heizung';
+    else if (/batter|strom|solar|lithium|inverter/.test(text)) categoryLabel = 'Technik / Elektro';
+    else if (/nässe|feucht|undicht|schimmel/.test(text)) categoryLabel = 'Reparatur / Nässeschaden';
+    else if (/unfall|gfk|schaden|beule/.test(text)) categoryLabel = 'Reparatur / Unfall-GFK';
+    else if (/brems|fahrwerk|reifen|achse/.test(text)) categoryLabel = 'Fahrwerk / Sicherheit';
+    return {
+      summary: `Die Angaben deuten auf ein Anliegen im Bereich „${categoryLabel}“ hin. Die genaue Ursache sollte durch die Werkstatt geprüft werden.`,
+      categoryLabel,
+      disclaimer: 'Hinweis: Keine verbindliche Ferndiagnose. Ein Fachtechniker prüft Fahrzeug und Ursache vor Ort.',
+      provider: 'rules' as const,
+    };
+  }
+
+  function appendMsg(body: HTMLElement, text: string, who: 'bot' | 'user', extraHtml = '') {
+    const el = document.createElement('div');
+    el.className = `chatw-msg chatw-msg-${who}`;
+    el.innerHTML = `${text}${extraHtml}`;
+    body.appendChild(el);
+    body.scrollTop = body.scrollHeight;
+    return el;
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-chat-widget]').forEach((root) => {
+    const panel = root.querySelector<HTMLElement>('[data-chat-panel]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-chat-toggle]');
+    const close = root.querySelector('[data-chat-close]');
+    const form = root.querySelector<HTMLFormElement>('[data-chat-form]');
+    const input = root.querySelector<HTMLTextAreaElement>('[data-chat-input]');
+    const body = root.querySelector<HTMLElement>('[data-chat-body]');
+    if (!panel || !toggle || !form || !input || !body) return;
+
+    const setOpen = (open: boolean) => {
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) {
+        track('chat_widget_open');
+        input.focus();
+      }
+    };
+
+    toggle.addEventListener('click', () => setOpen(panel.hidden));
+    close?.addEventListener('click', () => setOpen(false));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (message.length < 8) {
+        appendMsg(body, 'Bitte beschreibe das Problem etwas genauer (mind. ein kurzer Satz).', 'bot');
+        return;
+      }
+
+      appendMsg(body, message, 'user');
+      input.value = '';
+      track('workshop_assistant_start', { source: 'chat_widget' });
+
+      const thinking = appendMsg(body, 'Wird eingeordnet …', 'bot');
+      let data = localAssist(message);
+      try {
+        if (API) {
+          const res = await fetch(`${API}/api/workshop-assistant`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message }),
+          });
+          if (res.ok) data = await res.json();
+        }
+      } catch {
+        /* local fallback */
+      }
+
+      thinking.innerHTML = `
+        <strong>${data.categoryLabel}</strong><br />
+        ${data.summary}
+        <span class="muted" style="display:block;margin-top:.45rem;font-size:.78em">${data.disclaimer}</span>
+        <span class="chatw-actions">
+          <a class="btn btn-accent btn-sm" href="${workshopUrl}">Werkstatt anfragen</a>
+        </span>
+      `;
+      track('workshop_assistant_complete', { provider: data.provider || 'rules', source: 'chat_widget' });
+      body.scrollTop = body.scrollHeight;
+    });
+  });
+</script>
