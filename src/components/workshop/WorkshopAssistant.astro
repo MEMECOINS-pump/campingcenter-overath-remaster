@@ -20,15 +20,15 @@ import Icon from '@/components/ui/Icon.astro';
       <div class="wa-grid">
         <label class="field">
           <span class="field-label">Hersteller</span>
-          <input class="input" type="text" data-wa-make placeholder="optional" />
+          <input class="input" type="text" size="1" data-wa-make placeholder="optional" autocomplete="off" />
         </label>
         <label class="field">
           <span class="field-label">Modell</span>
-          <input class="input" type="text" data-wa-model placeholder="optional" />
+          <input class="input" type="text" size="1" data-wa-model placeholder="optional" autocomplete="off" />
         </label>
         <label class="field">
           <span class="field-label">Fehlercode</span>
-          <input class="input" type="text" data-wa-code placeholder="optional" />
+          <input class="input" type="text" size="1" data-wa-code placeholder="optional" autocomplete="off" />
         </label>
       </div>
       <button type="button" class="btn btn-accent" data-wa-run>
@@ -65,11 +65,20 @@ import Icon from '@/components/ui/Icon.astro';
 
   .wa-grid {
     display: grid;
+    grid-template-columns: 1fr;
     gap: 0.75rem;
+    width: 100%;
     min-width: 0;
   }
 
-  @media (min-width: 40em) {
+  /* 3 Spalten nur wenn die Karte noch volle Breite hat – nicht in der Desktop-Zweispalter-Ansicht */
+  @media (min-width: 40em) and (max-width: 63.99em) {
+    .wa-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 90em) {
     .wa-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -78,17 +87,21 @@ import Icon from '@/components/ui/Icon.astro';
   .wa-panel {
     display: grid;
     gap: 1rem;
+    width: 100%;
     min-width: 0;
-    overflow: hidden;
+    overflow: clip;
   }
 
   .wa-grid .field {
     min-width: 0;
+    width: 100%;
   }
 
-  .wa-grid .input {
+  .wa-grid :global(input.input) {
+    display: block;
+    box-sizing: border-box;
     width: 100%;
-    min-width: 0;
+    min-width: 0 !important;
     max-width: 100%;
   }
 
