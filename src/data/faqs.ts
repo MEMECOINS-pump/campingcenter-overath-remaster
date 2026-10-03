@@ -9,7 +9,7 @@ export interface Faq {
 export const faqs: Faq[] = [
   {
     q: 'Welche Marken führt das Campingcenter Overath?',
-    a: 'Wir sind Vertragshändler von EURA MOBIL, CHALLENGER, KNAUS, LA STRADA und PANAMA. Außerdem findest du bei uns gebrauchte Wohnmobile verschiedener Hersteller – vom Kastenwagen bis zum Alkoven.',
+    a: 'Wir sind Vertragspartner von CHALLENGER, LA STRADA und EURA MOBIL. Außerdem findest du bei uns gebrauchte Wohnmobile verschiedener Hersteller – vom Kastenwagen bis zum Alkoven.',
   },
   {
     q: 'Kann ich mein Wohnmobil an euch verkaufen?',

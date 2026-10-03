@@ -5,6 +5,9 @@ import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Photo from '@/components/ui/Photo.astro';
 import CtaSection from '@/components/sections/CtaSection.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
 import { rental, agbDocuments } from '@/data/content';
 import { partners } from '@/data/brands';
 import { company } from '@/data/company';
@@ -119,6 +122,41 @@ const steps = [
       <p class="small muted rt-note">
         Buchung, Preise und Verfügbarkeit laufen über die ADAC Wohnmobilvermietung. Du verlässt dafür diese Website.
       </p>
+    </div>
+  </section>
+
+  <section class="section" id="anfrage" aria-labelledby="rt-inquiry">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Unverbindliche Anfrage</p>
+        <h2 id="rt-inquiry">Mietanfrage an uns senden</h2>
+        <p class="lead">Neben der ADAC-Onlinebuchung kannst du uns auch direkt schreiben – z.&nbsp;B. wenn du ADAC-Mitglied bist und Fragen hast.</p>
+      </div>
+      <div class="card card-pad">
+        <form data-form="rental_inquiry" data-api-path="/api/rental-inquiry" data-subject="Neue Vermietungsanfrage – Campingcenter Overath">
+          <div class="form-stack">
+            <fieldset class="field">
+              <legend>Bist du ADAC-Mitglied?</legend>
+              <div class="seg" role="radiogroup">
+                <label class="seg-opt"><input type="radio" name="adacMember" value="ja" required data-track-change="adac_member_selected" /><span>Ja</span></label>
+                <label class="seg-opt"><input type="radio" name="adacMember" value="nein" required /><span>Nein</span></label>
+              </div>
+              <p class="field-error" aria-live="polite"></p>
+            </fieldset>
+            <div data-show-if="adacMember:ja">
+              <Field name="adacNumber" label="ADAC-Mitgliedsnummer (optional)" hint="Die Angabe ist freiwillig und hilft bei der Bearbeitung." autocomplete="off" />
+            </div>
+            <Field name="name" label="Name" required autocomplete="name" />
+            <Field name="email" label="E-Mail" type="email" required autocomplete="email" />
+            <Field name="telefon" label="Telefon" type="tel" required autocomplete="tel" />
+            <Field name="period" label="Gewünschter Mietzeitraum" placeholder="z. B. 12.–19. Juli" />
+            <Field name="travelers" label="Anzahl Reisende" />
+            <Field name="message" label="Nachricht" type="textarea" rows={4} />
+            <FormEnd submitLabel="Mietanfrage senden" />
+          </div>
+          <FormSuccess title="Anfrage vorbereitet" text="Deine Vermietungsanfrage geht an vermietung@ccoverath.de." />
+        </form>
+      </div>
     </div>
   </section>
 

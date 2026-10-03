@@ -9,6 +9,7 @@ import { track } from '@/lib/analytics';
  */
 
 const ENDPOINT = (import.meta.env.PUBLIC_FORM_ENDPOINT as string | undefined)?.trim() || '';
+const API_BASE = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
 const MAILTO = 'service@ccoverath.de';
 const MIN_FILL_MS = 2500;
 const MAILTO_MAX = 1800;
@@ -234,18 +235,45 @@ function bind(form: HTMLFormElement): void {
     submitting = true;
     setBusy(form, true);
     try {
-      if (ENDPOINT) {
+      const apiPath = form.dataset.apiPath?.trim();
+      if (API_BASE && apiPath) {
+        const json: Record<string, unknown> = Object.fromEntries(
+          [...detail.data.entries()].filter(([k]) => k !== 'website').map(([k, v]) => [k, typeof v === 'string' ? v : v.name]),
+        );
+        json.consent =
+          detail.data.get('datenschutz') === 'on' || detail.data.get('datenschutz') === 'true' || detail.data.get('consent') === 'true';
+        if (kind === 'rental_inquiry') {
+          json.adacMember = String(detail.data.get('adacMember') ?? '');
+          json.adacNumber = String(detail.data.get('adacNumber') ?? '');
+          json.period = String(detail.data.get('period') ?? '');
+          json.travelers = String(detail.data.get('travelers') ?? '');
+          json.message = String(detail.data.get('message') ?? '');
+          json.phone = String(detail.data.get('telefon') ?? detail.data.get('phone') ?? '');
+        }
+        if (kind === 'lastrada_inquiry') {
+          json.phone = String(detail.data.get('telefon') ?? detail.data.get('phone') ?? '');
+        }
+        const res = await fetch(`${API_BASE}${apiPath}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(json),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showSuccess(form, 'sent', mailto);
+        track(`${kind}_submit`, { mode: 'api' });
+      } else if (ENDPOINT) {
         detail.data.delete('website');
         detail.data.set('_subject', subject);
         detail.data.set('_form', kind);
         const res = await fetch(ENDPOINT, { method: 'POST', body: detail.data, headers: { Accept: 'application/json' } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         showSuccess(form, 'sent', mailto);
+        track(`${kind}_submit`, { mode: 'endpoint' });
       } else {
         await new Promise((r) => setTimeout(r, 450));
         showSuccess(form, 'prepared', mailto);
+        track(`${kind}_submit`, { mode: 'presentation' });
       }
-      track(`${kind}_submit`, { mode: ENDPOINT ? 'endpoint' : 'presentation' });
     } catch {
       setStatus(
         form,

@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
-import Icon from '@/components/ui/Icon.astro';
 import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
 import { vehicles } from '@/lib/vehicles';
 import { breadcrumbSchema } from '@/lib/schema';
 import { url } from '@/lib/url';
@@ -11,55 +12,86 @@ const crumbs = [{ label: 'Camper-Finder', href: '/camper-finder/' }];
 
 const questions = [
   {
-    name: 'style',
-    title: 'Wie möchtest du reisen?',
-    hint: 'Die Fahrzeugart bestimmt Platz, Fahrgefühl und Alltagstauglichkeit.',
+    name: 'persons',
+    title: 'Wie viele Personen reisen mit?',
+    hint: 'Damit wir Sitz- und Wohnraum richtig einschätzen.',
     options: [
-      { value: 'kompakt', label: 'Kompakt & wendig', text: 'Kastenwagen – alltagstauglich, bis zu 4 Personen' },
-      { value: 'komfort', label: 'Viel Komfort', text: 'Teil- oder Vollintegriert – großzügig, innovative Grundrisse' },
-      { value: 'raum', label: 'Viel Platz für die Familie', text: 'Alkoven – Raumwunder mit festen Betten, bis zu 6 Personen' },
-      { value: 'offen', label: 'Ich bin offen', text: 'Zeig mir alle Fahrzeugarten' },
+      { value: '1', label: '1', text: 'Solo' },
+      { value: '2', label: '2', text: 'Zu zweit' },
+      { value: '3', label: '3', text: 'Kleine Gruppe' },
+      { value: '4', label: '4', text: 'Familie' },
+      { value: '5plus', label: '5+', text: 'Große Gruppe' },
     ],
   },
   {
-    name: 'weight',
-    title: 'Welchen Führerschein hast du?',
-    hint: 'Mit Klasse B darfst du Fahrzeuge bis 3,5 t zulässiges Gesamtgewicht fahren.',
+    name: 'sleeps',
+    title: 'Wie viele Schlafplätze werden benötigt?',
+    hint: 'Nur Fahrzeuge mit passenden oder bestätigten Schlafplätzen zählen als harte Treffer.',
     options: [
-      { value: 'bis35', label: 'Klasse B', text: 'Fahrzeuge bis 3,5 t' },
-      { value: 'egal', label: 'C1 oder alte Klasse 3', text: 'Auch schwerere Fahrzeuge' },
+      { value: '1', label: '1', text: '' },
+      { value: '2', label: '2', text: '' },
+      { value: '3', label: '3', text: '' },
+      { value: '4', label: '4', text: '' },
+      { value: '5plus', label: '5+', text: '' },
     ],
   },
   {
-    name: 'length',
-    title: 'Wie lang darf dein Camper sein?',
-    hint: 'Kürzere Fahrzeuge parken leichter, längere bieten mehr Raum.',
+    name: 'bedType',
+    title: 'Welche Bettform bevorzugst du?',
+    hint: 'Wenn die Bettform in den Quelldaten fehlt, werten wir sie nicht als Treffer.',
     options: [
-      { value: '5-6', label: 'Bis 6 m', text: 'Passt auf fast jeden Parkplatz' },
-      { value: '6-7', label: '6 bis 7 m', text: 'Der beliebte Mittelweg' },
-      { value: '7+', label: 'Über 7 m', text: 'Maximaler Wohnraum' },
-      { value: 'egal', label: 'Egal', text: 'Hauptsache, es passt' },
+      { value: 'einzelbetten', label: 'Einzelbetten', text: '' },
+      { value: 'doppelbett', label: 'Doppelbett', text: '' },
+      { value: 'queensbett', label: 'Queensbett', text: '' },
+      { value: 'hubbett', label: 'Hubbett', text: '' },
+      { value: 'etagenbett', label: 'Etagenbett', text: '' },
+      { value: 'any', label: 'Keine Präferenz', text: '' },
+    ],
+  },
+  {
+    name: 'bedLength',
+    title: 'Welche Bettlänge benötigst du?',
+    hint: 'Hilfreich besonders für größere Personen. Maße in cm – ohne Beleg in den Daten kein Treffer.',
+    options: [
+      { value: 'lt190', label: 'Unter 190 cm', text: 'kürzere Betten ok' },
+      { value: 'min190', label: 'Mindestens 190 cm', text: '1,90 m' },
+      { value: 'min195', label: 'Mindestens 195 cm', text: '1,95 m' },
+      { value: 'min200', label: 'Mindestens 200 cm', text: '2,00 m' },
+      { value: 'gt200', label: 'Über 200 cm', text: '2,00 m+' },
+      { value: 'any', label: 'Keine Präferenz', text: '' },
+    ],
+  },
+  {
+    name: 'lengthMax',
+    title: 'Wie lang darf dein Fahrzeug maximal sein?',
+    hint: 'Filtert nach normalisierter Fahrzeuglänge in mm.',
+    options: [
+      { value: '6', label: 'Bis 6 m', text: '' },
+      { value: '6.5', label: 'Bis 6,5 m', text: '' },
+      { value: '7', label: 'Bis 7 m', text: '' },
+      { value: '7.5', label: 'Bis 7,5 m', text: '' },
+      { value: 'any', label: 'Über 7,5 m / egal', text: '' },
     ],
   },
   {
     name: 'condition',
     title: 'Neu oder gebraucht?',
-    hint: 'Gebrauchte sparen Wertverlust – neue kommen mit aktueller Technik.',
+    hint: 'Optional – du kannst beides offen lassen.',
     options: [
-      { value: 'neu', label: 'Neufahrzeug', text: 'Aktuelles Modell' },
-      { value: 'gebraucht', label: 'Gebraucht', text: 'Sofort da, weniger Wertverlust' },
-      { value: 'egal', label: 'Beides', text: 'Ich lasse mich beraten' },
+      { value: 'neu', label: 'Neufahrzeug', text: '' },
+      { value: 'gebraucht', label: 'Gebraucht', text: '' },
+      { value: 'any', label: 'Beides', text: '' },
     ],
   },
   {
     name: 'budget',
     title: 'Welches Budget hast du im Kopf?',
-    hint: 'Nur zur Orientierung – wir beraten dich gern auch zu Finanzierung und Inzahlungnahme.',
+    hint: 'Nur zur Orientierung – Finanzierung und Inzahlungnahme besprechen wir gern persönlich.',
     options: [
       { value: 'bis50', label: 'Bis 50.000 €', text: '' },
-      { value: '50-80', label: '50.000 bis 80.000 €', text: '' },
+      { value: '50-80', label: '50–80.000 €', text: '' },
       { value: '80+', label: 'Über 80.000 €', text: '' },
-      { value: 'egal', label: 'Noch offen', text: '' },
+      { value: 'any', label: 'Noch offen', text: '' },
     ],
   },
 ];
@@ -67,16 +99,16 @@ const questions = [
 
 <BaseLayout
   compareTray
-  title="Camper-Finder – welcher Camper passt zu dir?"
-  description="Fünf kurze Fragen, passende Wohnmobile aus unserem Bestand: Der Camper-Finder des Campingcenter Overath hilft dir bei der Wahl zwischen Kastenwagen, Teilintegriertem und Alkoven."
+  title="Camper-Finder – Welcher Camper passt zu dir?"
+  description="Beantworte ein paar kurze Fragen zu Personen, Schlafplätzen, Bettlänge und Fahrzeuglänge – der Camping Finder zeigt passende Wohnmobile aus dem Bestand des Campingcenter Overath."
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
   <section class="page-hero section-paper finder-hero">
     <div class="container">
       <Breadcrumbs items={crumbs} />
-      <p class="eyebrow">Camper-Finder</p>
+      <p class="eyebrow">Camping Finder</p>
       <h1>Welcher Camper passt zu dir?</h1>
-      <p class="lead">Fünf kurze Fragen – danach zeigen wir dir passende Fahrzeuge aus unserem aktuellen Bestand. Dauert keine Minute.</p>
+      <p class="lead">Beantworte ein paar kurze Fragen und finde heraus, welche Fahrzeuge zu deinen Reiseplänen passen.</p>
     </div>
   </section>
 
@@ -84,13 +116,13 @@ const questions = [
     <div class="container container-narrow">
       <form class="finder" data-finder novalidate>
         <div class="finder-progress" data-finder-progress>
-          <p><span data-finder-step>Frage 1</span> von {questions.length}</p>
+          <p><span data-finder-step>1 von {questions.length}</span></p>
           <div class="finder-bar" aria-hidden="true"><span data-finder-bar></span></div>
         </div>
 
         {
           questions.map((q, i) => (
-            <fieldset class="finder-q" data-finder-q={i} aria-describedby={`fq-${q.name}-hint`}>
+            <fieldset class:list={['finder-q', i === 0 && 'is-active']} data-finder-q={i} aria-describedby={`fq-${q.name}-hint`}>
               <legend>
                 <span class="finder-num">{String(i + 1).padStart(2, '0')}</span>
                 {q.title}
@@ -98,13 +130,13 @@ const questions = [
               <p class="hint" id={`fq-${q.name}-hint`}>
                 {q.hint}
               </p>
-              <div class="choice-grid finder-choices">
+              <div class="finder-options">
                 {q.options.map((o) => (
-                  <label class="choice">
-                    <input type="radio" name={q.name} value={o.value} />
-                    <span class="choice-body">
+                  <label class="finder-opt">
+                    <input type="radio" name={q.name} value={o.value} required={i === 0 || true} />
+                    <span class="finder-opt-card">
                       <strong>{o.label}</strong>
-                      {o.text && <small>{o.text}</small>}
+                      {o.text && <span>{o.text}</span>}
                     </span>
                   </label>
                 ))}
@@ -115,50 +147,55 @@ const questions = [
         }
 
         <div class="finder-nav">
-          <button type="button" class="btn btn-ghost" data-finder-back hidden>
-            <Icon name="arrow-left" /> Zurück
-          </button>
-          <button type="submit" class="btn btn-accent btn-lg" data-finder-next>
-            <span data-finder-next-label>Weiter</span> <Icon name="arrow-right" class="arrow" />
+          <button type="button" class="btn btn-ghost" data-finder-back hidden>Zurück</button>
+          <button type="submit" class="btn btn-accent btn-lg finder-next">
+            <span data-finder-next-label>Weiter</span>
           </button>
         </div>
       </form>
     </div>
   </section>
 
-  <section class="section-tight finder-results" aria-labelledby="finder-results-title" data-finder-results hidden tabindex="-1">
+  <section class="section" data-finder-results hidden aria-live="polite">
     <div class="container">
-      <div class="section-head-row">
-        <div class="section-head">
-          <p class="eyebrow">Dein Ergebnis</p>
-          <h2 id="finder-results-title" data-finder-title>Diese Camper passen zu dir</h2>
-          <p class="lead" data-finder-summary></p>
-        </div>
-        <div class="btn-row">
-          <button type="button" class="btn btn-ghost" data-finder-restart><Icon name="refresh" /> Neu starten</button>
-        </div>
+      <header class="finder-result-head">
+        <p class="eyebrow">Ergebnis</p>
+        <h2 data-finder-title>Deine Empfehlungen</h2>
+        <p class="lead" data-finder-summary></p>
+      </header>
+
+      <div class="finder-empty card card-pad" data-finder-empty hidden>
+        <h3>Wir finden gemeinsam eine Lösung.</h3>
+        <p>Hinterlasse unten deine Kontaktdaten – wir melden uns mit konkreten Vorschlägen inkl. deiner Finder-Antworten.</p>
+        <a class="btn btn-accent" href={url('/kontakt/#beratung')}>Persönliche Beratung anfragen</a>
       </div>
 
-      <ul class="finder-grid" role="list" data-finder-grid>
+      <div class="finder-grid" data-finder-grid>
         {
           vehicles.map((v, i) => (
-            <li data-finder-item={v.id} hidden>
+            <div class="finder-item" data-finder-item hidden>
               <VehicleCard vehicle={v} index={i} />
-            </li>
+              <div class="finder-why" data-finder-reasons={v.id}></div>
+              <div class="btn-row">
+                <a class="btn btn-accent btn-sm" href={url(`/wohnmobile/${v.slug}/`)}>Fahrzeug ansehen</a>
+                <a class="btn btn-ghost btn-sm" href={url(`/kontakt/?fahrzeug=${encodeURIComponent(v.title)}#beratung`)}>Beratung anfragen</a>
+              </div>
+            </div>
           ))
         }
-      </ul>
-
-      <div class="finder-cta card card-pad">
-        <div>
-          <h3>Lieber persönlich beraten lassen?</h3>
-          <p class="muted">Wir sind selbst Camper und nehmen uns Zeit für deine Fragen – auch zu Fahrzeugen, die gerade nicht online sind.</p>
-        </div>
-        <div class="btn-row">
-          <a class="btn btn-accent" href={url('/kontakt/#beratung')} data-track="consultation_click" data-track-location="finder_result">Beratung vereinbaren</a>
-          <a class="btn btn-ghost" href={url('/wohnmobile/')} data-finder-all>Alle Fahrzeuge ansehen</a>
-        </div>
       </div>
+
+      <form class="finder-lead card card-pad" data-finder-lead hidden>
+        <h3>Persönliche Beratung anfragen</h3>
+        <p class="muted">Wir speichern deine Antworten und Empfehlungen sicher und werten sie für unser Team aus.</p>
+        <div class="form-stack">
+          <Field name="name" label="Name" required autocomplete="name" />
+          <Field name="email" label="E-Mail-Adresse" type="email" required autocomplete="email" />
+          <Field name="phone" label="Telefonnummer" type="tel" required autocomplete="tel" />
+          <FormEnd submitLabel="Beratung anfragen" />
+        </div>
+        <p class="muted small" data-finder-lead-status aria-live="polite"></p>
+      </form>
     </div>
   </section>
 </BaseLayout>
@@ -168,129 +205,162 @@ const questions = [
 </script>
 
 <style>
-  .finder-hero {
-    padding-bottom: 1.5rem;
+  .finder-hero h1 {
+    max-width: 16ch;
   }
 
   .finder {
     display: grid;
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
-  .finder-progress {
-    display: none;
-  }
-
-  :global(.js) .finder-progress {
-    display: grid;
-    gap: 0.5rem;
-    font-size: var(--fs-sm);
-    font-weight: 650;
-    color: var(--text-muted);
+  .finder-progress p {
+    margin: 0 0 0.5rem;
+    font-weight: 700;
   }
 
   .finder-bar {
-    height: 6px;
-    overflow: hidden;
-    border-radius: var(--radius-pill);
+    height: 0.35rem;
+    border-radius: 999px;
     background: var(--sand);
+    overflow: hidden;
   }
 
   .finder-bar span {
     display: block;
-    width: 20%;
+    width: 14%;
     height: 100%;
-    border-radius: inherit;
     background: var(--brand);
-    transition: width 0.35s var(--ease-out);
+    transition: width 240ms var(--ease);
   }
 
   .finder-q {
-    border: 0;
+    display: none;
     margin: 0;
     padding: 0;
-    min-width: 0;
+    border: 0;
   }
 
-  :global(.js) .finder-q:not(.is-active) {
-    display: none;
+  .finder-q.is-active {
+    display: grid;
+    gap: 1rem;
   }
 
   .finder-q legend {
-    display: flex;
-    gap: 0.75rem;
-    align-items: baseline;
-    padding: 0;
-    font-family: var(--font-head);
-    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
+    display: grid;
+    gap: 0.35rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.55rem, 1.2rem + 1.4vw, 2.1rem);
     line-height: 1.15;
   }
 
   .finder-num {
     font-family: var(--font-body);
-    font-size: var(--fs-sm);
-    font-weight: 750;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--brand-ink);
   }
 
-  .finder-q .hint {
-    margin: 0.5rem 0 1.25rem;
-    font-size: var(--fs-sm);
+  .finder-options {
+    display: grid;
+    gap: 0.65rem;
   }
 
-  .finder-choices {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  .finder-opt {
+    cursor: pointer;
+  }
+
+  .finder-opt input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .finder-opt-card {
+    display: grid;
+    gap: 0.2rem;
+    min-height: 4.5rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--white);
+    transition:
+      border-color 160ms var(--ease),
+      background-color 160ms var(--ease),
+      transform 120ms var(--ease);
+  }
+
+  .finder-opt input:checked + .finder-opt-card {
+    border-color: var(--graphite);
+    background: var(--sand);
+  }
+
+  .finder-opt input:focus-visible + .finder-opt-card {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
   }
 
   .finder-nav {
+    position: sticky;
+    bottom: 0.75rem;
     display: flex;
-    justify-content: space-between;
     gap: 0.75rem;
+    justify-content: space-between;
+    padding-top: 0.5rem;
+    background: linear-gradient(to top, var(--bg), rgb(from var(--bg) r g b / 0.85) 70%, transparent);
   }
 
-  .finder-nav [data-finder-next] {
+  .finder-next {
     margin-left: auto;
-  }
-
-  @media (max-width: 39.99em) {
-    .finder-nav [data-finder-next] {
-      flex: 1;
-    }
-  }
-
-  .finder-results[hidden] {
-    display: none;
-  }
-
-  .finder-results:focus {
-    outline: none;
+    min-width: min(100%, 12rem);
   }
 
   .finder-grid {
     display: grid;
-    gap: 1.25rem;
-    list-style: none;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: 2rem;
   }
 
-  .finder-grid > li {
+  .finder-item {
     display: grid;
+    gap: 0.85rem;
   }
 
-  .finder-grid > li[hidden] {
-    display: none;
+  .finder-why {
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius);
+    background: var(--sand);
+    font-size: var(--fs-sm);
   }
 
-  .finder-cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.25rem 2rem;
-    margin-top: 2rem;
+  .finder-why ul {
+    margin: 0.35rem 0 0;
+    padding-left: 0;
+    list-style: none;
   }
 
-  .finder-cta h3 {
-    font-size: 1.35rem;
+  .finder-why-label {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .finder-lead {
+    margin-top: 2.5rem;
+  }
+
+  .finder-empty {
+    margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 40em) {
+    .finder-options {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64em) {
+    .finder-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 </style>

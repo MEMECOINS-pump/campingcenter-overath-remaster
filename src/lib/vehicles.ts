@@ -1,6 +1,6 @@
 import inventory from '@/data/inventory.json';
 import { formatKm, formatLength, formatPrice, formatWeight } from './format';
-import type { Category, Condition, FilterableVehicle } from './filter';
+import type { BedSpec, Category, Condition, FilterableVehicle } from './filter';
 
 export * from './filter';
 
@@ -22,13 +22,44 @@ export interface Vehicle extends FilterableVehicle {
   highlights: string[];
   images: string[];
   sourceUrl: string;
+  /** Stable mapping to mobile.de / sync layer */
+  sourceProvider: 'mobile.de' | 'fixture';
+  sourceVehicleId: string;
+  internalVehicleId: string;
 }
 
 export type { Category, Condition };
 
+function seatsFromHighlights(highlights: string[]): number | null {
+  for (const h of highlights) {
+    const m = h.match(/(\d+)\s*Sitzer/i);
+    if (m) return Number(m[1]);
+  }
+  return null;
+}
+
+type RawVehicle = Omit<Vehicle, 'seats' | 'sleepingPlaces' | 'beds' | 'sourceProvider' | 'sourceVehicleId' | 'internalVehicleId'> & {
+  seats?: number | null;
+  sleepingPlaces?: number | null;
+  beds?: BedSpec[];
+};
+
+function normalizeVehicle(raw: RawVehicle): Vehicle {
+  const seats = raw.seats ?? seatsFromHighlights(raw.highlights ?? []);
+  return {
+    ...raw,
+    seats,
+    sleepingPlaces: raw.sleepingPlaces ?? null,
+    beds: raw.beds ?? [],
+    sourceProvider: 'mobile.de',
+    sourceVehicleId: String(raw.id),
+    internalVehicleId: `mobile.de:${raw.id}`,
+  };
+}
+
 export const inventorySource = inventory.source;
 export const snapshotDate = inventory.snapshotDate;
-export const vehicles = inventory.vehicles as Vehicle[];
+export const vehicles: Vehicle[] = (inventory.vehicles as RawVehicle[]).map(normalizeVehicle);
 
 export const getVehicle = (slug: string): Vehicle | undefined => vehicles.find((v) => v.slug === slug);
 
@@ -121,6 +152,9 @@ export const toLite = (v: Vehicle): VehicleLite => ({
   price: v.price,
   lengthMm: v.lengthMm,
   mileageKm: v.mileageKm,
+  seats: v.seats,
+  sleepingPlaces: v.sleepingPlaces,
+  beds: v.beds,
   image: v.images[0] ? vehicleImage(v.images[0], 640) : null,
   priceLabel: priceLabel(v),
   facts: cardFacts(v),

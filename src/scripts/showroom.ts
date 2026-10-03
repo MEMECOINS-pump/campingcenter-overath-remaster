@@ -31,6 +31,14 @@ type ListField = keyof typeof listFields;
 function init(form: HTMLFormElement, grid: HTMLElement): void {
   const items: Item[] = Array.from(grid.querySelectorAll<HTMLElement>('[data-grid-item]')).map((el) => {
     const d = (el.querySelector<HTMLElement>('[data-vehicle]') ?? el).dataset;
+    let beds: Item['beds'] = [];
+    if (d.beds) {
+      try {
+        beds = JSON.parse(d.beds) as Item['beds'];
+      } catch {
+        beds = [];
+      }
+    }
     return {
       el,
       id: d.id ?? '',
@@ -43,6 +51,9 @@ function init(form: HTMLFormElement, grid: HTMLElement): void {
       price: Number(d.price ?? 0),
       lengthMm: numOrNull(d.length),
       mileageKm: numOrNull(d.km),
+      seats: numOrNull(d.seats),
+      sleepingPlaces: numOrNull(d.sleeps),
+      beds,
     };
   });
 

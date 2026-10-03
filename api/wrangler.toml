@@ -1,0 +1,25 @@
+name = "cco-api"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "STORE"
+id = "00000000000000000000000000000000"
+preview_id = "00000000000000000000000000000000"
+
+[triggers]
+crons = ["0 */6 * * *", "0 */12 * * *"]
+
+[vars]
+PUBLIC_SITE_ORIGIN = "https://memecoins-pump.github.io"
+PUBLIC_SITE_BASE = "/campingcenter-overath-remaster"
+FINDER_REPORT_TO = "martin_meinke@ccoverath.de"
+RENTAL_MAIL_TO = "vermietung@ccoverath.de"
+WORKSHOP_MAIL_TO = "service@ccoverath.de"
+MOBILE_DE_SELLER_KEY = ""
+# Secrets (set via `wrangler secret put`):
+# MOBILE_DE_API_USER, MOBILE_DE_API_PASSWORD
+# MAIL_HOST, MAIL_USER, MAIL_PASSWORD, MAIL_FROM
+# AI_API_KEY, AI_API_BASE
+# LASTRADA_API_KEY

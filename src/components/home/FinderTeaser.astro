@@ -8,7 +8,7 @@ import { url } from '@/lib/url';
 
 const countFor = (id: string) => vehicles.filter((v) => v.category === id).length;
 const hrefFor = (id: string, title: string) =>
-  id === 'van' ? '/panama/' : countFor(id) > 0 ? `/wohnmobile/?art=${id}` : `/kontakt/?fahrzeug=${encodeURIComponent(title)}#beratung`;
+  countFor(id) > 0 ? `/wohnmobile/?art=${id}` : `/kontakt/?fahrzeug=${encodeURIComponent(title)}#beratung`;
 ---
 
 <section class="section section-paper finder" aria-labelledby="finder-title">
@@ -46,7 +46,7 @@ const hrefFor = (id: string, title: string) =>
                     <li>{f}</li>
                   ))}
                 </ul>
-                <p class="type-count">{t.id === 'van' ? 'PANAMA Vans entdecken' : count > 0 ? `${count} im Bestand` : 'Auf Anfrage'}</p>
+                <p class="type-count">{count > 0 ? `${count} im Bestand` : 'Auf Anfrage'}</p>
               </div>
             </li>
           );

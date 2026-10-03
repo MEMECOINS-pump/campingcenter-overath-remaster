@@ -13,7 +13,7 @@ const primary = [
   { label: 'Werkstatt', href: '/werkstatt-kundendienst/', hint: 'Service & Terminanfrage', icon: 'wrench' as const },
 ];
 const secondary = [
-  ...mainNav.filter((i) => ['/panama/', '/ueber-uns/'].includes(i.href)),
+  ...mainNav.filter((i) => i.href === '/ueber-uns/'),
   ...(mainNav.find((i) => i.label === 'Wohnmobile')?.children ?? []).filter((c) => c.href !== '/wohnmobile/'),
   ...moreNav,
 ];

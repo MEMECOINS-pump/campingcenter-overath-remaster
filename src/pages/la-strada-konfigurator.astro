@@ -1,0 +1,145 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import Icon from '@/components/ui/Icon.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { breadcrumbSchema } from '@/lib/schema';
+import { company } from '@/data/company';
+
+const crumbs = [
+  { label: 'Marken', href: '/marken/' },
+  { label: 'La Strada Konfigurator', href: '/la-strada-konfigurator/' },
+];
+
+const configuratorUrl = 'https://konfigurator.lastrada-mobile.de/konfigurator';
+---
+
+<BaseLayout
+  title="LA STRADA Konfigurator – Campingcenter Overath"
+  description="Konfiguriere dein LA STRADA Reisemobil und frage dein persönliches Angebot beim Campingcenter Overath an. Offizieller Vertragspartner."
+  overlayHeader
+  jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="LA STRADA · Vertragspartner"
+    title="Dein LA STRADA. Bei uns konfiguriert."
+    lead="Nutze den offiziellen LA STRADA Konfigurator und sende uns danach deine Konfiguration – wir erstellen dir ein persönliches, unverbindliches Angebot."
+    image="challenger-bridge"
+    imageAlt="Reisemobil auf der Straße"
+  >
+    <a class="btn btn-accent btn-lg" href={configuratorUrl} target="_blank" rel="noopener" data-track="lastrada_configurator_open">
+      Konfigurator öffnen <Icon name="external" /><span class="sr-only"> (öffnet in neuem Tab)</span>
+    </a>
+    <a class="btn btn-glass btn-lg" href="#anfrage">Persönliches Angebot anfragen</a>
+  </PageHero>
+
+  <section class="section" aria-labelledby="ls-embed">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Offizieller Konfigurator</p>
+        <h2 id="ls-embed">Bleib in der Campingcenter-Erfahrung</h2>
+        <p class="lead">
+          Wir betten den autorisierten LA STRADA Konfigurator ein, wo technisch sinnvoll. Auf sehr schmalen Displays öffnest du ihn besser in einem eigenen Tab – das Hersteller-Branding bleibt erhalten.
+        </p>
+      </div>
+
+      <div class="ls-frame card">
+        <iframe
+          class="ls-iframe"
+          title="LA STRADA Konfigurator"
+          src={configuratorUrl}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+        <p class="ls-fallback muted">
+          Lässt sich der Konfigurator nicht gut bedienen?
+          <a href={configuratorUrl} target="_blank" rel="noopener">Im neuen Tab öffnen<span class="sr-only"> (öffnet in neuem Tab)</span></a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-sand" id="anfrage" aria-labelledby="ls-form-title">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Nächster Schritt</p>
+        <h2 id="ls-form-title">Konfiguration anfragen</h2>
+        <p class="lead">Keine verbindliche Preisaussage – wir prüfen Verfügbarkeit und Optionen und melden uns persönlich.</p>
+        <ul class="checklist">
+          <li>Campingcenter Overath als Ansprechpartner</li>
+          <li>Konfigurations-ID oder PDF-Hinweis genügt</li>
+          <li>Beratung in Overath oder telefonisch</li>
+        </ul>
+      </div>
+      <div class="card card-pad">
+        <form data-form="lastrada_inquiry" data-api-path="/api/lastrada/inquiry">
+          <div class="form-stack">
+            <Field name="name" label="Name" required autocomplete="name" />
+            <Field name="email" label="E-Mail" type="email" required autocomplete="email" />
+            <Field name="telefon" label="Telefon" type="tel" required autocomplete="tel" />
+            <Field name="model" label="Gewähltes Modell" placeholder="z. B. Avanti EB" />
+            <Field name="configurationId" label="Konfigurations-ID / Code" placeholder="falls vorhanden" />
+            <Field name="options" label="Wichtigste Optionen" type="textarea" rows={3} />
+            <Field name="message" label="Nachricht" type="textarea" rows={4} />
+            <FormEnd submitLabel="Persönliches Angebot anfragen" />
+          </div>
+          <FormSuccess title="Anfrage vorbereitet" text="Wir melden uns mit einer persönlichen Einschätzung – ohne verbindliche Preisbindung aus dem Konfigurator." />
+        </form>
+        <p class="muted small">Oder direkt: <a href={company.phone.href}>{company.phone.display}</a></p>
+      </div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .ls-frame {
+    overflow: hidden;
+  }
+
+  .ls-iframe {
+    display: block;
+    width: 100%;
+    min-height: min(78svh, 52rem);
+    border: 0;
+    background: var(--sand);
+  }
+
+  .ls-fallback {
+    margin: 0;
+    padding: 0.85rem 1rem 1rem;
+    font-size: var(--fs-sm);
+  }
+
+  .checklist {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .checklist li {
+    position: relative;
+    padding-left: 1.4rem;
+  }
+
+  .checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--brand-ink);
+    font-weight: 700;
+  }
+
+  @media (max-width: 39.99em) {
+    .ls-iframe {
+      min-height: 70svh;
+    }
+  }
+</style>

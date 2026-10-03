@@ -5,6 +5,7 @@ import {
   filterVehicles,
   filtersToParams,
   paramsToFilters,
+  runCampingFinder,
   runFinder,
   sortVehicles,
   weightClass,
@@ -14,21 +15,54 @@ import {
 const base: FilterableVehicle = {
   id: 'x',
   condition: 'neu',
-  make: 'Knaus',
+  make: 'Challenger',
   category: 'teilintegriert',
   transmission: 'Schaltgetriebe',
   grossWeightKg: 3500,
   price: 70000,
   lengthMm: 6990,
   mileageKm: 10,
+  seats: 4,
+  sleepingPlaces: 4,
+  beds: [{ type: 'doppelbett', lengthMm: 2000, widthMm: 1400, label: 'Heckdoppelbett' }],
 };
 const v = (patch: Partial<FilterableVehicle>): FilterableVehicle => ({ ...base, ...patch });
 
 const list = [
-  v({ id: 'a', make: 'Knaus', price: 45000, category: 'kastenwagen', lengthMm: 5990, condition: 'gebraucht', mileageKm: 40000 }),
-  v({ id: 'b', make: 'Challenger', price: 72000, grossWeightKg: 4250, lengthMm: 7400 }),
-  v({ id: 'c', make: 'Eura Mobil', price: 89000, category: 'alkoven', transmission: 'Automatik', lengthMm: 6990 }),
-  v({ id: 'd', make: 'Knaus', price: 61000, grossWeightKg: null, lengthMm: null }),
+  v({
+    id: 'a',
+    make: 'Challenger',
+    price: 45000,
+    category: 'kastenwagen',
+    lengthMm: 5990,
+    condition: 'gebraucht',
+    mileageKm: 40000,
+    seats: 4,
+    sleepingPlaces: 2,
+    beds: [{ type: 'einzelbetten', lengthMm: 1900, widthMm: 700, label: null }],
+  }),
+  v({ id: 'b', make: 'Challenger', price: 72000, grossWeightKg: 4250, lengthMm: 7400, seats: 4, sleepingPlaces: 4 }),
+  v({
+    id: 'c',
+    make: 'Eura Mobil',
+    price: 89000,
+    category: 'alkoven',
+    transmission: 'Automatik',
+    lengthMm: 6990,
+    seats: 6,
+    sleepingPlaces: 6,
+    beds: [{ type: 'etagenbett', lengthMm: 1950, widthMm: 800, label: null }],
+  }),
+  v({
+    id: 'd',
+    make: 'La Strada',
+    price: 61000,
+    grossWeightKg: null,
+    lengthMm: null,
+    seats: null,
+    sleepingPlaces: null,
+    beds: [],
+  }),
 ];
 
 describe('weightClass', () => {
@@ -45,8 +79,8 @@ describe('filterVehicles', () => {
   });
 
   it('combines facets with AND and values within a facet with OR', () => {
-    const f = { ...emptyFilters(), make: ['Knaus', 'Challenger'], condition: ['neu' as const] };
-    expect(filterVehicles(list, f).map((x) => x.id)).toEqual(['b', 'd']);
+    const f = { ...emptyFilters(), make: ['Challenger', 'Eura Mobil'], condition: ['neu' as const] };
+    expect(filterVehicles(list, f).map((x) => x.id)).toEqual(['b', 'c']);
   });
 
   it('excludes vehicles with unknown weight or length when those filters are set', () => {
@@ -59,7 +93,7 @@ describe('filterVehicles', () => {
   });
 
   it('counts active filters', () => {
-    expect(activeFilterCount({ ...emptyFilters(), make: ['Knaus'], priceMax: 1, category: ['alkoven', 'kastenwagen'] })).toBe(4);
+    expect(activeFilterCount({ ...emptyFilters(), make: ['Challenger'], priceMax: 1, category: ['alkoven', 'kastenwagen'] })).toBe(4);
   });
 });
 
@@ -87,22 +121,30 @@ describe('URL state', () => {
   });
 });
 
-describe('runFinder', () => {
-  it('returns exact matches when possible', () => {
+describe('runCampingFinder', () => {
+  it('matches hard constraints with explainable reasons', () => {
+    const r = runCampingFinder(list, { sleeps: '4', lengthMax: '7.5', bedLength: 'min195', budget: '80+', condition: 'neu' });
+    expect(r.hasExact).toBe(true);
+    expect(r.exact.map((m) => m.vehicle.id)).toEqual(['c']);
+    expect(r.exact[0]?.reasons.some((x) => x.label.includes('Schlafplätze'))).toBe(true);
+  });
+
+  it('excludes vehicles when required bed length is unknown', () => {
+    const r = runCampingFinder(list, { bedLength: 'min190', lengthMax: 'any', budget: 'any', condition: 'any' });
+    expect(r.exact.every((m) => m.vehicle.id !== 'd')).toBe(true);
+  });
+
+  it('returns empty exact set instead of fake matches', () => {
+    const r = runCampingFinder(list, { sleeps: '5plus', bedLength: 'gt200', lengthMax: '6', budget: 'bis50' });
+    expect(r.hasExact).toBe(false);
+    expect(r.exact).toHaveLength(0);
+  });
+});
+
+describe('runFinder legacy bridge', () => {
+  it('still returns style-based matches', () => {
     const r = runFinder(list, { style: 'raum', condition: 'neu' });
     expect(r.exact).toBe(true);
     expect(r.results.map((x) => x.id)).toEqual(['c']);
-    expect(r.relaxed).toEqual([]);
-  });
-
-  it('relaxes the least important constraints first and reports them', () => {
-    const r = runFinder(list, { condition: 'gebraucht', budget: 'bis50', style: 'raum', length: '7+' });
-    expect(r.exact).toBe(false);
-    expect(r.results.map((x) => x.id)).toEqual(['a']);
-    expect(r.relaxed).toEqual(['Fahrzeugart', 'Länge']);
-  });
-
-  it('treats "egal" as no constraint', () => {
-    expect(runFinder(list, { weight: 'egal', budget: 'egal', length: 'egal', condition: 'egal', style: 'offen' }).results).toHaveLength(4);
   });
 });

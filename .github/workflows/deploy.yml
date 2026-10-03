@@ -47,6 +47,7 @@ jobs:
           SITE_URL: ${{ steps.pages.outputs.origin }}
           BASE_PATH: ${{ steps.pages.outputs.base_path && format('{0}/', steps.pages.outputs.base_path) || '/' }}
           PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          PUBLIC_API_BASE: ${{ vars.PUBLIC_API_BASE }}
           PUBLIC_INDEXABLE: ${{ vars.PUBLIC_INDEXABLE }}
 
       - name: Verify build output

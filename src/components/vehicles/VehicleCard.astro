@@ -20,6 +20,8 @@ const cover = v.images[0];
   class="vcard"
   data-vehicle
   data-id={v.id}
+  data-slug={v.slug}
+  data-internal-id={v.internalVehicleId}
   data-order={index}
   data-condition={v.condition}
   data-make={v.make}
@@ -29,6 +31,9 @@ const cover = v.images[0];
   data-price={v.price}
   data-length={v.lengthMm ?? ''}
   data-km={v.mileageKm ?? 0}
+  data-seats={v.seats ?? ''}
+  data-sleeps={v.sleepingPlaces ?? ''}
+  data-beds={JSON.stringify(v.beds)}
 >
   <div class="vcard-media">
     {

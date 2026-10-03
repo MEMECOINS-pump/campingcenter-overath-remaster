@@ -1,6 +1,7 @@
 ---
 import Logo from '@/components/brand/Logo.astro';
 import Icon from '@/components/ui/Icon.astro';
+import OpeningStatus from '@/components/layout/OpeningStatus.astro';
 import { mainNav, moreNav } from '@/data/navigation';
 import { company } from '@/data/company';
 import { stripBase, url } from '@/lib/url';
@@ -15,6 +16,13 @@ const isActive = (href: string, children?: { href: string }[]) =>
 ---
 
 <header class="site-header" data-header data-overlay={overlay ? 'true' : undefined}>
+  <div class="header-utility">
+    <div class="container header-utility-inner">
+      <OpeningStatus />
+      <a class="util-link" href={company.phone.href} data-track="call_click" data-track-location="header-utility">{company.phone.display}</a>
+      <a class="util-link util-route" href={company.directions} target="_blank" rel="noopener">Route <span class="sr-only">(öffnet in neuem Tab)</span></a>
+    </div>
+  </div>
   <div class="container header-inner">
     <a class="header-logo" href={url('/')} aria-label={`${company.name} – Startseite`}>
       <Logo tone={overlay ? 'light' : 'dark'} />
@@ -108,7 +116,9 @@ const isActive = (href: string, children?: { href: string }[]) =>
     position: sticky;
     top: 0;
     z-index: 50;
-    height: calc(var(--header-h) + var(--safe-top));
+    display: grid;
+    grid-template-rows: auto var(--header-h);
+    min-height: calc(var(--header-h) + var(--safe-top) + 2rem);
     padding-top: var(--safe-top);
     background: rgb(247 243 236 / 0.92);
     backdrop-filter: saturate(1.4) blur(14px);
@@ -118,6 +128,36 @@ const isActive = (href: string, children?: { href: string }[]) =>
       background-color 0.25s ease,
       border-color 0.25s ease,
       box-shadow 0.25s ease;
+  }
+
+  .header-utility {
+    border-bottom: 1px solid rgb(28 32 36 / 0.08);
+  }
+
+  .header-utility-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2rem;
+    font-size: var(--fs-xs);
+  }
+
+  .util-link {
+    display: none;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+
+  @media (min-width: 48em) {
+    .util-link {
+      display: inline;
+    }
+  }
+
+  .site-header[data-overlay]:not(.is-solid) .header-utility {
+    border-bottom-color: rgb(255 255 255 / 0.12);
   }
 
   .site-header[data-overlay] {

@@ -1,9 +1,7 @@
 import type { ImageMetadata } from 'astro';
 import euraMobil from '@/assets/logos/eura-mobil.png';
 import challenger from '@/assets/logos/challenger.webp';
-import knaus from '@/assets/logos/knaus.png';
 import laStrada from '@/assets/logos/la-strada.png';
-import panama from '@/assets/logos/panama.png';
 import rmv from '@/assets/logos/rmv.png';
 import buettner from '@/assets/logos/buettner.png';
 import reich from '@/assets/logos/reich.png';
@@ -20,7 +18,7 @@ export interface Brand {
   internalHref?: string;
 }
 
-/** Vertragshändler-Marken laut ccoverath.de (Startseite, /wohnmobile/). */
+/** Offizielle Vertragspartner-Marken (Challenger, La Strada, Eura Mobil). */
 export const brands: Brand[] = [
   {
     id: 'challenger',
@@ -28,23 +26,7 @@ export const brands: Brand[] = [
     inventoryMake: 'Challenger',
     logo: challenger,
     website: 'https://www.reisemobile-challenger.de/',
-    summary: 'Offizieller Partner von Challenger – aktuelle Modelle findest du auf der offiziellen deutschen Challenger-Website.',
-  },
-  {
-    id: 'eura-mobil',
-    name: 'EURA MOBIL',
-    inventoryMake: 'Eura Mobil',
-    logo: euraMobil,
-    website: 'https://www.euramobil.de/',
-    summary: 'Vertragshändler für EURA MOBIL Reisemobile.',
-  },
-  {
-    id: 'knaus',
-    name: 'KNAUS',
-    inventoryMake: 'Knaus',
-    logo: knaus,
-    website: 'https://www.knaus.com/',
-    summary: 'Vertragshändler für KNAUS Reisemobile.',
+    summary: 'Vertragspartner für Challenger Reisemobile – aktuelle Modelle und persönliche Beratung in Overath.',
   },
   {
     id: 'la-strada',
@@ -52,15 +34,16 @@ export const brands: Brand[] = [
     inventoryMake: 'La Strada',
     logo: laStrada,
     website: 'https://www.lastrada-mobile.de/',
-    summary: 'Vertragshändler für LA STRADA – die deutsche Manufaktur für Reisemobile.',
+    summary: 'Vertragspartner für LA STRADA – deutsche Manufaktur-Qualität. Konfiguriere dein Modell und frage dein Angebot bei uns an.',
+    internalHref: '/la-strada-konfigurator/',
   },
   {
-    id: 'panama',
-    name: 'PANAMA',
-    logo: panama,
-    website: 'https://www.panama-van.de/',
-    summary: 'Der PANAMA-Profi im Raum Köln: Peak, Peak Next Generation und Urban.',
-    internalHref: '/panama/',
+    id: 'eura-mobil',
+    name: 'EURA MOBIL',
+    inventoryMake: 'Eura Mobil',
+    logo: euraMobil,
+    website: 'https://www.euramobil.de/',
+    summary: 'Vertragspartner für EURA MOBIL Reisemobile – vom Familienmobil bis zum Premium-Alkoven.',
   },
 ];
 
@@ -70,7 +53,7 @@ export interface Partner {
   website: string;
 }
 
-/** „Unsere Partner“ laut ccoverath.de (Startseite, Vermietung). */
+/** Technik- und Service-Partner (keine Fahrzeugmarken). */
 export const partners: Partner[] = [
   { name: 'RMV Reise-Mobil-Versicherung', logo: rmv, website: 'https://www.rmv-versicherung.de/' },
   { name: 'Büttner Elektronik', logo: buettner, website: 'https://www.buettner-elektronik.de/home.html' },

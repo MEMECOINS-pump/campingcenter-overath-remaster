@@ -1,14 +1,13 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/home/Hero.astro';
+import CampingFinderHero from '@/components/home/CampingFinderHero.astro';
 import QuickActions from '@/components/home/QuickActions.astro';
 import FeaturedVehicles from '@/components/home/FeaturedVehicles.astro';
-import FinderTeaser from '@/components/home/FinderTeaser.astro';
 import BrandShowcase from '@/components/sections/BrandShowcase.astro';
 import StorySection from '@/components/home/StorySection.astro';
 import AnkaufTeaser from '@/components/home/AnkaufTeaser.astro';
 import WorkshopTeaser from '@/components/home/WorkshopTeaser.astro';
-import PanamaTeaser from '@/components/home/PanamaTeaser.astro';
 import RentalTeaser from '@/components/home/RentalTeaser.astro';
 import Journey from '@/components/sections/Journey.astro';
 import TourTeaser from '@/components/home/TourTeaser.astro';
@@ -24,20 +23,19 @@ import { faqSchema } from '@/lib/schema';
 <BaseLayout
   compareTray
   title="Campingcenter Overath – Wohnmobile kaufen, mieten & Werkstatt"
-  description="Wohnmobile kaufen, mieten und professionell betreuen lassen: Vertragshändler von EURA MOBIL, CHALLENGER, KNAUS, LA STRADA und PANAMA, ADAC-Mietstation Köln-Ost und Fachwerkstatt in Overath."
+  description="Wohnmobile kaufen, mieten und professionell betreuen lassen: Vertragspartner von CHALLENGER, LA STRADA und EURA MOBIL, ADAC-Mietstation Köln-Ost und Fachwerkstatt in Overath."
   overlayHeader
   jsonLd={[faqSchema(faqs)]}
 >
   <Hero />
+  <CampingFinderHero />
   <QuickActions />
   <FeaturedVehicles />
-  <FinderTeaser />
   <BrandShowcase />
-  <StorySection />
   <AnkaufTeaser />
   <WorkshopTeaser />
-  <PanamaTeaser />
   <RentalTeaser />
+  <StorySection />
   <Journey />
   <TourTeaser />
   <PromotionTeaser />

@@ -9,6 +9,7 @@ import FormSuccess from '@/components/forms/FormSuccess.astro';
 import PhotoUploader from '@/components/forms/PhotoUploader.astro';
 import YouTubeLite from '@/components/embeds/YouTubeLite.astro';
 import PromotionTeaser from '@/components/home/PromotionTeaser.astro';
+import WorkshopAssistant from '@/components/workshop/WorkshopAssistant.astro';
 import CtaSection from '@/components/sections/CtaSection.astro';
 import { serviceGroups, workshopHighlights, workshopRequestTopics } from '@/data/services';
 import { agbDocuments, videos } from '@/data/content';
@@ -127,6 +128,8 @@ const today = new Date().toISOString().slice(0, 10);
       <YouTubeLite id={videos.workshop.id} title={videos.workshop.title} />
     </div>
   </section>
+
+  <WorkshopAssistant />
 
   <section id="termin" class="section ws-request" aria-labelledby="ws-form-title">
     <div class="container ws-request-grid">

@@ -10,7 +10,12 @@ export const company = {
   motto: 'Von Campern für Camper',
   foundedStatement: 'Seit 30 Jahren',
   description:
-    'Wohnmobile kaufen, mieten und professionell betreuen lassen: Vertragshändler von EURA MOBIL, CHALLENGER, KNAUS, LA STRADA und PANAMA, ADAC-Mietstation Köln-Ost und Fachwerkstatt für Wohnmobile und Wohnwagen in Overath.',
+    'Wohnmobile kaufen, mieten und professionell betreuen lassen: Vertragspartner von CHALLENGER, LA STRADA und EURA MOBIL, ADAC-Mietstation Köln-Ost und Fachwerkstatt für Wohnmobile und Wohnwagen in Overath.',
+  emails: {
+    service: 'service@ccoverath.de',
+    rental: 'vermietung@ccoverath.de',
+    finderReport: 'martin_meinke@ccoverath.de',
+  },
   address: {
     street: 'Weberstraße 12',
     postalCode: '51491',

@@ -44,7 +44,7 @@ export function organizationSchema(site: URL | undefined): Json {
         closes: h.closes,
       })),
     ),
-    brand: ['EURA MOBIL', 'CHALLENGER', 'KNAUS', 'LA STRADA', 'PANAMA'].map((name) => ({ '@type': 'Brand', name })),
+    brand: ['CHALLENGER', 'LA STRADA', 'EURA MOBIL'].map((name) => ({ '@type': 'Brand', name })),
     sameAs: [company.officialWebsite, company.social.facebook],
   };
 }

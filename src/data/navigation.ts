@@ -14,14 +14,14 @@ export const mainNav: NavItem[] = [
       { label: 'Alle Fahrzeuge', href: '/wohnmobile/', hint: 'Neu- und Gebrauchtfahrzeuge im Bestand' },
       { label: 'Gebrauchte Wohnmobile', href: '/wohnmobil-verkauf/', hint: 'Gebrauchtfahrzeuge im Bestand' },
       { label: 'Camper-Finder', href: '/camper-finder/', hint: 'Welcher Camper passt zu dir?' },
-      { label: 'Marken', href: '/marken/', hint: 'EURA MOBIL, Challenger, Knaus, La Strada, Panama' },
+      { label: 'Marken', href: '/marken/', hint: 'Challenger, La Strada, Eura Mobil' },
+      { label: 'La Strada Konfigurator', href: '/la-strada-konfigurator/', hint: 'Dein LA STRADA konfigurieren' },
       { label: 'Merkliste', href: '/merkliste/', hint: 'Deine gemerkten Fahrzeuge' },
     ],
   },
   { label: 'Ankauf', href: '/wohnmobil-ankauf/', hint: 'Ankauf starten' },
   { label: 'Vermietung', href: '/vermietung-wohnmobile/', hint: 'Wohnmobil mieten' },
   { label: 'Werkstatt', href: '/werkstatt-kundendienst/', hint: 'Service & Terminanfrage' },
-  { label: 'Panama Vans', href: '/panama/', hint: '365 Tage Freiheit' },
   { label: 'Über uns', href: '/ueber-uns/', hint: 'Von Campern für Camper' },
 ];
 

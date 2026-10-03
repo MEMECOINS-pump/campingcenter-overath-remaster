@@ -1,0 +1,187 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { company, openingHours, formatHours } from '@/data/company';
+import { computeOpenStatus, schedulePayload } from '@/lib/opening-hours';
+import { url } from '@/lib/url';
+
+/** SSR seed – client refreshes with Europe/Berlin. */
+const initial = computeOpenStatus();
+const payload = JSON.stringify(schedulePayload());
+---
+
+<div class="oh" data-opening-status data-schedule={payload}>
+  <button type="button" class="oh-pill" data-oh-open aria-expanded="false" aria-controls="oh-sheet" data-state={initial.state}>
+    <span class="oh-dot" aria-hidden="true"></span>
+    <span class="oh-short" data-oh-short>{initial.state === 'open' ? 'Geöffnet' : 'Geschlossen'}</span>
+    <span class="oh-long" data-oh-long>{initial.label}</span>
+  </button>
+
+  <dialog class="oh-sheet" id="oh-sheet" data-oh-sheet>
+    <div class="oh-sheet-inner">
+      <header class="oh-sheet-head">
+        <p class="eyebrow">Öffnungszeiten</p>
+        <button type="button" class="oh-close" data-oh-close aria-label="Schließen"><Icon name="close" /></button>
+      </header>
+      <p class="oh-today" data-oh-today>{initial.todayLabel}</p>
+      <ul class="oh-week">
+        {openingHours.map((p) => (
+          <li>
+            <strong>{p.days}</strong>
+            <span>{formatHours(p)}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="oh-sun muted">Sonntags geschlossen.</p>
+      <div class="btn-row">
+        <a class="btn btn-accent btn-sm" href={company.phone.href}>Anrufen</a>
+        <a class="btn btn-ghost btn-sm" href={company.directions} target="_blank" rel="noopener">
+          Route <span class="sr-only">(öffnet in neuem Tab)</span>
+        </a>
+        <a class="btn btn-ghost btn-sm" href={url('/kontakt/')}>Kontakt</a>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<style>
+  .oh {
+    position: relative;
+  }
+
+  .oh-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 36px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: rgb(255 255 255 / 0.72);
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .site-header[data-overlay]:not(.is-solid) .oh-pill {
+    border-color: rgb(255 255 255 / 0.28);
+    background: rgb(14 12 10 / 0.28);
+    color: #fff;
+  }
+
+  .oh-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  .oh-pill[data-state='open'] .oh-dot {
+    background: var(--success);
+  }
+
+  .oh-long {
+    display: none;
+  }
+
+  @media (min-width: 48em) {
+    .oh-short {
+      display: none;
+    }
+    .oh-long {
+      display: inline;
+    }
+  }
+
+  .oh-sheet {
+    width: min(100% - 1.5rem, 24rem);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    color: var(--text);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .oh-sheet::backdrop {
+    background: rgb(14 12 10 / 0.45);
+  }
+
+  .oh-sheet-inner {
+    padding: 1.25rem 1.35rem 1.5rem;
+  }
+
+  .oh-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .oh-close {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--sand);
+    cursor: pointer;
+  }
+
+  .oh-today {
+    margin: 0.75rem 0 1rem;
+    font-weight: 650;
+  }
+
+  .oh-week {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .oh-week li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--fs-sm);
+  }
+
+  .oh-sun {
+    margin: 0.75rem 0 1.25rem;
+    font-size: var(--fs-sm);
+  }
+</style>
+
+<script>
+  import { computeOpenStatus, type OpenStatus } from '@/lib/opening-hours';
+
+  function apply(root: HTMLElement, status: OpenStatus) {
+    root.querySelectorAll<HTMLElement>('[data-oh-short]').forEach((el) => {
+      el.textContent = status.state === 'open' ? 'Geöffnet' : 'Geschlossen';
+    });
+    root.querySelectorAll<HTMLElement>('[data-oh-long]').forEach((el) => {
+      el.textContent = status.label;
+    });
+    root.querySelectorAll<HTMLElement>('[data-oh-today]').forEach((el) => {
+      el.textContent = status.todayLabel;
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-oh-open]').forEach((btn) => {
+      btn.dataset.state = status.state;
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-opening-status]').forEach((root) => {
+    apply(root, computeOpenStatus());
+    const sheet = root.querySelector<HTMLDialogElement>('[data-oh-sheet]');
+    root.querySelector('[data-oh-open]')?.addEventListener('click', () => sheet?.showModal());
+    root.querySelector('[data-oh-close]')?.addEventListener('click', () => sheet?.close());
+    sheet?.addEventListener('click', (e) => {
+      if (e.target === sheet) sheet.close();
+    });
+  });
+</script>

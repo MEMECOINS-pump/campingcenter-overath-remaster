@@ -1,0 +1,197 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<section class="section section-sand" id="assistent" aria-labelledby="wa-title">
+  <div class="container wa">
+    <div class="wa-copy">
+      <p class="eyebrow">Werkstatt-Assistent</p>
+      <h2 id="wa-title">Kurz beschreiben. Besser einordnen.</h2>
+      <p class="lead">
+        Beschreibe kurz, was mit deinem Fahrzeug nicht stimmt. Unser digitaler Assistent hilft dir dabei, deine Anfrage richtig einzuordnen – ohne Ferndiagnose.
+      </p>
+    </div>
+
+    <div class="wa-panel card card-pad" data-workshop-assistant>
+      <label class="field">
+        <span class="field-label">Was ist das Problem?</span>
+        <textarea name="message" rows="4" placeholder="z. B. Meine Heizung funktioniert nicht mehr und zeigt Fehlercode E517." data-wa-message></textarea>
+      </label>
+      <div class="wa-grid">
+        <label class="field">
+          <span class="field-label">Hersteller</span>
+          <input type="text" data-wa-make placeholder="optional" />
+        </label>
+        <label class="field">
+          <span class="field-label">Modell</span>
+          <input type="text" data-wa-model placeholder="optional" />
+        </label>
+        <label class="field">
+          <span class="field-label">Fehlercode</span>
+          <input type="text" data-wa-code placeholder="optional" />
+        </label>
+      </div>
+      <button type="button" class="btn btn-accent" data-wa-run>
+        Einordnen <Icon name="arrow-right" class="arrow" />
+      </button>
+      <p class="muted small" data-wa-status aria-live="polite"></p>
+
+      <div class="wa-result" data-wa-result hidden>
+        <h3>Zusammenfassung deiner Werkstatt-Anfrage</h3>
+        <dl class="wa-dl" data-wa-structured></dl>
+        <p data-wa-summary></p>
+        <p class="muted small" data-wa-disclaimer></p>
+        <div class="btn-row">
+          <a class="btn btn-accent" href="#termin" data-wa-to-form>Anfrage an Werkstatt senden</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wa {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  @media (min-width: 64em) {
+    .wa {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      align-items: start;
+      gap: 3rem;
+    }
+  }
+
+  .wa-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 40em) {
+    .wa-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .wa-panel {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .wa-result {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .wa-dl {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0 0 1rem;
+  }
+
+  .wa-dl div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.75rem;
+    font-size: var(--fs-sm);
+  }
+
+  .wa-dl dt {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .wa-dl dd {
+    margin: 0;
+  }
+</style>
+
+<script>
+  import { track } from '@/lib/analytics';
+
+  const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
+
+  function localAssist(message: string) {
+    const text = message.toLowerCase();
+    let categoryLabel = 'Allgemeine Werkstattanfrage';
+    if (/heiz|truma|e5\d{2}/.test(text)) categoryLabel = 'Technik / Heizung';
+    else if (/batter|strom|solar/.test(text)) categoryLabel = 'Technik / Elektro';
+    else if (/nässe|feucht|undicht/.test(text)) categoryLabel = 'Reparatur / Nässeschaden';
+    else if (/unfall|gfk|schaden/.test(text)) categoryLabel = 'Reparatur / Unfall-GFK';
+    return {
+      summary:
+        `Die Angaben deuten auf ein Anliegen im Bereich „${categoryLabel}“ hin. Die genaue Ursache sollte durch die Werkstatt geprüft werden.`,
+      categoryLabel,
+      disclaimer: 'Hinweis: Keine verbindliche Ferndiagnose. Ein Fachtechniker prüft Fahrzeug und Ursache vor Ort.',
+      structured: { Problem: message, Bereich: categoryLabel },
+      provider: 'rules' as const,
+    };
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-workshop-assistant]').forEach((root) => {
+    const run = root.querySelector<HTMLButtonElement>('[data-wa-run]');
+    const status = root.querySelector('[data-wa-status]');
+    const result = root.querySelector<HTMLElement>('[data-wa-result]');
+    const summary = root.querySelector('[data-wa-summary]');
+    const disclaimer = root.querySelector('[data-wa-disclaimer]');
+    const structured = root.querySelector('[data-wa-structured]');
+    const toForm = root.querySelector<HTMLAnchorElement>('[data-wa-to-form]');
+
+    run?.addEventListener('click', async () => {
+      const message = root.querySelector<HTMLTextAreaElement>('[data-wa-message]')?.value.trim() || '';
+      if (message.length < 8) {
+        if (status) status.textContent = 'Bitte beschreibe das Problem etwas genauer.';
+        return;
+      }
+      track('workshop_assistant_start');
+      if (status) status.textContent = 'Wird eingeordnet …';
+      if (run) run.disabled = true;
+
+      const payload = {
+        message,
+        vehicleMake: root.querySelector<HTMLInputElement>('[data-wa-make]')?.value.trim(),
+        vehicleModel: root.querySelector<HTMLInputElement>('[data-wa-model]')?.value.trim(),
+        faultCode: root.querySelector<HTMLInputElement>('[data-wa-code]')?.value.trim(),
+      };
+
+      let data = localAssist(message);
+      try {
+        if (API) {
+          const res = await fetch(`${API}/api/workshop-assistant`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) data = await res.json();
+        }
+      } catch {
+        /* keep local fallback */
+      }
+
+      if (summary) summary.textContent = data.summary;
+      if (disclaimer) disclaimer.textContent = data.disclaimer;
+      if (structured) {
+        structured.innerHTML = Object.entries(data.structured || {})
+          .map(([k, v]) => `<div><dt>${k}</dt><dd>${String(v)}</dd></div>`)
+          .join('');
+      }
+      if (result) result.hidden = false;
+      if (status) status.textContent = '';
+      if (run) run.disabled = false;
+      track('workshop_assistant_complete', { provider: data.provider || 'rules' });
+
+      // Prefill workshop form category / description when possible
+      const beschreibung = document.querySelector<HTMLTextAreaElement>('textarea[name="beschreibung"]');
+      if (beschreibung && !beschreibung.value) {
+        beschreibung.value = `${message}\n\n— Assistent: ${data.categoryLabel}`;
+      }
+      const chips = document.querySelectorAll<HTMLInputElement>('input[name="anliegen"]');
+      chips.forEach((c) => {
+        if (data.categoryLabel.toLowerCase().includes(c.value.toLowerCase().slice(0, 6))) c.checked = true;
+      });
+      toForm?.focus();
+    });
+  });
+</script>

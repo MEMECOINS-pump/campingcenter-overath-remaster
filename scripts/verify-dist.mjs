@@ -9,7 +9,7 @@ const site = process.env.SITE_URL || '';
 
 const requiredRoutes = [
   '', 'wohnmobile/', 'wohnmobil-verkauf/', 'wohnmobil-ankauf/', 'vermietung-wohnmobile/', 'werkstatt-kundendienst/',
-  'panama/', 'marken/', 'ueber-uns/', 'kontakt/', 'jobs/', 'rechnungswesen/', 'reinigungskraft/', 'bewerbung/',
+  'marken/', 'la-strada-konfigurator/', 'ueber-uns/', 'kontakt/', 'jobs/', 'rechnungswesen/', 'reinigungskraft/', 'bewerbung/',
   '360-rundgang/', 'fahrzeugwaesche-herbst/', 'camper-finder/', 'merkliste/', 'vergleich/', 'impressum/',
   'datenschutz/', 'agb/', 'barrierefreiheitserklaerung/', 'download/', 'danke/',
 ];
