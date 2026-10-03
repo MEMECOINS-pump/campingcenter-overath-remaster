@@ -151,37 +151,51 @@ import { url } from '@/lib/url';
   .chatw {
     --cw-radius: 1.25rem;
     --cw-pad: 1rem;
-    --cw-w: min(calc(100vw - 1.25rem), 23.5rem);
-    --cw-h: min(78vh, 38rem);
+    --cw-gap-bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + 1rem);
+    --cw-max-h: calc(100dvh - var(--cw-gap-bottom) - 0.75rem);
+    --cw-w: min(calc(100vw - 1.25rem), 24rem);
+    --cw-h: min(36rem, var(--cw-max-h));
     position: fixed;
     right: 1rem;
-    bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + 1rem);
-    z-index: 70;
+    bottom: var(--cw-gap-bottom);
+    z-index: 80;
     display: grid;
     justify-items: end;
+    align-content: end;
     gap: 0.75rem;
     width: var(--cw-w);
+    max-width: calc(100vw - 1.25rem);
     font-family: var(--font-body);
+    pointer-events: none;
+  }
+
+  .chatw > * {
+    pointer-events: auto;
   }
 
   .chatw[data-size='sm'] {
     --cw-w: min(calc(100vw - 1.25rem), 20rem);
-    --cw-h: min(62vh, 28rem);
+    --cw-h: min(28rem, var(--cw-max-h));
   }
 
   .chatw[data-size='md'] {
-    --cw-w: min(calc(100vw - 1.25rem), 23.5rem);
-    --cw-h: min(78vh, 38rem);
+    --cw-w: min(calc(100vw - 1.25rem), 24rem);
+    --cw-h: min(36rem, var(--cw-max-h));
   }
 
   .chatw[data-size='lg'] {
-    --cw-w: min(calc(100vw - 1.25rem), 30rem);
-    --cw-h: min(84vh, 46rem);
+    --cw-w: min(calc(100vw - 1.25rem), 32rem);
+    --cw-h: min(44rem, var(--cw-max-h));
   }
 
   .chatw[data-size='xl'] {
-    --cw-w: min(calc(100vw - 1.25rem), 40rem);
-    --cw-h: min(90vh, 56rem);
+    --cw-w: min(calc(100vw - 1.25rem), 42rem);
+    --cw-h: min(52rem, var(--cw-max-h));
+  }
+
+  /* Wenn Panel offen: FAB ausblenden, gesamter Platz fürs Fenster */
+  .chatw:has([data-chat-panel]:not([hidden])) .chatw-fab {
+    display: none;
   }
 
   .chatw-fab {
@@ -255,7 +269,8 @@ import { url } from '@/lib/url';
   .chatw-panel {
     position: relative;
     width: 100%;
-    height: var(--cw-h);
+    height: min(var(--cw-h), var(--cw-max-h));
+    max-height: var(--cw-max-h);
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr);
     overflow: hidden;
@@ -838,14 +853,8 @@ import { url } from '@/lib/url';
   }
 
   @media (max-width: 40em) {
-    .chatw-sizes {
+    .chatw-size-btn[data-chat-size='xl'] {
       display: none;
-    }
-
-    .chatw[data-size='xl'],
-    .chatw[data-size='lg'] {
-      --cw-w: min(calc(100vw - 1.25rem), 23.5rem);
-      --cw-h: min(78vh, 38rem);
     }
   }
 
@@ -1076,9 +1085,10 @@ import { url } from '@/lib/url';
         const dx = startX - e.clientX;
         const dy = startY - e.clientY;
         const maxW = Math.min(window.innerWidth - 24, 720);
-        const maxH = Math.min(window.innerHeight - 24, 900);
+        const styles = getComputedStyle(root);
+        const maxH = Math.max(320, Number.parseFloat(styles.getPropertyValue('--cw-max-h')) || window.innerHeight - 80);
         const w = Math.max(300, Math.min(maxW, startW + dx));
-        const h = Math.max(360, Math.min(maxH, startH + dy));
+        const h = Math.max(320, Math.min(maxH, startH + dy));
         root.style.setProperty('--cw-w', `${w}px`);
         root.style.setProperty('--cw-h', `${h}px`);
         root.dataset.size = 'custom';
