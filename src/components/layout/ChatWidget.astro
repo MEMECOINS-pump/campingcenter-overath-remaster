@@ -263,7 +263,7 @@ import { url } from '@/lib/url';
       }
     };
 
-    toggle.addEventListener('click', () => setOpen(panel.hidden));
+    toggle.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
     close?.addEventListener('click', () => setOpen(false));
 
     form.addEventListener('submit', async (e) => {
