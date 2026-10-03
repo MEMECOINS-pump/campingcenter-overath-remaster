@@ -193,9 +193,25 @@ import { url } from '@/lib/url';
     --cw-h: min(52rem, var(--cw-max-h));
   }
 
-  /* Wenn Panel offen: FAB ausblenden, gesamter Platz fürs Fenster */
-  .chatw:has([data-chat-panel]:not([hidden])) .chatw-fab {
+  /* Offen: FAB weg, Actionbar aus, Fenster bleibt im Viewport */
+  .chatw.is-open {
+    --cw-gap-bottom: calc(var(--safe-bottom) + 0.75rem);
+    --cw-max-h: calc(100dvh - var(--cw-gap-bottom) - 0.5rem);
+  }
+
+  .chatw.is-open .chatw-fab {
     display: none;
+  }
+
+  @media (max-width: 40em) {
+    .chatw.is-open {
+      right: 0.5rem;
+      left: 0.5rem;
+      width: auto;
+      max-width: none;
+      --cw-w: 100%;
+      --cw-h: var(--cw-max-h);
+    }
   }
 
   .chatw-fab {
@@ -927,8 +943,8 @@ import { url } from '@/lib/url';
 
     const scrollToLatest = () => {
       requestAnimationFrame(() => {
-        if (anchor) anchor.scrollIntoView({ block: 'end', behavior: 'smooth' });
-        else body.scrollTop = body.scrollHeight;
+        // Nur im Chat-Body scrollen – nie die ganze Seite verschieben
+        body.scrollTop = body.scrollHeight;
       });
     };
 
@@ -975,10 +991,12 @@ import { url } from '@/lib/url';
     const setOpen = (open: boolean) => {
       panel.hidden = !open;
       toggle.setAttribute('aria-expanded', String(open));
+      root.classList.toggle('is-open', open);
+      document.body.classList.toggle('bar-hidden', open);
       if (open) {
         track('chat_widget_open');
         const chatPane = root.querySelector<HTMLElement>('[data-chat-pane="chat"]');
-        if (!chatPane?.hidden) input.focus();
+        if (!chatPane?.hidden) input.focus({ preventScroll: true });
         scrollToLatest();
       }
     };
@@ -994,7 +1012,7 @@ import { url } from '@/lib/url';
       });
       if (name === 'manuals') track('chat_manuals_open');
       if (name === 'chat') {
-        input.focus();
+        input.focus({ preventScroll: true });
         scrollToLatest();
       }
     };
@@ -1085,10 +1103,10 @@ import { url } from '@/lib/url';
         const dx = startX - e.clientX;
         const dy = startY - e.clientY;
         const maxW = Math.min(window.innerWidth - 24, 720);
-        const styles = getComputedStyle(root);
-        const maxH = Math.max(320, Number.parseFloat(styles.getPropertyValue('--cw-max-h')) || window.innerHeight - 80);
+        const panelBottom = panel.getBoundingClientRect().bottom;
+        const maxH = Math.max(280, Math.min(panelBottom - 12, window.innerHeight - 24));
         const w = Math.max(300, Math.min(maxW, startW + dx));
-        const h = Math.max(320, Math.min(maxH, startH + dy));
+        const h = Math.max(280, Math.min(maxH, startH + dy));
         root.style.setProperty('--cw-w', `${w}px`);
         root.style.setProperty('--cw-h', `${h}px`);
         root.dataset.size = 'custom';
