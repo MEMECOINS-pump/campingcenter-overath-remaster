@@ -57,7 +57,7 @@ for (const file of htmlFiles) {
     continue;
   }
 
-  if (!/<html lang="de/.test(html)) fail(name, 'lang="de" fehlt');
+  if (!/<html lang="(de|en)/.test(html)) fail(name, 'lang="de|en" fehlt');
   if (!/<title>[^<]{10,}<\/title>/.test(html)) fail(name, '<title> fehlt oder zu kurz');
   const desc = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
   if (desc.length < 50) fail(name, `meta description zu kurz (${desc.length})`);

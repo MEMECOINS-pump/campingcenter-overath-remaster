@@ -1,0 +1,196 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { company } from '@/data/company';
+import { vehicles } from '@/lib/vehicles';
+import { url } from '@/lib/url';
+
+const items = [
+  { icon: 'shield' as const, label: company.foundedStatement, hint: 'Familiär in Overath' },
+  { icon: 'tag' as const, label: '3 Markenpartner', hint: 'Challenger · LA STRADA · Eura Mobil' },
+  { icon: 'van' as const, label: `${vehicles.length} Fahrzeuge`, hint: 'Aktueller Bestand' },
+  { icon: 'wrench' as const, label: 'Fachwerkstatt', hint: 'Service & Nachrüstung' },
+];
+---
+
+<section class="prestige" aria-label="Warum Campingcenter Overath">
+  <div class="container prestige-inner">
+    <p class="prestige-brand">
+      <span class="prestige-mark">CCO</span>
+      <span class="prestige-name">{company.name}</span>
+      <span class="prestige-claim">{company.claim}</span>
+    </p>
+    <ul class="prestige-list" role="list">
+      {
+        items.map((item) => (
+          <li>
+            <Icon name={item.icon} />
+            <span>
+              <strong>{item.label}</strong>
+              <small>{item.hint}</small>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <a class="prestige-link" href={url('/ueber-uns/')}>
+      Über uns <Icon name="arrow-right" />
+    </a>
+  </div>
+</section>
+
+<style>
+  .prestige {
+    position: relative;
+    background:
+      linear-gradient(180deg, #2c2925 0%, #1f1c19 100%);
+    color: #f4efe6;
+    overflow: hidden;
+  }
+
+  .prestige::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 120% at 10% 0%, rgb(200 135 77 / 0.22), transparent 55%),
+      radial-gradient(ellipse 60% 80% at 90% 100%, rgb(101 116 95 / 0.18), transparent 50%);
+    pointer-events: none;
+  }
+
+  .prestige-inner {
+    position: relative;
+    display: grid;
+    gap: 1.25rem;
+    padding-block: 1.35rem;
+  }
+
+  .prestige-brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.55rem 0.85rem;
+    margin: 0;
+  }
+
+  .prestige-mark {
+    font-family: var(--font-head);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #e8b57a;
+  }
+
+  .prestige-name {
+    font-weight: 750;
+    font-size: var(--fs-sm);
+  }
+
+  .prestige-claim {
+    color: rgb(244 239 230 / 0.72);
+    font-size: var(--fs-xs);
+  }
+
+  .prestige-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .prestige-list li {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .prestige-list :global(.icon) {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.15rem;
+    color: #e8b57a;
+    flex: none;
+  }
+
+  .prestige-list strong {
+    display: block;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .prestige-list small {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.72rem;
+    color: rgb(244 239 230 / 0.65);
+    line-height: 1.35;
+  }
+
+  .prestige-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #e8b57a;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    text-decoration: none;
+    min-height: 44px;
+  }
+
+  .prestige-link:hover {
+    color: #fff;
+  }
+
+  .prestige-link :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  @media (min-width: 48em) {
+    .prestige-inner {
+      grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 2fr) auto;
+      align-items: center;
+      gap: 1.5rem;
+      padding-block: 1.5rem;
+    }
+
+    .prestige-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .prestige-brand {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .prestige-list li {
+      animation: prestige-in 700ms var(--ease-out) both;
+    }
+    .prestige-list li:nth-child(2) {
+      animation-delay: 60ms;
+    }
+    .prestige-list li:nth-child(3) {
+      animation-delay: 120ms;
+    }
+    .prestige-list li:nth-child(4) {
+      animation-delay: 180ms;
+    }
+  }
+
+  @keyframes prestige-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

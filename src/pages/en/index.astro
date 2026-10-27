@@ -1,0 +1,71 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import PrestigeStrip from '@/components/home/PrestigeStrip.astro';
+import CampingFinderHero from '@/components/home/CampingFinderHero.astro';
+import QuickActions from '@/components/home/QuickActions.astro';
+import RecentlyArrived from '@/components/home/RecentlyArrived.astro';
+import FeaturedVehicles from '@/components/home/FeaturedVehicles.astro';
+import BrandShowcase from '@/components/sections/BrandShowcase.astro';
+import StorySection from '@/components/home/StorySection.astro';
+import AnkaufTeaser from '@/components/home/AnkaufTeaser.astro';
+import WorkshopTeaser from '@/components/home/WorkshopTeaser.astro';
+import RentalTeaser from '@/components/home/RentalTeaser.astro';
+import FaqAccordion from '@/components/ui/FaqAccordion.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { faqs } from '@/data/faqs';
+import { faqSchema } from '@/lib/schema';
+import { t } from '@/i18n';
+
+const lang = 'en' as const;
+---
+
+<BaseLayout
+  lang={lang}
+  compareTray
+  title={t(lang, 'seoHomeTitle')}
+  description={t(lang, 'seoHomeDesc')}
+  overlayHeader
+  path="/"
+  jsonLd={[faqSchema(faqs)]}
+>
+  <Hero lang={lang} />
+  <PrestigeStrip />
+  <CampingFinderHero />
+  <QuickActions />
+  <RecentlyArrived />
+  <FeaturedVehicles />
+  <BrandShowcase />
+  <AnkaufTeaser />
+  <WorkshopTeaser />
+  <RentalTeaser />
+  <StorySection />
+
+  <section class="section faq-section" aria-labelledby="faq-title">
+    <div class="container faq-grid">
+      <SectionHeader
+        id="faq-title"
+        eyebrow={t(lang, 'faqEyebrow')}
+        title={t(lang, 'faqTitle')}
+        lead={t(lang, 'faqLead')}
+      />
+      <FaqAccordion items={faqs} />
+    </div>
+  </section>
+
+  <ContactSection />
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  @media (min-width: 64em) {
+    .faq-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+</style>

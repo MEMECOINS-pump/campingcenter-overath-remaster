@@ -1,0 +1,758 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
+import { company } from '@/data/company';
+import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
+import { url } from '@/lib/url';
+
+interface Props {
+  lang?: Locale;
+}
+
+const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+---
+
+<div
+  class="companion"
+  data-companion
+  data-lang={lang}
+  data-i18n-open={t(lang, 'companionOpenNow')}
+  data-i18n-closed={t(lang, 'companionClosedNow')}
+  data-i18n-holiday={t(lang, 'companionHolidayClosed')}
+  data-i18n-title={t(lang, 'companionTitle')}
+  data-i18n-a11y={t(lang, 'companionCardA11y')}
+  data-i18n-lang={t(lang, 'companionCardLang')}
+  data-i18n-offline={t(lang, 'companionAiOfflineTitle')}
+>
+  <button
+    type="button"
+    class="companion-fab"
+    data-companion-open
+    aria-haspopup="dialog"
+    aria-expanded="false"
+    aria-controls="companion-panel"
+    aria-label={t(lang, 'companionFabAria')}
+  >
+    <span class="companion-fab-mark" aria-hidden="true">
+      <!-- Minimalist motorhome + subtle compass cue -->
+      <svg class="companion-fab-svg" viewBox="0 0 48 48" focusable="false">
+        <rect x="4" y="18" width="28" height="14" rx="2.5" fill="currentColor" opacity="0.92" />
+        <path d="M32 22h6.2a2 2 0 0 1 1.6.8L44 28.5V32h-12V22Z" fill="currentColor" opacity="0.92" />
+        <circle cx="14" cy="34" r="3.2" fill="var(--graphite)" />
+        <circle cx="14" cy="34" r="1.35" fill="currentColor" opacity="0.85" />
+        <circle cx="34" cy="34" r="3.2" fill="var(--graphite)" />
+        <circle cx="34" cy="34" r="1.35" fill="currentColor" opacity="0.85" />
+        <rect x="8" y="21" width="7" height="5" rx="1" fill="var(--graphite)" opacity="0.35" />
+        <rect x="17" y="21" width="7" height="5" rx="1" fill="var(--graphite)" opacity="0.35" />
+        <circle cx="39.5" cy="14.5" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.55" />
+        <path d="m41.6 12.6-1.2 2.8-2.8 1.2 1.2-2.8Z" fill="currentColor" opacity="0.7" />
+      </svg>
+    </span>
+  </button>
+
+  <dialog
+    class="companion-panel"
+    id="companion-panel"
+    data-companion-panel
+    aria-labelledby="companion-title"
+  >
+    <div class="companion-sheet">
+      <header class="companion-head">
+        <button type="button" class="companion-back" data-companion-back hidden aria-label={t(lang, 'companionBack')}>
+          <Icon name="chevron-left" />
+          <span>{t(lang, 'companionBack')}</span>
+        </button>
+        <div class="companion-head-copy">
+          <p class="companion-kicker">Campingcenter Overath</p>
+          <h2 id="companion-title" data-companion-heading>{t(lang, 'companionTitle')}</h2>
+          <p class="companion-sub" data-companion-sub>{t(lang, 'companionSubtitle')}</p>
+        </div>
+        <button type="button" class="companion-x" data-companion-close aria-label={t(lang, 'companionClose')}>
+          <Icon name="close" />
+        </button>
+      </header>
+
+      <div class="companion-body">
+        <div class="companion-view is-active" data-companion-view="hub">
+          <div class="companion-status" data-companion-status>
+            <span class="companion-status-dot" aria-hidden="true"></span>
+            <span data-companion-status-label>{t(lang, 'companionClosedNow')}</span>
+          </div>
+
+          <ul class="companion-cards">
+            <li>
+              <button type="button" class="companion-card" data-companion-action="chat">
+                <span class="companion-card-icon" aria-hidden="true"><Icon name="sparkle" /></span>
+                <span class="companion-card-text">
+                  <span class="companion-card-title">{t(lang, 'companionCardAdvice')}</span>
+                  <span class="companion-card-hint">{t(lang, 'companionCardAdviceHint')}</span>
+                </span>
+                <Icon name="chevron-right" class="companion-card-chevron" />
+              </button>
+            </li>
+            <li>
+              <button type="button" class="companion-card" data-companion-action="a11y">
+                <span class="companion-card-icon" aria-hidden="true"><Icon name="a11y-compass" /></span>
+                <span class="companion-card-text">
+                  <span class="companion-card-title">{t(lang, 'companionCardA11y')}</span>
+                  <span class="companion-card-hint">{t(lang, 'companionCardA11yHint')}</span>
+                </span>
+                <Icon name="chevron-right" class="companion-card-chevron" />
+              </button>
+            </li>
+            <li>
+              <button type="button" class="companion-card" data-companion-action="lang">
+                <span class="companion-card-icon" aria-hidden="true"><Icon name="compass" /></span>
+                <span class="companion-card-text">
+                  <span class="companion-card-title">{t(lang, 'companionCardLang')}</span>
+                  <span class="companion-card-hint">{t(lang, 'companionCardLangHint')}</span>
+                </span>
+                <Icon name="chevron-right" class="companion-card-chevron" />
+              </button>
+            </li>
+          </ul>
+
+          <section class="companion-contact" aria-label={t(lang, 'companionQuickContact')}>
+            <h3 class="companion-section-title">{t(lang, 'companionQuickContact')}</h3>
+            <div class="companion-contact-row">
+              <a
+                class="btn btn-accent companion-contact-btn"
+                href={company.phone.href}
+                data-track="call_click"
+                data-track-location="companion"
+              >
+                <Icon name="phone" />
+                {t(lang, 'companionCallNow')}
+              </a>
+              <a
+                class="btn companion-contact-btn"
+                href={url(localizedPath('/kontakt/', lang))}
+                data-track="cta_click"
+                data-track-location="companion"
+              >
+                <Icon name="mail" />
+                {t(lang, 'companionWriteMessage')}
+              </a>
+            </div>
+            <p class="companion-contact-meta">
+              <a href={company.phone.href}>{company.phone.display}</a>
+              ·
+              <a href={`mailto:${company.email}`}>{company.email}</a>
+            </p>
+          </section>
+        </div>
+
+        <div class="companion-view" data-companion-view="a11y" hidden>
+          <AccessibilityPrefs lang={lang} embedded />
+          <p class="companion-a11y-note">
+            <a href={url(localizedPath('/barrierefreiheit/', lang))}>{t(lang, 'a11yStatement')}</a>
+          </p>
+        </div>
+
+        <div class="companion-view" data-companion-view="lang" hidden>
+          <p class="companion-lang-lead">{t(lang, 'companionLangLead')}</p>
+          <div class="companion-lang-list" role="radiogroup" aria-label={t(lang, 'companionCardLang')}>
+            <a
+              class="companion-lang-opt"
+              href={url(localizedPath('/', 'de'))}
+              data-companion-lang="de"
+              data-lang-switch="de"
+              aria-current={lang === 'de' ? 'true' : undefined}
+            >
+              <span class="companion-lang-code">DE</span>
+              <span class="companion-lang-label">Deutsch</span>
+              {lang === 'de' && <span class="companion-lang-check" aria-hidden="true">✓</span>}
+            </a>
+            <a
+              class="companion-lang-opt"
+              href={url(localizedPath('/', 'en'))}
+              data-companion-lang="en"
+              data-lang-switch="en"
+              aria-current={lang === 'en' ? 'true' : undefined}
+            >
+              <span class="companion-lang-code">EN</span>
+              <span class="companion-lang-label">English</span>
+              {lang === 'en' && <span class="companion-lang-check" aria-hidden="true">✓</span>}
+            </a>
+          </div>
+        </div>
+
+        <div class="companion-view" data-companion-view="offline" hidden>
+          <div class="companion-offline">
+            <h3>{t(lang, 'companionAiOfflineTitle')}</h3>
+            <p>{t(lang, 'companionAiOfflineBody')}</p>
+            <div class="companion-contact-row">
+              <a class="btn btn-accent" href={company.phone.href}>{t(lang, 'companionCallNow')}</a>
+              <a class="btn" href={url(localizedPath('/kontakt/', lang))}>{t(lang, 'companionWriteMessage')}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<script>
+  const LANG_KEY = 'cco:lang';
+
+  document.querySelectorAll<HTMLElement>('[data-companion]').forEach((root) => {
+    const panel = root.querySelector<HTMLDialogElement>('[data-companion-panel]');
+    const openBtn = root.querySelector<HTMLButtonElement>('[data-companion-open]');
+    const closeBtn = root.querySelector('[data-companion-close]');
+    const backBtn = root.querySelector<HTMLElement>('[data-companion-back]');
+    const heading = root.querySelector('[data-companion-heading]');
+    const sub = root.querySelector<HTMLElement>('[data-companion-sub]');
+    const statusLabel = root.querySelector('[data-companion-status-label]');
+    const statusBox = root.querySelector<HTMLElement>('[data-companion-status]');
+    if (!panel || !openBtn) return;
+
+    const currentLang = root.dataset.lang || 'de';
+    const i18nTitle = root.dataset.i18nTitle || '';
+    const titles: Record<string, string> = {
+      hub: i18nTitle,
+      a11y: root.dataset.i18nA11y || '',
+      lang: root.dataset.i18nLang || '',
+      offline: root.dataset.i18nOffline || '',
+    };
+
+    const paintStatus = () => {
+      const html = document.documentElement;
+      const state = html.dataset.ccoOpen || 'closed';
+      const reason = html.dataset.ccoOpenReason || '';
+      let label =
+        reason === 'holiday'
+          ? root.dataset.i18nHoliday || ''
+          : state === 'open'
+            ? root.dataset.i18nOpen || ''
+            : root.dataset.i18nClosed || '';
+      if (html.dataset.ccoOpenLabel && currentLang === 'de') label = html.dataset.ccoOpenLabel;
+      if (statusLabel) statusLabel.textContent = label;
+      if (statusBox) {
+        statusBox.dataset.state = state;
+        statusBox.dataset.reason = reason;
+      }
+    };
+    paintStatus();
+
+    const setView = (name: string) => {
+      root.querySelectorAll<HTMLElement>('[data-companion-view]').forEach((el) => {
+        const on = el.dataset.companionView === name;
+        el.hidden = !on;
+        el.classList.toggle('is-active', on);
+      });
+      if (heading) heading.textContent = titles[name] || i18nTitle;
+      if (sub) sub.hidden = name !== 'hub';
+      if (backBtn) backBtn.hidden = name === 'hub';
+      if (name === 'a11y') window.dispatchEvent(new CustomEvent('cco:a11y-sync'));
+    };
+
+    const setOpen = (open: boolean) => {
+      openBtn.setAttribute('aria-expanded', String(open));
+      if (open) {
+        if (!panel.open) panel.showModal();
+        document.body.classList.add('scroll-locked', 'companion-open');
+        paintStatus();
+        setView('hub');
+        openBtn.classList.add('has-arrived');
+      } else if (panel.open) {
+        panel.close();
+      }
+    };
+
+    panel.addEventListener('close', () => {
+      openBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('scroll-locked', 'companion-open');
+      setView('hub');
+      openBtn.focus({ preventScroll: true });
+    });
+
+    openBtn.addEventListener('click', () => setOpen(!panel.open));
+    closeBtn?.addEventListener('click', () => setOpen(false));
+    backBtn?.addEventListener('click', () => setView('hub'));
+    panel.addEventListener('click', (e) => {
+      if (e.target === panel) setOpen(false);
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-companion-action]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.companionAction;
+        if (action === 'chat') {
+          setOpen(false);
+          let opened = false;
+          const onReady = () => {
+            opened = true;
+          };
+          window.addEventListener('cco:chat-opened', onReady, { once: true });
+          window.dispatchEvent(new CustomEvent('cco:open-chat', { detail: { lang: currentLang } }));
+          window.setTimeout(() => {
+            window.removeEventListener('cco:chat-opened', onReady);
+            if (!opened) {
+              setOpen(true);
+              setView('offline');
+            }
+          }, 900);
+          return;
+        }
+        if (action === 'a11y') setView('a11y');
+        if (action === 'lang') setView('lang');
+      });
+    });
+
+    root.querySelectorAll<HTMLAnchorElement>('[data-lang-switch]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const next = link.dataset.langSwitch;
+        if (!next) return;
+        try {
+          localStorage.setItem(LANG_KEY, next);
+        } catch {
+          /* ignore */
+        }
+        const parts = location.pathname.split('/').filter(Boolean);
+        const repoIdx = parts.indexOf('campingcenter-overath-remaster');
+        const prefix = repoIdx >= 0 ? `/${parts.slice(0, repoIdx + 1).join('/')}` : '';
+        let rest = repoIdx >= 0 ? `/${parts.slice(repoIdx + 1).join('/')}` : location.pathname;
+        if (!rest.endsWith('/')) rest += '/';
+        if (rest.startsWith('/en/')) rest = rest.slice(3) || '/';
+        if (rest === '/en/') rest = '/';
+        const dest = next === 'en' ? `${prefix}${rest === '/' ? '/en/' : `/en${rest}`}` : `${prefix}${rest}`;
+        e.preventDefault();
+        location.assign(dest);
+      });
+    });
+
+    try {
+      if (!sessionStorage.getItem('cco:companion-arrived')) {
+        openBtn.classList.add('will-arrive');
+        sessionStorage.setItem('cco:companion-arrived', '1');
+        window.setTimeout(() => {
+          openBtn.classList.remove('will-arrive');
+          openBtn.classList.add('has-arrived');
+        }, 80);
+      } else {
+        openBtn.classList.add('has-arrived');
+      }
+    } catch {
+      openBtn.classList.add('has-arrived');
+    }
+
+    window.addEventListener('cco:open-companion', ((ev: CustomEvent<{ view?: string }>) => {
+      setOpen(true);
+      if (ev.detail?.view) setView(ev.detail.view);
+    }) as EventListener);
+  });
+</script>
+
+<style>
+  .companion {
+    --companion-bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + var(--consent-lift, 0px) + 1rem);
+    position: fixed;
+    right: max(0.85rem, env(safe-area-inset-right, 0px));
+    bottom: var(--companion-bottom);
+    z-index: var(--z-companion, 68);
+    display: grid;
+    justify-items: end;
+    pointer-events: none;
+    font-family: var(--font-body);
+  }
+
+  .companion > * {
+    pointer-events: auto;
+  }
+
+  .companion-fab {
+    display: grid;
+    place-items: center;
+    width: 3.55rem;
+    height: 3.55rem;
+    min-width: 52px;
+    min-height: 52px;
+    padding: 0;
+    border: 0;
+    border-radius: 1.15rem;
+    background: linear-gradient(160deg, #f4ebe0 0%, var(--brand) 55%, #b8732a 100%);
+    color: var(--graphite);
+    box-shadow:
+      0 0 0 1px rgb(28 32 36 / 0.08),
+      0 14px 28px -14px rgb(28 32 36 / 0.45);
+    cursor: pointer;
+    transform: translateY(2px);
+    opacity: 0.96;
+    transition:
+      transform 0.35s var(--ease-out),
+      box-shadow 0.2s var(--ease),
+      filter 0.2s var(--ease);
+  }
+
+  .companion-fab.will-arrive {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  .companion-fab.has-arrived {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .companion-fab:hover {
+    filter: brightness(1.03);
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px rgb(28 32 36 / 0.1),
+      0 18px 32px -14px rgb(28 32 36 / 0.5);
+  }
+
+  .companion-fab:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .companion-fab[aria-expanded='true'] {
+    background: var(--graphite);
+    color: var(--brand);
+  }
+
+  .companion-fab-svg {
+    width: 2rem;
+    height: 2rem;
+    display: block;
+  }
+
+  .companion-panel {
+    width: min(calc(100vw - 1rem), 26rem);
+    max-height: min(92dvh, 40rem);
+    margin: auto;
+    margin-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+    padding: 0;
+    border: 0;
+    border-radius: 1.25rem;
+    background: transparent;
+    color: var(--text);
+    box-shadow: none;
+  }
+
+  .companion-panel::backdrop {
+    background: rgb(36 40 43 / 0.45);
+  }
+
+  @media (max-width: 39.99em) {
+    .companion-panel {
+      width: 100%;
+      max-width: none;
+      height: min(100dvh, 100%);
+      max-height: 100dvh;
+      margin: 0;
+      border-radius: 1.1rem 1.1rem 0 0;
+      margin-top: auto;
+    }
+
+    .companion-sheet {
+      height: 100%;
+      max-height: 100dvh;
+      border-radius: 1.1rem 1.1rem 0 0;
+    }
+  }
+
+  .companion-sheet {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    max-height: inherit;
+    overflow: hidden;
+    border: 1px solid rgb(28 32 36 / 0.08);
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, #fbf7f0 0%, #fff 42%);
+    box-shadow: 0 28px 56px -24px rgb(28 32 36 / 0.4);
+  }
+
+  .companion-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 0.75rem;
+    align-items: start;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid rgb(28 32 36 / 0.06);
+  }
+
+  .companion-back {
+    grid-column: 1 / -1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: fit-content;
+    margin: 0 0 0.15rem;
+    padding: 0.25rem 0.4rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: rgb(28 32 36 / 0.05);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .companion-back[hidden] {
+    display: none !important;
+  }
+
+  .companion-kicker {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+
+  .companion-head-copy h2 {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--graphite);
+  }
+
+  .companion-sub {
+    margin: 0.35rem 0 0;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+
+  .companion-sub[hidden] {
+    display: none !important;
+  }
+
+  .companion-x {
+    display: grid;
+    place-items: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(28 32 36 / 0.06);
+    cursor: pointer;
+  }
+
+  .companion-body {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 0.85rem 1rem 1.15rem;
+  }
+
+  .companion-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.85rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    background: rgb(28 32 36 / 0.05);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .companion-status-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: #8a7170;
+  }
+
+  .companion-status[data-state='open'] .companion-status-dot {
+    background: var(--success);
+  }
+
+  .companion-cards {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .companion-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    width: 100%;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid rgb(28 32 36 / 0.08);
+    border-radius: 1rem;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .companion-card:hover {
+    border-color: rgb(208 129 21 / 0.45);
+    box-shadow: 0 10px 22px -16px rgb(28 32 36 / 0.35);
+    transform: translateY(-1px);
+  }
+
+  .companion-card-icon {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.8rem;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .companion-card-title {
+    display: block;
+    font-size: 0.98rem;
+    font-weight: 800;
+  }
+
+  .companion-card-hint {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+  }
+
+  .companion-card-chevron {
+    width: 1rem;
+    height: 1rem;
+    opacity: 0.45;
+  }
+
+  .companion-section-title {
+    margin: 1.1rem 0 0.55rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .companion-contact-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .companion-contact-btn {
+    justify-content: center;
+    min-height: 2.7rem;
+    font-size: 0.85rem;
+  }
+
+  .companion-contact-meta {
+    margin: 0.65rem 0 0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .companion-contact-meta a {
+    color: inherit;
+    font-weight: 700;
+  }
+
+  .companion-lang-lead {
+    margin: 0 0 0.85rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .companion-lang-list {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .companion-lang-opt {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgb(28 32 36 / 0.1);
+    border-radius: 1rem;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .companion-lang-opt[aria-current='true'] {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 1px var(--brand);
+  }
+
+  .companion-lang-code {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.75rem;
+    background: var(--graphite);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .companion-lang-label {
+    font-weight: 750;
+  }
+
+  .companion-offline {
+    padding: 0.5rem 0.15rem 0.25rem;
+  }
+
+  .companion-offline h3 {
+    margin: 0 0 0.45rem;
+    font-size: 1.05rem;
+  }
+
+  .companion-offline p {
+    margin: 0 0 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+
+  .companion-a11y-note {
+    margin: 0.85rem 0 0;
+    font-size: 0.82rem;
+  }
+
+  .companion-a11y-note a {
+    font-weight: 750;
+    color: var(--brand-ink);
+  }
+
+  .companion-view[hidden] {
+    display: none !important;
+  }
+
+  :global(body.companion-open) .companion-fab {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global(body:has(.chatw.is-open)) .companion-fab {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .companion-fab,
+    .companion-fab.will-arrive,
+    .companion-fab.has-arrived,
+    .companion-card {
+      transition: none;
+      transform: none;
+      opacity: 1;
+    }
+  }
+</style>

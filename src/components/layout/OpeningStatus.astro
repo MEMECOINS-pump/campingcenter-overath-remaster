@@ -196,15 +196,6 @@ import { url } from '@/lib/url';
     background: #ea580c;
   }
 
-  /* Nur kurz sichtbar, wenn Boot-Script noch nicht gemalt hat */
-  .oh-pill[data-state='pending'] .oh-line {
-    opacity: 0.72;
-  }
-
-  :global(html.js) .oh-pill[data-state='pending'] {
-    opacity: 1;
-  }
-
   .site-header[data-overlay]:not(.is-solid) .oh-pill {
     border-color: rgb(255 255 255 / 0.35);
     background: rgb(14 12 10 / 0.45);
@@ -315,86 +306,4 @@ import { url } from '@/lib/url';
   }
 </style>
 
-<script>
-  import { computeOpenStatus, type OpenStatus } from '@/lib/opening-hours';
-
-  function apply(root: HTMLElement, status: OpenStatus) {
-    const isHoliday = status.reason === 'holiday';
-    const next = status.state === 'closed' ? status.opensNext : null;
-    root.dataset.state = status.state;
-    root.dataset.reason = status.reason;
-
-    root.querySelectorAll<HTMLElement>('[data-oh-line]').forEach((el) => {
-      el.textContent = status.label;
-    });
-    root.querySelectorAll<HTMLElement>('[data-oh-sub]').forEach((el) => {
-      if (isHoliday) {
-        el.hidden = false;
-        el.textContent = `Gesetzlicher Feiertag (NRW)${next ? ` · ${next}` : ''}`;
-      } else if (next) {
-        el.hidden = false;
-        el.textContent = next;
-      } else {
-        el.hidden = true;
-        el.textContent = '';
-      }
-    });
-    root.querySelectorAll<HTMLElement>('[data-oh-today]').forEach((el) => {
-      el.textContent = status.todayLabel;
-    });
-    root.querySelectorAll<HTMLButtonElement>('[data-oh-open]').forEach((btn) => {
-      btn.dataset.state = status.state;
-      btn.dataset.reason = status.reason;
-    });
-    root.querySelectorAll<HTMLElement>('[data-oh-banner]').forEach((el) => {
-      el.dataset.state = status.state;
-      el.dataset.reason = status.reason;
-    });
-    root.querySelectorAll<HTMLElement>('[data-oh-banner-title]').forEach((el) => {
-      el.textContent = isHoliday
-        ? 'Heute Feiertag – geschlossen'
-        : status.state === 'open'
-          ? 'Jetzt geöffnet'
-          : 'Jetzt geschlossen';
-    });
-    root.querySelectorAll<HTMLElement>('[data-oh-alert]').forEach((el) => {
-      el.hidden = !isHoliday;
-    });
-    root.querySelectorAll<HTMLElement>('[data-oh-alert-name]').forEach((el) => {
-      el.textContent = status.holiday?.name ?? '';
-    });
-    // Sticky-Offsets: Feiertagsbanner-Höhe an Chrome-Tokens melden
-    const alertEl = root.querySelector<HTMLElement>('[data-oh-alert]');
-    const alertH = isHoliday && alertEl && !alertEl.hidden ? Math.ceil(alertEl.getBoundingClientRect().height) : 0;
-    document.documentElement.style.setProperty('--header-alert-h', `${alertH}px`);
-    root.querySelectorAll<HTMLElement>('[data-oh-next]').forEach((el) => {
-      el.hidden = !next;
-      el.textContent = next ?? '';
-    });
-  }
-
-  function tick() {
-    document.querySelectorAll<HTMLElement>('[data-opening-status]').forEach((root) => apply(root, computeOpenStatus()));
-  }
-
-  document.querySelectorAll<HTMLElement>('[data-opening-status]').forEach((root) => {
-    apply(root, computeOpenStatus());
-    const sheet = root.querySelector<HTMLDialogElement>('[data-oh-sheet]');
-    const setSheet = (open: boolean) => {
-      document.body.classList.toggle('scroll-locked', open);
-      if (open) sheet?.showModal();
-      else sheet?.close();
-    };
-    root.querySelector('[data-oh-open]')?.addEventListener('click', () => setSheet(true));
-    root.querySelector('[data-oh-close]')?.addEventListener('click', () => setSheet(false));
-    sheet?.addEventListener('click', (e) => {
-      if (e.target === sheet) setSheet(false);
-    });
-    sheet?.addEventListener('close', () => document.body.classList.remove('scroll-locked'));
-  });
-
-  window.setInterval(tick, 30_000);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') tick();
-  });
-</script>
+<!-- Opening status + sheet: bound in src/scripts/site.ts (boot + astro:page-load) -->

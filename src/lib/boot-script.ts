@@ -50,6 +50,10 @@ try{
   var favs=JSON.parse(localStorage.getItem('cco:favorites')||'[]');
   if(Array.isArray(favs)&&favs.length){html.dataset.favCount=String(favs.length);}
 }catch(e){}
+try{
+  var langPref=localStorage.getItem('cco:lang');
+  if(langPref==='de'||langPref==='en')html.dataset.ccoLang=langPref;
+}catch(e){}
 function berlin(){
   var parts=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Berlin',weekday:'long',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
   var g=function(t){var x=parts.find(function(p){return p.type===t;});return x?x.value:'';};

@@ -25,10 +25,6 @@
     background: currentColor;
   }
 
-  .open-state[data-state='pending'] {
-    opacity: 0.75;
-  }
-
   .open-state[data-state='open'] {
     background: var(--success-soft);
     color: var(--success);
@@ -45,26 +41,3 @@
     border: 1px solid #ea580c;
   }
 </style>
-
-<script>
-  import { computeOpenStatus } from '@/lib/opening-hours';
-
-  function tick() {
-    document.querySelectorAll<HTMLElement>('span[data-open-state], .open-state[data-open-state]').forEach((el) => {
-      const status = computeOpenStatus();
-      el.dataset.state = status.state;
-      el.dataset.reason = status.reason;
-      el.textContent =
-        status.state === 'open' ? `Jetzt geöffnet · bis ${status.closesAt} Uhr` : status.shortLabel === 'Geschlossen' ? 'Aktuell geschlossen' : status.shortLabel;
-      if (status.reason === 'holiday') el.textContent = `Feiertag · Geschlossen`;
-      else if (status.state === 'open') el.textContent = `Jetzt geöffnet`;
-      else el.textContent = 'Aktuell geschlossen';
-    });
-  }
-
-  tick();
-  window.setInterval(tick, 30_000);
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') tick();
-  });
-</script>

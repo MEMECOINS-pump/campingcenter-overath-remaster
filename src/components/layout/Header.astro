@@ -2,15 +2,21 @@
 import Logo from '@/components/brand/Logo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import OpeningStatus from '@/components/layout/OpeningStatus.astro';
-import { mainNav, moreNav } from '@/data/navigation';
+import { mainNavFor, moreNavFor } from '@/data/navigation';
 import { company } from '@/data/company';
-import { stripBase, url } from '@/lib/url';
+import { getLangFromPath, localizedPath, stripLocale, t, type Locale } from '@/i18n';
+import { url } from '@/lib/url';
 
 interface Props {
   overlay?: boolean;
+  lang?: Locale;
 }
-const { overlay = false } = Astro.props;
-const current = stripBase(Astro.url.pathname);
+const { overlay = false, lang: langProp } = Astro.props;
+const lang = langProp ?? getLangFromPath(Astro.url.pathname);
+const mainNav = mainNavFor(lang);
+const moreNav = moreNavFor(lang);
+const L = (path: string) => url(localizedPath(path, lang));
+const current = stripLocale(Astro.url.pathname);
 const isActive = (href: string, children?: { href: string }[]) =>
   current === href || (href !== '/' && current.startsWith(href)) || !!children?.some((c) => current.startsWith(c.href));
 ---
@@ -20,11 +26,11 @@ const isActive = (href: string, children?: { href: string }[]) =>
     <OpeningStatus />
   </div>
   <div class="container header-inner">
-    <a class="header-logo" href={url('/')} aria-label={`${company.name} – Startseite`}>
+    <a class="header-logo" href={L('/')} aria-label={`${company.name} – ${t(lang, 'homeAria')}`}>
       <Logo tone={overlay ? 'light' : 'dark'} />
     </a>
 
-    <nav class="desktop-nav" aria-label="Hauptnavigation">
+    <nav class="desktop-nav" aria-label={t(lang, 'mainNavAria')}>
       <ul class="nav-list">
         {
           mainNav.map((item) =>
@@ -34,17 +40,17 @@ const isActive = (href: string, children?: { href: string }[]) =>
                   type="button"
                   class="nav-link"
                   aria-expanded="false"
-                  aria-controls={`dd-${item.label}`}
+                  aria-controls={`dd-${item.href}`}
                   aria-current={isActive(item.href, item.children) ? 'true' : undefined}
                 >
                   {item.label}
                   <Icon name="chevron-down" class="nav-caret" />
                 </button>
-                <div class="dropdown" id={`dd-${item.label}`} hidden>
+                <div class="dropdown" id={`dd-${item.href}`} hidden>
                   <ul>
                     {item.children.map((child) => (
                       <li>
-                        <a href={url(child.href)} aria-current={current === child.href ? 'page' : undefined}>
+                        <a href={L(child.href)} aria-current={current === child.href ? 'page' : undefined}>
                           <span class="dd-label">{child.label}</span>
                           {child.hint && <span class="dd-hint">{child.hint}</span>}
                         </a>
@@ -55,7 +61,7 @@ const isActive = (href: string, children?: { href: string }[]) =>
               </li>
             ) : (
               <li class="nav-item">
-                <a class="nav-link" href={url(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
+                <a class="nav-link" href={L(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
                   {item.label}
                 </a>
               </li>
@@ -64,7 +70,7 @@ const isActive = (href: string, children?: { href: string }[]) =>
         }
         <li class="nav-item has-menu" data-dropdown>
           <button type="button" class="nav-link" aria-expanded="false" aria-controls="dd-mehr">
-            Mehr
+            {t(lang, 'more')}
             <Icon name="chevron-down" class="nav-caret" />
           </button>
           <div class="dropdown dropdown-end" id="dd-mehr" hidden>
@@ -72,7 +78,7 @@ const isActive = (href: string, children?: { href: string }[]) =>
               {
                 moreNav.map((child) => (
                   <li>
-                    <a href={url(child.href)} aria-current={current === child.href ? 'page' : undefined}>
+                    <a href={L(child.href)} aria-current={current === child.href ? 'page' : undefined}>
                       <span class="dd-label">{child.label}</span>
                     </a>
                   </li>
@@ -85,7 +91,7 @@ const isActive = (href: string, children?: { href: string }[]) =>
     </nav>
 
     <div class="header-actions">
-      <a class="header-fav" href={url('/merkliste/')} aria-label="Merkliste" data-fav-link>
+      <a class="header-fav" href={L('/merkliste/')} aria-label={t(lang, 'favorites')} data-fav-link>
         <Icon name="heart" />
         <span class="fav-count" data-fav-count hidden>0</span>
       </a>
@@ -93,15 +99,15 @@ const isActive = (href: string, children?: { href: string }[]) =>
         <Icon name="phone" />
         <span>{company.phone.display}</span>
       </a>
-      <a class="btn btn-accent btn-sm header-cta" href={url('/kontakt/#beratung')} data-track="cta_click" data-track-location="header">
-        Beratung vereinbaren
+      <a class="btn btn-accent btn-sm header-cta" href={L('/kontakt/') + '#beratung'} data-track="cta_click" data-track-location="header">
+        {t(lang, 'bookAdvice')}
       </a>
-      <a class="icon-btn header-call-mobile" href={company.phone.href} aria-label={`Anrufen: ${company.phone.display}`} data-track="call_click" data-track-location="header-mobile">
+      <a class="icon-btn header-call-mobile" href={company.phone.href} aria-label={`${t(lang, 'callAria')}: ${company.phone.display}`} data-track="call_click" data-track-location="header-mobile">
         <Icon name="phone" />
       </a>
       <button type="button" class="icon-btn header-menu-btn" aria-haspopup="dialog" aria-controls="mobile-menu" aria-expanded="false" data-menu-open>
         <Icon name="menu" />
-        <span class="sr-only">Menü öffnen</span>
+        <span class="sr-only">{t(lang, 'menu')}</span>
       </button>
     </div>
   </div>

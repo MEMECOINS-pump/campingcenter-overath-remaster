@@ -1,44 +1,53 @@
 ---
 import Logo from '@/components/brand/Logo.astro';
 import Icon from '@/components/ui/Icon.astro';
-import { mainNav, moreNav } from '@/data/navigation';
+import { mainNavFor, moreNavFor } from '@/data/navigation';
 import { company, openingHours, formatHours } from '@/data/company';
-import { stripBase, url } from '@/lib/url';
+import { getLangFromPath, localizedPath, stripLocale, t, type Locale } from '@/i18n';
+import { url } from '@/lib/url';
 
-const current = stripBase(Astro.url.pathname);
+interface Props {
+  lang?: Locale;
+}
+const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+const mainNav = mainNavFor(lang);
+const moreNav = moreNavFor(lang);
+const L = (path: string) => url(localizedPath(path, lang));
+const current = stripLocale(Astro.url.pathname);
 const primary = [
-  { label: 'Verkauf', href: '/wohnmobile/', hint: 'Fahrzeuge entdecken', icon: 'van' as const },
-  { label: 'Fahrzeug verkaufen', href: '/wohnmobil-ankauf/', hint: 'Ankauf starten', icon: 'tag' as const },
-  { label: 'Vermietung', href: '/vermietung-wohnmobile/', hint: 'Wohnmobil mieten', icon: 'key' as const },
-  { label: 'Werkstatt', href: '/werkstatt-kundendienst/', hint: 'Service & Terminanfrage', icon: 'wrench' as const },
+  { label: t(lang, 'navSale'), href: '/wohnmobile/', hint: t(lang, 'navSaleHint'), icon: 'van' as const },
+  { label: t(lang, 'footerSell'), href: '/wohnmobil-ankauf/', hint: t(lang, 'navTradeInHint'), icon: 'tag' as const },
+  { label: t(lang, 'navRental'), href: '/vermietung-wohnmobile/', hint: t(lang, 'navRentalHint'), icon: 'key' as const },
+  { label: t(lang, 'navWorkshop'), href: '/werkstatt-kundendienst/', hint: t(lang, 'navWorkshopHint'), icon: 'wrench' as const },
 ];
+const saleChildren = mainNav.find((i) => i.href === '/wohnmobile/')?.children ?? [];
 const secondary = [
   ...mainNav.filter((i) => i.href === '/ueber-uns/'),
-  ...(mainNav.find((i) => i.label === 'Verkauf')?.children ?? []).filter((c) => c.href !== '/wohnmobile/'),
+  ...saleChildren.filter((c) => c.href !== '/wohnmobile/'),
   ...moreNav,
 ];
 ---
 
-<dialog class="mobile-menu" id="mobile-menu" aria-label="Menü" data-menu>
+<dialog class="mobile-menu" id="mobile-menu" aria-label={t(lang, 'menu')} data-menu>
   <div class="mm-shell">
     <div class="mm-top">
-      <a href={url('/')} class="mm-logo" aria-label={`${company.name} – Startseite`}>
+      <a href={L('/')} class="mm-logo" aria-label={`${company.name} – ${t(lang, 'homeAria')}`}>
         <Logo withClaim={false} />
       </a>
       <button type="button" class="mm-close" data-menu-close autofocus>
         <Icon name="close" />
-        <span class="sr-only">Menü schließen</span>
+        <span class="sr-only">{t(lang, 'menuClose')}</span>
       </button>
     </div>
 
     <div class="mm-scroll">
-      <nav aria-label="Mobile Navigation">
-        <p class="mm-heading">Menü</p>
+      <nav aria-label={t(lang, 'mobileNavAria')}>
+        <p class="mm-heading">{t(lang, 'menu')}</p>
         <ul class="mm-primary">
           {
             primary.map((item) => (
               <li>
-                <a href={url(item.href)} aria-current={current.startsWith(item.href) ? 'page' : undefined}>
+                <a href={L(item.href)} aria-current={current.startsWith(item.href) ? 'page' : undefined}>
                   <span class="mm-icon">
                     <Icon name={item.icon} />
                   </span>
@@ -57,7 +66,7 @@ const secondary = [
           {
             secondary.map((item) => (
               <li>
-                <a href={url(item.href)} aria-current={current === item.href ? 'page' : undefined}>
+                <a href={L(item.href)} aria-current={current === item.href ? 'page' : undefined}>
                   {item.label}
                 </a>
               </li>
@@ -67,7 +76,7 @@ const secondary = [
       </nav>
 
       <section class="mm-contact" aria-labelledby="mm-contact-h">
-        <p class="mm-heading" id="mm-contact-h">Kontakt</p>
+        <p class="mm-heading" id="mm-contact-h">{t(lang, 'contact')}</p>
         <ul class="mm-contact-list">
           <li>
             <a href={company.phone.href} data-track="call_click" data-track-location="mobile-menu">

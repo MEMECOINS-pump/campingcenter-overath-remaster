@@ -1,7 +1,14 @@
 ---
 import { Font } from 'astro:assets';
-import { absoluteUrl, stripBase, url } from '@/lib/url';
+import { absoluteUrl, url } from '@/lib/url';
 import { company } from '@/data/company';
+import {
+  getLangFromPath,
+  localizedPath,
+  ogLocale,
+  stripLocale,
+  type Locale,
+} from '@/i18n';
 
 export interface SeoProps {
   title: string;
@@ -12,17 +19,38 @@ export interface SeoProps {
   noindex?: boolean;
   type?: 'website' | 'article' | 'product';
   jsonLd?: Record<string, unknown>[];
+  lang?: Locale;
 }
 
-const { title, description, path, image, imageAlt, noindex = false, type = 'website', jsonLd = [] } = Astro.props as SeoProps;
+const {
+  title,
+  description,
+  path,
+  image,
+  imageAlt,
+  noindex = false,
+  type = 'website',
+  jsonLd = [],
+  lang: langProp,
+} = Astro.props as SeoProps;
+
+const lang = langProp ?? getLangFromPath(Astro.url.pathname);
+const barePath = path ?? stripLocale(Astro.url.pathname);
 
 // The presentation duplicates ccoverath.de; it must not compete with it in search results.
 const indexable = import.meta.env.PUBLIC_INDEXABLE === 'true';
-const canonical = absoluteUrl(path ?? stripBase(Astro.url.pathname), Astro.site);
+const canonical = absoluteUrl(localizedPath(barePath, lang), Astro.site);
 const fullTitle = title.includes('Campingcenter Overath') ? title : `${title} | ${company.name}`;
 const ogImage = image
   ? new URL(image, Astro.site ?? 'http://localhost:4321').href
   : absoluteUrl('/og-default.jpg', Astro.site);
+const deHref = absoluteUrl(localizedPath(barePath, 'de'), Astro.site);
+const enHref = absoluteUrl(localizedPath(barePath, 'en'), Astro.site);
+const altDe =
+  imageAlt ??
+  (lang === 'en'
+    ? 'Motorhome at sunset by the sea – Campingcenter Overath'
+    : 'Wohnmobil bei Sonnenuntergang am Meer – Campingcenter Overath');
 ---
 
 <meta charset="utf-8" />
@@ -30,6 +58,9 @@ const ogImage = image
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+<link rel="alternate" hreflang="de" href={deHref} />
+<link rel="alternate" hreflang="en" href={enHref} />
+<link rel="alternate" hreflang="x-default" href={deHref} />
 {(noindex || !indexable) && <meta name="robots" content="noindex, follow" />}
 <meta name="theme-color" content="#f7f3ec" />
 <meta name="format-detection" content="telephone=no" />
@@ -42,13 +73,20 @@ const ogImage = image
 <link rel="sitemap" href={url('/sitemap-index.xml')} />
 
 <meta property="og:type" content={type === 'product' ? 'product' : type} />
-<meta property="og:locale" content="de_DE" />
+<meta property="og:locale" content={ogLocale(lang)} />
+{
+  lang === 'de' ? (
+    <meta property="og:locale:alternate" content="en_GB" />
+  ) : (
+    <meta property="og:locale:alternate" content="de_DE" />
+  )
+}
 <meta property="og:site_name" content={company.name} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:image:alt" content={imageAlt ?? 'Wohnmobil bei Sonnenuntergang am Meer – Campingcenter Overath'} />
+<meta property="og:image:alt" content={altDe} />
 <meta name="twitter:card" content="summary_large_image" />
 
 <Font cssVariable="--font-sans" preload />

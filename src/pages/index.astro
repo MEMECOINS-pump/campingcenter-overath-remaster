@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/home/Hero.astro';
+import PrestigeStrip from '@/components/home/PrestigeStrip.astro';
 import CampingFinderHero from '@/components/home/CampingFinderHero.astro';
 import QuickActions from '@/components/home/QuickActions.astro';
 import RecentlyArrived from '@/components/home/RecentlyArrived.astro';
@@ -26,6 +27,7 @@ import { faqSchema } from '@/lib/schema';
   jsonLd={[faqSchema(faqs)]}
 >
   <Hero />
+  <PrestigeStrip />
   <CampingFinderHero />
   <QuickActions />
   <RecentlyArrived />
