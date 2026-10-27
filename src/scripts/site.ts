@@ -152,11 +152,15 @@ function initConsent(): void {
   const dialog = $<HTMLDialogElement>('[data-consent-dialog]');
   const form = $<HTMLFormElement>('[data-consent-form]');
 
+  // Boot script may already unhide the banner; keep that, or show if still needed.
   if (banner && !readConsent()) banner.hidden = false;
+  else if (banner && readConsent()) banner.hidden = true;
 
   const decide = (media: boolean, stats: boolean) => {
     writeConsent(media, stats);
     if (banner) banner.hidden = true;
+    document.documentElement.classList.add('consent-known');
+    document.documentElement.classList.remove('needs-consent');
   };
 
   $$('[data-consent-action]').forEach((btn) =>

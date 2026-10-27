@@ -1,0 +1,82 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LegalShell from '@/components/sections/LegalShell.astro';
+import { company } from '@/data/company';
+import { url } from '@/lib/url';
+---
+
+<BaseLayout
+  title="Erklärung zur Barrierefreiheit"
+  description="Erklärung zur Barrierefreiheit der Website des Campingcenter Overath – Stand der Umsetzung, bekannte Einschränkungen und Kontakt."
+  path="/barrierefreiheit/"
+>
+  <LegalShell title="Erklärung zur Barrierefreiheit" path="/barrierefreiheit/" original="/barrierefreiheitserklaerung/" updated="27.10.2026">
+    <p>
+      Diese Erklärung beschreibt den Stand der digitalen Barrierefreiheit unserer Website. Sie ist keine Zertifizierung und
+      kein Prüfsiegel. Wir orientieren uns an den Web Content Accessibility Guidelines (WCAG) 2.2, Konformitätsstufe AA,
+      und verbessern die Seite laufend.
+    </p>
+
+    <h2>Angaben zum Anbieter</h2>
+    <address>
+      {company.legalName}<br />
+      {company.address.street}<br />
+      {company.address.postalCode} {company.address.city}<br />
+      E-Mail: <a href={`mailto:${company.email}`}>{company.email}</a><br />
+      Telefon: <a href={company.phone.href}>{company.phone.display}</a><br />
+      <a href={url('/impressum/')}>Zum Impressum</a>
+    </address>
+
+    <h2>Zum Barrierefreiheitsstärkungsgesetz (BFSG)</h2>
+    <p>
+      Das Campingcenter Overath betreibt diese Website als Präsentation und Informationsangebot zu Handel, Vermietung und
+      Service von Wohnmobilen. Ob und in welchem Umfang das BFSG auf einzelne Online-Angebote zutrifft, hängt von der
+      konkreten Dienstleistung und dem geltenden Recht ab. Diese Erklärung ersetzt keine Rechtsberatung und behauptet
+      keine vollständige BFSG-Konformität. Wir nehmen Barrierefreiheit ernst und nehmen Hinweise gern entgegen.
+    </p>
+
+    <h2>Was diese Website anbietet</h2>
+    <p>
+      Informationen zu neuen und gebrauchten Wohnmobilen, Merkliste und Vergleich, Ankauf-Anfrage, Werkstatt-Termin,
+      Kontakt und Bewerbung. Persönliche Beratung findet in Overath statt.
+    </p>
+
+    <h2>Umgesetzte Maßnahmen</h2>
+    <ul>
+      <li>Tastaturbedienung für Navigation, Filter, Formulare und Dialoge; sichtbarer Fokus.</li>
+      <li>Überschriftenstruktur, Landmarken und Skip-Link „Zum Inhalt springen“.</li>
+      <li>Kontrastziele an WCAG AA ausgerichtet; Schriftgröße über den Browser und über den Accessibility Compass (A− / A / A+) als echte Root-Schriftgröße.</li>
+      <li>Touch-Ziele möglichst mindestens 44 × 44 Pixel.</li>
+      <li>Formulare mit Beschriftungen und konkreten Fehlermeldungen; kein Captcha.</li>
+      <li>Optional: Kontrast erhöhen, Animationen reduzieren, lesefreundlichere Abstände, Links hervorheben – lokal im Browser gespeichert, ohne Tracking.</li>
+      <li>Systemeinstellung „Bewegung reduzieren“ wird berücksichtigt.</li>
+      <li>Inhaltlich relevante Bilder mit Alternativtexten; dekorative Grafiken werden übersprungen.</li>
+    </ul>
+
+    <h2>Bekannte Einschränkungen</h2>
+    <ul>
+      <li>Der 360°-Rundgang ist vor allem visuell und für blinde Nutzerinnen und Nutzer nur eingeschränkt zugänglich. Gerne beschreiben wir das Gelände am Telefon.</li>
+      <li>Fahrzeugfotos stammen aus Inseraten; Alternativtexte beschreiben das Fahrzeug, nicht jedes Detail.</li>
+      <li>Untertitel eingebundener YouTube-Videos hängen von YouTube ab und sind nur nach Medien-Zustimmung verfügbar.</li>
+      <li>AGB und einzelne PDF-Dokumente können unvollständig barrierefrei sein. Auf Wunsch senden wir Inhalte in einem anderen Format.</li>
+      <li>Der Camping-Assistent (Chat) und komplexe Filter können mit Screenreadern je nach Browser unterschiedlich wirken; wir verbessern das schrittweise.</li>
+      <li>Externe Buchungsstrecken (z.&nbsp;B. ADAC-Vermietung, Hersteller-Konfiguratoren) unterliegen den Anbietern dort.</li>
+    </ul>
+
+    <h2>Feedback und Kontakt</h2>
+    <p>
+      Barriere gefunden? Schreib an <a href={`mailto:${company.email}`}>{company.email}</a> oder ruf an unter
+      <a href={company.phone.href}>{company.phone.display}</a>. Wir melden uns und helfen mit Alternativen, wo nötig.
+    </p>
+
+    <h2>Zuständige Marktüberwachungsbehörde</h2>
+    <address>
+      Marktüberwachungsstelle der Länder für die Barrierefreiheit von Produkten und Dienstleistungen (MLBF)<br />
+      c/o Ministerium für Arbeit, Soziales, Gesundheit und Gleichstellung Sachsen-Anhalt<br />
+      Postfach 39 11 55<br />
+      39135 Magdeburg<br />
+      Telefon: +49 391 567 6970<br />
+      E-Mail: <a href="mailto:mlbf@ms.sachsen-anhalt.de">mlbf@ms.sachsen-anhalt.de</a>
+    </address>
+  </LegalShell>
+</BaseLayout>

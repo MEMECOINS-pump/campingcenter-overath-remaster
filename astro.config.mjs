@@ -33,6 +33,10 @@ export default defineConfig({
       '/caravan-salon/': '/',
       '/fruehjahrswaesche/': '/fahrzeugwaesche-herbst/',
       '/newsletter/': '/kontakt/',
+      '/werkstatt/': '/werkstatt-kundendienst/',
+      '/ankauf/': '/wohnmobil-ankauf/',
+      '/vermietung/': '/vermietung-wohnmobile/',
+      '/barrierefreiheitserklaerung/': '/barrierefreiheit/',
     }).map(([from, to]) => [from, `${base.replace(/\/$/, '')}${to}`]),
   ),
   markdown: {

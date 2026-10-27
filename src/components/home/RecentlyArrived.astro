@@ -33,7 +33,7 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
           <ul class="rail-track" role="list">
             {arrived.map((v, i) => (
               <li class="rail-item">
-                <VehicleCard vehicle={v} index={i} priority={i === 0} compare={false} showNewInventoryBadge={showNewBadge} />
+                <VehicleCard vehicle={v} index={i} priority={i === 0} showNewInventoryBadge={showNewBadge} />
               </li>
             ))}
           </ul>

@@ -196,8 +196,13 @@ import { url } from '@/lib/url';
     background: #ea580c;
   }
 
-  .oh-pill[data-state='pending'] {
+  /* Nur kurz sichtbar, wenn Boot-Script noch nicht gemalt hat */
+  .oh-pill[data-state='pending'] .oh-line {
     opacity: 0.72;
+  }
+
+  :global(html.js) .oh-pill[data-state='pending'] {
+    opacity: 1;
   }
 
   .site-header[data-overlay]:not(.is-solid) .oh-pill {

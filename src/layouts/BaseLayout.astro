@@ -10,6 +10,7 @@ import CompareTray from '@/components/vehicles/CompareTray.astro';
 import ChatWidget from '@/components/layout/ChatWidget.astro';
 import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
 import { organizationSchema } from '@/lib/schema';
+import { buildBootScript } from '@/lib/boot-script';
 
 interface Props extends SeoProps {
   /** Transparent header over a full-bleed hero. */
@@ -33,12 +34,14 @@ const {
   jsonLd = [],
   ...seo
 } = Astro.props;
+
+const boot = buildBootScript();
 ---
 
 <!doctype html>
 <html lang="de-DE">
   <head>
-    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script is:inline set:html={boot} />
     <SeoHead {...seo} jsonLd={[organizationSchema(Astro.site), ...jsonLd]} />
     <slot name="head" />
   </head>

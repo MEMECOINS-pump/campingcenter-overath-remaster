@@ -50,7 +50,7 @@
   import { computeOpenStatus } from '@/lib/opening-hours';
 
   function tick() {
-    document.querySelectorAll<HTMLElement>('[data-open-state]').forEach((el) => {
+    document.querySelectorAll<HTMLElement>('span[data-open-state], .open-state[data-open-state]').forEach((el) => {
       const status = computeOpenStatus();
       el.dataset.state = status.state;
       el.dataset.reason = status.reason;

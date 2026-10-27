@@ -36,5 +36,5 @@ export const legalNav: NavItem[] = [
   { label: 'Impressum', href: '/impressum/' },
   { label: 'Datenschutz', href: '/datenschutz/' },
   { label: 'AGB', href: '/agb/' },
-  { label: 'Barrierefreiheit', href: '/barrierefreiheitserklaerung/' },
+  { label: 'Barrierefreiheit', href: '/barrierefreiheit/' },
 ];

@@ -148,7 +148,8 @@ export function computeOpenStatus(date = new Date(), schedule: OpeningPeriod[] =
     opensNext,
     shortLabel: 'Geschlossen',
     todayLabel: formatTodayHours(today),
-    label: opensNext ? `Aktuell geschlossen · ${opensNext}` : 'Aktuell geschlossen',
+    // opensNext belongs only in the secondary line (data-oh-sub) — never duplicate in label
+    label: 'Aktuell geschlossen',
   };
 }
 

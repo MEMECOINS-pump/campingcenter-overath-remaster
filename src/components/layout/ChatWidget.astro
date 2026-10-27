@@ -151,7 +151,7 @@ import { url } from '@/lib/url';
   .chatw {
     --cw-radius: 1.25rem;
     --cw-pad: 1rem;
-    --cw-gap-bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + 1rem);
+    --cw-gap-bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + var(--consent-lift, 0px) + 1rem);
     --cw-max-h: calc(100dvh - var(--cw-gap-bottom) - 0.75rem);
     --cw-w: min(calc(100vw - 1.25rem), 24rem);
     --cw-h: min(36rem, var(--cw-max-h));
@@ -674,16 +674,27 @@ import { url } from '@/lib/url';
     outline: none;
   }
 
+  .chatw-input-wrap:focus-within {
+    box-shadow: 0 0 0 3px rgb(31 95 191 / 0.35);
+  }
+
   .chatw-send {
     display: grid;
     place-items: center;
     width: 2.45rem;
     height: 2.45rem;
+    min-width: 44px;
+    min-height: 44px;
     border: 0;
     border-radius: 0.8rem;
     background: var(--brand);
     color: var(--graphite);
     cursor: pointer;
+  }
+
+  .chatw-send:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
   }
 
   .chatw-send:hover {
