@@ -464,7 +464,7 @@ function toEnHref(href: string): string | null {
     const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
     if (base && base !== '/' && path.startsWith(base)) path = path.slice(base.length) || '/';
     if (path === '/en' || path.startsWith('/en/')) return null;
-    let bare = path.endsWith('/') || /\.[a-z0-9]+$/i.test(path) ? path : `${path}/`;
+    const bare = path.endsWith('/') || /\.[a-z0-9]+$/i.test(path) ? path : `${path}/`;
     if (!hasEnBare(bare)) return null;
     const enPath = bare === '/' ? '/en/' : `/en${bare}`;
     return `${base}${enPath}${u.search}${u.hash}`;
