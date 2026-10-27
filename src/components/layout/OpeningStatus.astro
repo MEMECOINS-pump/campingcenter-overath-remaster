@@ -45,22 +45,26 @@ const dayLabels =
     <span class="oh-alert-closed" data-oh-alert-closed>{lang === 'en' ? '— we are closed' : '— wir haben geschlossen'}</span>
   </div>
 
-  <div class="container oh-row">
-    <button
-      type="button"
-      class="oh-pill"
-      data-oh-open
-      aria-expanded="false"
-      aria-controls="oh-sheet"
-      data-state="pending"
-      data-reason="hours"
-    >
-      <span class="oh-dot" aria-hidden="true"></span>
-      <span class="oh-copy">
-        <span class="oh-line" data-oh-line>{t(lang, 'openingHours')}</span>
-        <span class="oh-sub" data-oh-sub hidden></span>
-      </span>
-    </button>
+  <div class="header-shell">
+    <slot name="leading" />
+    <div class="header-gap">
+      <button
+        type="button"
+        class="oh-pill"
+        data-oh-open
+        aria-expanded="false"
+        aria-controls="oh-sheet"
+        data-state="pending"
+        data-reason="hours"
+      >
+        <span class="oh-dot" aria-hidden="true"></span>
+        <span class="oh-copy">
+          <span class="oh-line" data-oh-line>{t(lang, 'openingHours')}</span>
+          <span class="oh-sub" data-oh-sub hidden></span>
+        </span>
+      </button>
+    </div>
+    <slot name="trailing" />
   </div>
 
   <dialog class="oh-sheet" id="oh-sheet" data-oh-sheet>
@@ -69,23 +73,17 @@ const dayLabels =
         <p class="eyebrow">{t(lang, 'openingHours')}</p>
         <button type="button" class="oh-close" data-oh-close aria-label={t(lang, 'companionClose')}><Icon name="close" /></button>
       </header>
-
       <div class="oh-banner" data-oh-banner data-state="pending" data-reason="hours">
         <p class="oh-banner-title" data-oh-banner-title>{t(lang, 'openingHours')}</p>
         <p class="oh-banner-detail" data-oh-today></p>
         <p class="oh-banner-next" data-oh-next hidden></p>
       </div>
-
       <ul class="oh-week">
         {
           dayLabels.map((p) => (
             <li>
               <strong>{p.days}</strong>
-              <span>
-                {lang === 'en'
-                  ? p.hours.map((h) => `${h.opens}–${h.closes}`).join(' and ')
-                  : formatHours(p)}
-              </span>
+              <span>{lang === 'en' ? p.hours.map((h) => `${h.opens}–${h.closes}`).join(' and ') : formatHours(p)}</span>
             </li>
           ))
         }
@@ -108,7 +106,46 @@ const dayLabels =
 
 <style>
   .oh {
+    display: flex;
+    flex-direction: column;
     width: 100%;
+  }
+
+  /* Mobile: logo row + compact status under it. Desktop: one row, pill in the gap. */
+  .header-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'leading trailing'
+      'gap gap';
+    grid-template-rows: var(--header-h) var(--header-utility-h);
+    align-items: center;
+    column-gap: 0.75rem;
+    width: min(100% - 2 * var(--gutter), 90rem);
+    margin-inline: auto;
+  }
+
+  .header-gap {
+    grid-area: gap;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+    height: 100%;
+  }
+
+  @media (min-width: 90em) {
+    .header-shell {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'leading gap trailing';
+      grid-template-rows: var(--header-h);
+      column-gap: 0.65rem;
+    }
+
+    .header-gap {
+      justify-content: center;
+      padding-inline: 0.35rem;
+    }
   }
 
   .oh-alert {
@@ -117,7 +154,7 @@ const dayLabels =
     align-items: baseline;
     justify-content: center;
     gap: 0.35rem 0.55rem;
-    padding: 0.55rem 0.85rem;
+    padding: 0.35rem 0.85rem;
     background: #c2410c;
     color: #fff;
     font-size: 0.92rem;
@@ -147,21 +184,14 @@ const dayLabels =
     font-weight: 700;
   }
 
-  .oh-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-height: 2.4rem;
-    padding-block: 0.35rem;
-  }
-
   .oh-pill {
     display: inline-flex;
-    align-items: flex-start;
-    gap: 0.55rem;
-    min-height: 40px;
-    max-width: min(100%, 36rem);
-    padding: 0.4rem 0.85rem;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 2.25rem;
+    padding: 0.25rem 0.7rem;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: rgb(255 255 255 / 0.92);
@@ -173,20 +203,50 @@ const dayLabels =
     text-align: left;
   }
 
+  @media (min-width: 90em) {
+    .oh-pill {
+      align-items: flex-start;
+      gap: 0.45rem;
+      min-height: 0;
+      padding: 0.35rem 0.7rem;
+    }
+  }
+
   .oh-copy {
-    display: grid;
-    gap: 0.1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
     min-width: 0;
   }
 
-  .oh-line {
+  .oh-line,
+  .oh-sub {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     line-height: 1.25;
   }
 
   .oh-sub {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 650;
     opacity: 0.85;
+  }
+
+  .oh-sub:not([hidden])::before {
+    content: '· ';
+  }
+
+  @media (min-width: 90em) {
+    .oh-copy {
+      display: grid;
+      gap: 0.02rem;
+    }
+
+    .oh-sub:not([hidden])::before {
+      content: none;
+    }
   }
 
   .oh-sub[hidden] {
@@ -196,10 +256,15 @@ const dayLabels =
   .oh-dot {
     width: 0.55rem;
     height: 0.55rem;
-    margin-top: 0.35rem;
     border-radius: 50%;
     background: var(--text-muted);
     flex: none;
+  }
+
+  @media (min-width: 90em) {
+    .oh-dot {
+      margin-top: 0.22rem;
+    }
   }
 
   .oh-pill[data-state='open'] .oh-dot {
@@ -338,3 +403,5 @@ const dayLabels =
 </style>
 
 <!-- Opening status + sheet: bound in src/scripts/site.ts (boot + astro:page-load) -->
+
+

@@ -2,7 +2,8 @@
 import Logo from '@/components/brand/Logo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import OpeningStatus from '@/components/layout/OpeningStatus.astro';
-import { mainNavFor, moreNavFor } from '@/data/navigation';
+import * as navigation from '@/data/navigation';
+import type { NavItem } from '@/data/navigation';
 import { company } from '@/data/company';
 import { getLangFromPath, localizedPath, stripLocale, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
@@ -13,8 +14,12 @@ interface Props {
 }
 const { overlay = false, lang: langProp } = Astro.props;
 const lang = langProp ?? getLangFromPath(Astro.url.pathname);
-const mainNav = mainNavFor(lang);
-const moreNav = moreNavFor(lang);
+const navApi = navigation as typeof navigation & {
+  mainNavFor?: (locale: Locale) => NavItem[];
+  moreNavFor?: (locale: Locale) => NavItem[];
+};
+const mainNav = navApi.mainNavFor?.(lang) ?? navApi.mainNav;
+const moreNav = navApi.moreNavFor?.(lang) ?? navApi.moreNav;
 const L = (path: string) => url(localizedPath(path, lang));
 const current = stripLocale(Astro.url.pathname);
 const isActive = (href: string, children?: { href: string }[]) =>
@@ -22,14 +27,11 @@ const isActive = (href: string, children?: { href: string }[]) =>
 ---
 
 <header class="site-header" data-header data-overlay={overlay ? 'true' : undefined}>
-  <div class="header-utility">
-    <OpeningStatus lang={lang} />
-  </div>
-  <div class="container header-inner">
-    <a class="header-logo" href={L('/')} aria-label={`${company.name} – ${t(lang, 'homeAria')}`}>
+  <OpeningStatus lang={lang}>
+    <a slot="leading" class="header-logo" href={L('/')} aria-label={`${company.name} – ${t(lang, 'homeAria')}`}>
       <Logo tone={overlay ? 'light' : 'dark'} />
     </a>
-
+    <div slot="trailing" class="header-end">
     <nav class="desktop-nav" aria-label={t(lang, 'mainNavAria')}>
       <ul class="nav-list">
         {
@@ -110,7 +112,8 @@ const isActive = (href: string, children?: { href: string }[]) =>
         <span class="sr-only">{t(lang, 'menu')}</span>
       </button>
     </div>
-  </div>
+    </div>
+  </OpeningStatus>
 </header>
 
 <style>
@@ -118,9 +121,7 @@ const isActive = (href: string, children?: { href: string }[]) =>
     position: sticky;
     top: 0;
     z-index: 50;
-    display: grid;
-    grid-template-rows: auto var(--header-h);
-    min-height: calc(var(--header-h) + var(--safe-top) + 2rem);
+    min-height: calc(var(--header-h) + var(--header-utility-h) + var(--header-alert-h) + var(--safe-top));
     padding-top: var(--safe-top);
     background: rgb(247 243 236 / 0.92);
     backdrop-filter: saturate(1.4) blur(14px);
@@ -130,14 +131,6 @@ const isActive = (href: string, children?: { href: string }[]) =>
       background-color 0.25s ease,
       border-color 0.25s ease,
       box-shadow 0.25s ease;
-  }
-
-  .header-utility {
-    border-bottom: 1px solid rgb(28 32 36 / 0.08);
-  }
-
-  .site-header[data-overlay]:not(.is-solid) .header-utility {
-    border-bottom-color: rgb(255 255 255 / 0.12);
   }
 
   .site-header[data-overlay] {
@@ -167,24 +160,31 @@ const isActive = (href: string, children?: { href: string }[]) =>
     color: #676c6d;
   }
 
-  .header-inner {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    width: min(100% - 2 * var(--gutter), 90rem);
-  }
-
   .header-logo {
+    grid-area: leading;
     display: inline-flex;
     align-items: center;
+    justify-self: start;
+    align-self: center;
     min-width: 0;
-    max-width: calc(100% - 6.5rem);
+    max-width: 100%;
     min-height: 44px;
     text-decoration: none;
-    margin-right: auto;
     border-radius: var(--radius-sm);
     overflow: hidden;
+  }
+
+  .header-end {
+    grid-area: trailing;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    justify-self: end;
+    align-self: center;
+    gap: 0.35rem;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
   }
 
   .desktop-nav {
@@ -301,8 +301,8 @@ const isActive = (href: string, children?: { href: string }[]) =>
   }
 
   @media (max-width: 22.49em) {
-    .header-inner {
-      gap: 0.5rem;
+    .header-end {
+      gap: 0.15rem;
     }
   }
 
@@ -396,6 +396,10 @@ const isActive = (href: string, children?: { href: string }[]) =>
     .header-logo {
       max-width: none;
     }
+
+    .header-end {
+      gap: 0.65rem;
+    }
   }
 
   /* Desktop density: 1024 → Marke, 1280 → Name, ab ~1600 Name + Claim */
@@ -410,8 +414,8 @@ const isActive = (href: string, children?: { href: string }[]) =>
       display: none;
     }
 
-    .header-inner {
-      gap: 0.5rem;
+    .header-end {
+      gap: 0.35rem;
     }
 
     .nav-link {
