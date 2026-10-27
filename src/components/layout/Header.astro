@@ -172,10 +172,13 @@ const isActive = (href: string, children?: { href: string }[]) =>
   .header-logo {
     display: inline-flex;
     align-items: center;
+    min-width: 0;
+    max-width: calc(100% - 6.5rem);
     min-height: 44px;
     text-decoration: none;
     margin-right: auto;
     border-radius: var(--radius-sm);
+    overflow: hidden;
   }
 
   .desktop-nav {
@@ -378,9 +381,18 @@ const isActive = (href: string, children?: { href: string }[]) =>
     .header-cta {
       display: inline-flex;
     }
+
+    /* Eine Telefonnummer – nur hier im Header, nicht nochmal in der Utility-Zeile */
+    .header-phone {
+      display: inline-flex;
+    }
+
+    .header-logo {
+      max-width: none;
+    }
   }
 
-  /* Desktop density tiers: 1024 → logo mark only, 1280 → name, 1600 → name + claim + phone number */
+  /* Desktop density: 1024 → Marke, 1280 → Name, ab ~1600 Name + Claim */
   @media (min-width: 64em) and (max-width: 79.99em) {
     .site-header :global(.logo-text) {
       display: none;
@@ -399,12 +411,6 @@ const isActive = (href: string, children?: { href: string }[]) =>
     .nav-link {
       padding: 0 0.5rem;
       font-size: 0.9rem;
-    }
-  }
-
-  @media (min-width: 100em) {
-    .header-phone {
-      display: inline-flex;
     }
   }
 </style>

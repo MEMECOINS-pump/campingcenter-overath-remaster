@@ -46,6 +46,7 @@ const clipId = `cco-disc-${Math.random().toString(36).slice(2, 8)}`;
   .logo-text {
     display: grid;
     gap: 0.28rem;
+    min-width: 0;
   }
 
   .logo-name {
@@ -55,6 +56,8 @@ const clipId = `cco-disc-${Math.random().toString(36).slice(2, 8)}`;
     letter-spacing: -0.01em;
     color: var(--graphite);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .logo-claim {
@@ -62,6 +65,8 @@ const clipId = `cco-disc-${Math.random().toString(36).slice(2, 8)}`;
     font-weight: 500;
     color: #676c6d;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .logo-light .logo-name {
@@ -72,24 +77,40 @@ const clipId = `cco-disc-${Math.random().toString(36).slice(2, 8)}`;
     color: rgb(255 255 255 / 0.78);
   }
 
-  @media (max-width: 22.49em) {
+  /* Handy/Tablet: Claim aus – verhindert Überlappung mit Icons/Menü */
+  @media (max-width: 63.99em) {
     .logo-claim {
       display: none;
     }
 
     .logo {
       gap: 0.5rem;
+      max-width: min(100%, 14.5rem);
     }
 
     .logo-mark {
-      width: 2.3rem;
-      height: 2.3rem;
+      width: 2.35rem;
+      height: 2.35rem;
     }
 
     .logo-name {
-      font-size: 0.98rem;
-      white-space: normal;
-      line-height: 1.1;
+      font-size: 0.95rem;
+      line-height: 1.15;
+    }
+  }
+
+  @media (max-width: 22.49em) {
+    .logo {
+      max-width: min(100%, 11.5rem);
+    }
+
+    .logo-mark {
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+
+    .logo-name {
+      font-size: 0.9rem;
     }
   }
 </style>
