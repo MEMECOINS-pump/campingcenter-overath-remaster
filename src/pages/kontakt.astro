@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -33,7 +33,7 @@ const today = new Date().toISOString().slice(0, 10);
     <a class="btn btn-accent btn-lg" href={company.phone.href} data-track="call_click" data-track-location="contact_hero">
       <Icon name="phone" /> Anrufen
     </a>
-    <a class="btn btn-glass btn-lg" href="#beratung">Beratung vereinbaren</a>
+    <a class="btn btn-light btn-lg" href="#beratung">Beratung vereinbaren</a>
   </PageHero>
 
   <ContactSection title="Besuch uns in Overath." eyebrow="Adresse & Öffnungszeiten" />

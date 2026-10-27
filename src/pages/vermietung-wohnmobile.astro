@@ -1,4 +1,4 @@
----
+﻿---
 import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
@@ -45,7 +45,7 @@ const steps = [
     <a class="btn btn-accent btn-lg" href={rental.adacBookingUrl} target="_blank" rel="noopener" data-track="rental_booking_click" data-track-location="rental_hero">
       Wohnmobil beim ADAC buchen <Icon name="external" /><span class="sr-only"> (öffnet in neuem Tab)</span>
     </a>
-    <a class="btn btn-glass btn-lg" href={company.phone.href} data-track="call_click" data-track-location="rental_hero">
+    <a class="btn btn-light btn-lg" href={company.phone.href} data-track="call_click" data-track-location="rental_hero">
       <Icon name="phone" /> Beratung am Telefon
     </a>
   </PageHero>

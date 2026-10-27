@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -38,7 +38,7 @@ const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin
     <a class="btn btn-accent btn-lg" href={termin} data-track="cta_click" data-track-location="wash_hero">
       Waschtermin anfragen <Icon name="arrow-right" class="arrow" />
     </a>
-    <a class="btn btn-glass btn-lg" href={company.phone.href} data-track="call_click" data-track-location="wash_hero">
+    <a class="btn btn-light btn-lg" href={company.phone.href} data-track="call_click" data-track-location="wash_hero">
       <Icon name="phone" /> {company.phone.display}
     </a>
   </PageHero>

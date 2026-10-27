@@ -1,4 +1,4 @@
----
+﻿---
 import '@/styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import SeoHead, { type SeoProps } from '@/components/layout/SeoHead.astro';
@@ -51,7 +51,7 @@ const boot = buildBootScript();
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
     <Header overlay={overlayHeader} />
     <MobileMenu />
-    <main id="main" tabindex="-1" transition:animate="fade">
+    <main id="main" tabindex="-1" transition:animate="none">
       <slot />
     </main>
     <Footer />

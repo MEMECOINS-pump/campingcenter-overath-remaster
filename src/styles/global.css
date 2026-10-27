@@ -1340,3 +1340,185 @@ body:has(.chatw.is-open) .ctray {
 .section-head-row .section-head {
   margin-bottom: 0;
 }
+
+/* ---------- breadcrumbs (global: survive ClientRouter + CSP) ---------- */
+.crumbs ul,
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  list-style-type: none;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  list-style: none;
+}
+
+.crumbs li::marker {
+  content: '';
+  display: none;
+}
+
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  text-decoration: underline;
+  color: var(--text);
+}
+
+.crumbs [aria-current] {
+  color: var(--text);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60vw;
+}
+
+.crumbs .crumb-sep {
+  width: 0.9rem;
+  height: 0.9rem;
+  opacity: 0.6;
+  flex: none;
+}
+
+.crumbs-light ul,
+.crumbs-light ol,
+.crumbs-light a:hover,
+.crumbs-light [aria-current] {
+  color: rgb(255 255 255 / 0.88);
+}
+
+/* ---------- page hero (global: survive ClientRouter + CSP) ---------- */
+.phero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: clamp(32rem, 72svh, 44rem);
+  color: #fff;
+  background: #2a2622;
+  overflow: clip;
+}
+
+.phero-lg {
+  min-height: clamp(34rem, 88svh, 52rem);
+}
+
+.phero-media,
+.phero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.phero-media picture,
+.phero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phero.focus-left .phero-media img {
+  object-position: 25% 50%;
+}
+
+.phero.focus-right .phero-media img {
+  object-position: 75% 50%;
+}
+
+.phero.focus-top .phero-media img {
+  object-position: 50% 25%;
+}
+
+.phero.focus-bottom .phero-media img {
+  object-position: 50% 75%;
+}
+
+.phero-shade {
+  background:
+    linear-gradient(to top, rgb(14 12 10 / 0.9) 0%, rgb(14 12 10 / 0.55) 48%, rgb(14 12 10 / 0.62) 100%),
+    linear-gradient(to right, rgb(14 12 10 / 0.72) 0%, rgb(14 12 10 / 0.35) 42%, transparent 78%);
+}
+
+.phero-inner {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 2rem;
+  min-width: 0;
+  padding-top: calc(var(--sticky-top) + 1.25rem);
+  padding-bottom: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
+}
+
+.phero-copy {
+  align-self: end;
+  max-width: 46rem;
+  min-width: 0;
+}
+
+.phero-eyebrow {
+  font-size: var(--fs-xs);
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffd9a3;
+}
+
+.phero h1 {
+  margin-top: 0.75rem;
+  max-width: 18ch;
+  color: #fff;
+  font-size: var(--fs-hero);
+  line-height: 1.02;
+  text-shadow: 0 2px 30px rgb(0 0 0 / 0.35);
+}
+
+.phero-lead {
+  margin-top: 1rem;
+  max-width: 36rem;
+  font-size: var(--fs-lg);
+  line-height: 1.5;
+  color: rgb(255 255 255 / 0.92);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+  text-shadow: 0 1px 18px rgb(0 0 0 / 0.35);
+}
+
+.phero-ctas {
+  margin-top: 1.75rem;
+}
+
+/* Prefer solid secondary CTAs over glass on busy hero photos (WCAG). */
+.phero .btn-glass {
+  --btn-bg: rgb(255 255 255 / 0.94);
+  --btn-fg: var(--graphite);
+  --btn-border: transparent;
+  backdrop-filter: none;
+}
+
+.phero .btn-glass:hover {
+  --btn-bg: var(--white);
+  --btn-border: transparent;
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 35.99em) {
+  .phero-ctas .btn {
+    width: 100%;
+  }
+}
