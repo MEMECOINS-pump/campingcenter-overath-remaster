@@ -24,7 +24,7 @@ export function stripLocale(pathname: string): string {
 }
 
 /**
- * EN pages shipped so far (expand as translations land).
+ * Exact EN page paths (bare, no `/en` prefix). Vehicle detail slugs match via hasEnRoute().
  * Missing EN routes fall back to German URLs so nav never 404s.
  */
 export const enRoutes = new Set<string>([
@@ -37,8 +37,24 @@ export const enRoutes = new Set<string>([
   '/ueber-uns/',
   '/camper-finder/',
   '/marken/',
+  '/merkliste/',
+  '/vergleich/',
   '/404/',
 ]);
+
+/** True when an English counterpart exists for this bare path. */
+export function hasEnRoute(barePath: string): boolean {
+  const bare = barePath.endsWith('/') || barePath === '/' ? barePath : `${barePath}/`;
+  if (enRoutes.has(bare)) return true;
+  // Inventory detail pages ship under /en/wohnmobile/:slug/
+  if (/^\/wohnmobile\/[^/]+\/$/.test(bare)) return true;
+  return false;
+}
+
+/** Serialize for boot-script redirect (exact paths only; slug pattern is inlined in boot). */
+export function enRoutesPayload(): string[] {
+  return [...enRoutes];
+}
 
 export { glossary, g, translateCategoryLabel, translateTransmission, translateCondition } from './glossary';
 export { translateVehicleCopy, tmRemember } from './tm';
@@ -46,12 +62,16 @@ export { translateVehicleCopy, tmRemember } from './tm';
 /** Build a localized internal path (no base); use with `url()`. */
 export function localizedPath(path: string, lang: Locale): string {
   const clean = path.startsWith('/') ? path : `/${path}`;
-  const normalized = clean.endsWith('/') || /\.[a-z0-9]+$/i.test(clean) ? clean : `${clean}/`;
-  if (lang === defaultLocale) return normalized;
+  const [pathname = '/', hash = ''] = clean.split('#');
+  const [pathOnly = '/', query = ''] = pathname.split('?');
+  const normalized = pathOnly.endsWith('/') || /\.[a-z0-9]+$/i.test(pathOnly) ? pathOnly : `${pathOnly}/`;
+  const q = query ? `?${query}` : '';
+  const h = hash ? `#${hash}` : '';
+  if (lang === defaultLocale) return `${normalized}${q}${h}`;
   const bare = normalized === '/en/' ? '/' : normalized.startsWith('/en/') ? normalized.slice(3) : normalized;
-  if (!enRoutes.has(bare)) return bare; // DE fallback until EN page exists
-  if (bare === '/') return '/en/';
-  return `/en${bare}`;
+  if (!hasEnRoute(bare)) return `${bare}${q}${h}`;
+  const enBase = bare === '/' ? '/en/' : `/en${bare}`;
+  return `${enBase}${q}${h}`;
 }
 
 /** Switch locale while keeping the same page path when an EN counterpart exists. */

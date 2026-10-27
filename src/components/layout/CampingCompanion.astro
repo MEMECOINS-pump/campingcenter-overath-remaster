@@ -2,7 +2,7 @@
 import Icon from '@/components/ui/Icon.astro';
 import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
 import { company } from '@/data/company';
-import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
+import { getLangFromPath, localizedPath, switchLocalePath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
 
 interface Props {
@@ -10,6 +10,8 @@ interface Props {
 }
 
 const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+const switchToDe = url(switchLocalePath(Astro.url.pathname, 'de'));
+const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
 ---
 
 <div
@@ -154,7 +156,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
           <div class="companion-lang-list" role="radiogroup" aria-label={t(lang, 'companionCardLang')}>
             <a
               class="companion-lang-opt"
-              href={url(localizedPath('/', 'de'))}
+              href={switchToDe}
               data-companion-lang="de"
               data-lang-switch="de"
               aria-current={lang === 'de' ? 'true' : undefined}
@@ -165,7 +167,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
             </a>
             <a
               class="companion-lang-opt"
-              href={url(localizedPath('/', 'en'))}
+              href={switchToEn}
               data-companion-lang="en"
               data-lang-switch="en"
               aria-current={lang === 'en' ? 'true' : undefined}
@@ -301,22 +303,15 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
     root.querySelectorAll<HTMLAnchorElement>('[data-lang-switch]').forEach((link) => {
       link.addEventListener('click', (e) => {
         const next = link.dataset.langSwitch;
-        if (!next) return;
+        if (next !== 'de' && next !== 'en') return;
+        e.preventDefault();
         try {
           localStorage.setItem(LANG_KEY, next);
         } catch {
           /* ignore */
         }
-        const parts = location.pathname.split('/').filter(Boolean);
-        const repoIdx = parts.indexOf('campingcenter-overath-remaster');
-        const prefix = repoIdx >= 0 ? `/${parts.slice(0, repoIdx + 1).join('/')}` : '';
-        let rest = repoIdx >= 0 ? `/${parts.slice(repoIdx + 1).join('/')}` : location.pathname;
-        if (!rest.endsWith('/')) rest += '/';
-        if (rest.startsWith('/en/')) rest = rest.slice(3) || '/';
-        if (rest === '/en/') rest = '/';
-        const dest = next === 'en' ? `${prefix}${rest === '/' ? '/en/' : `/en${rest}`}` : `${prefix}${rest}`;
-        e.preventDefault();
-        location.assign(dest);
+        const href = link.getAttribute('href');
+        if (href) location.assign(href);
       });
     });
 
