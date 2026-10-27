@@ -255,11 +255,14 @@ function hardPass<T extends FilterableVehicle>(v: T, a: FinderAnswers): { ok: bo
   if (minBed !== null) {
     const bed = maxBedLengthMm(v);
     if (bed == null) {
-      // Strict: do not pretend match when bed length unknown
-      return { ok: false, needsConfirmation: true, reasons: [...reasons, { label: 'Bettlänge nicht belegt – ausgeschlossen', ok: false }] };
+      // Keine erfundenen Maße – Treffer nur mit Bestätigungshinweis
+      needsConfirmation = true;
+      reasons.push({ label: 'Bettlänge bitte vor Ort bestätigen lassen', ok: false });
+    } else if (bed < minBed) {
+      return { ok: false, needsConfirmation, reasons };
+    } else {
+      reasons.push({ label: `Bettlänge mindestens ${(minBed / 10).toFixed(0)} cm`.replace('200.1', '200'), ok: true });
     }
-    if (bed < minBed) return { ok: false, needsConfirmation, reasons };
-    reasons.push({ label: `Bettlänge mindestens ${(minBed / 10).toFixed(0)} cm`.replace('200.1', '200'), ok: true });
   }
 
   if (a.budget && a.budget !== 'any') {
@@ -320,7 +323,8 @@ export function runCampingFinder<T extends FilterableVehicle>(
     exact.push({
       vehicle,
       score: soft.score + (hard.needsConfirmation ? -1 : 2),
-      reasons: [...hard.reasons.filter((r) => r.ok), ...soft.reasons],
+      // Keep confirmation hints (ok:false) so UI can show “bitte bestätigen”
+      reasons: [...hard.reasons, ...soft.reasons],
       needsConfirmation: hard.needsConfirmation,
     });
   }

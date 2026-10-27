@@ -4,24 +4,24 @@
    ========================================================================= */
 
 :root {
-  /* palette */
-  --ivory: #f7f3ec;
-  --paper: #fbf9f5;
-  --sand: #ece4d6;
-  --sand-strong: #d9ccb6;
-  --white: #ffffff;
-  --graphite: #1c2024;
-  --charcoal: #2b3036;
-  --slate: #5d646b;
-  --mist: #8b9197;
-  --line: #e3dccf;
-  --line-strong: #cfc5b3;
-  --forest: #3b5a47;
-  --forest-soft: #e4ebe4;
-  --brand: #d08115;
-  --brand-strong: #b86f0c;
-  --brand-ink: #8a5208;
-  --brand-soft: #f6e7cf;
+  /* palette – warm premium (less harsh pure white) */
+  --ivory: #f7f4ee;
+  --paper: #faf8f4;
+  --sand: #eee8de;
+  --sand-strong: #e1dad0;
+  --white: #faf8f4;
+  --graphite: #24282b;
+  --charcoal: #2f3438;
+  --slate: #5c646b;
+  --mist: #8a9197;
+  --line: #e1dad0;
+  --line-strong: #d0c8bc;
+  --forest: #65745f;
+  --forest-soft: #e6ebe3;
+  --brand: #c8874d;
+  --brand-strong: #b0743f;
+  --brand-ink: #8a5a2b;
+  --brand-soft: #f3e6d6;
   --danger: #a3261b;
   --danger-soft: #fbe9e6;
   --success: #2f6b45;
@@ -29,7 +29,7 @@
 
   /* semantic */
   --bg: var(--ivory);
-  --surface: var(--white);
+  --surface: var(--paper);
   --text: var(--graphite);
   --text-muted: var(--slate);
   --focus: #1f5fbf;
@@ -65,19 +65,29 @@
   --radius-lg: 22px;
   --radius-md: var(--radius);
   --radius-pill: 999px;
-  --shadow-sm: 0 1px 2px rgb(28 32 36 / 0.06), 0 1px 1px rgb(28 32 36 / 0.04);
-  --shadow: 0 10px 30px -12px rgb(28 32 36 / 0.18), 0 2px 6px rgb(28 32 36 / 0.05);
-  --shadow-lg: 0 30px 60px -24px rgb(28 32 36 / 0.35);
+  --shadow-sm: 0 1px 2px rgb(36 40 43 / 0.05), 0 1px 1px rgb(36 40 43 / 0.03);
+  --shadow: 0 8px 24px -14px rgb(36 40 43 / 0.16), 0 2px 6px rgb(36 40 43 / 0.04);
+  --shadow-lg: 0 24px 48px -22px rgb(36 40 43 / 0.28);
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur: 220ms;
 
   /* chrome */
   --header-h: 4rem;
-  --header-utility-h: 2rem;
+  --header-utility-h: 2.75rem;
+  --header-alert-h: 0px;
   --actionbar-h: 0px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --sticky-top: calc(var(--header-h) + var(--header-utility-h) + var(--header-alert-h) + var(--safe-top));
+
+  /* stacking: actionbar < compare < sticky-cta < toast < chat < cookie < skip */
+  --z-actionbar: 40;
+  --z-compare: 42;
+  --z-sticky-cta: 44;
+  --z-toast: 60;
+  --z-chat: 70;
+  --z-cookie: 90;
 
   color-scheme: light;
 }
@@ -98,7 +108,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: calc(var(--header-h) + 1rem);
+  scroll-padding-top: calc(var(--sticky-top) + 1rem);
   hanging-punctuation: first last;
 }
 
@@ -1169,6 +1179,33 @@ body.scroll-locked {
   body[data-actionbar] {
     --actionbar-h: 4.2rem;
   }
+
+  /* Chat/Keyboard: Actionbar ist weg – Layout-Offset mitziehen */
+  body.bar-hidden,
+  body.kb-open {
+    --actionbar-h: 0px;
+  }
+
+  /* Ankauf-Wizard: sticky Bottom-Nav → Chat/Cookie höher */
+  body.page-ankauf {
+    --actionbar-h: 4.5rem;
+  }
+
+  body.page-ankauf.bar-hidden,
+  body.page-ankauf.kb-open {
+    --actionbar-h: 0px;
+  }
+}
+
+/* Consent sichtbar: Chat aus dem Weg, damit Cookie-Buttons klickbar bleiben */
+body:has([data-consent-banner]:not([hidden])) .chatw {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Chat offen: Vergleichs-Tray ausblenden */
+body:has(.chatw.is-open) .ctray {
+  display: none !important;
 }
 
 /* ---------- toast ---------- */
@@ -1176,7 +1213,7 @@ body.scroll-locked {
   position: fixed;
   left: 50%;
   bottom: calc(var(--actionbar-h) + var(--safe-bottom) + 1rem);
-  z-index: 60;
+  z-index: var(--z-toast);
   max-width: min(92vw, 28rem);
   padding: 0.75rem 1.1rem;
   border-radius: var(--radius-pill);

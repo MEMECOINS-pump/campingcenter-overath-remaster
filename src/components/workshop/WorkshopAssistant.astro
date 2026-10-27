@@ -37,7 +37,7 @@ import Icon from '@/components/ui/Icon.astro';
       <p class="muted small" data-wa-status aria-live="polite"></p>
 
       <div class="wa-result" data-wa-result hidden>
-        <h3>Zusammenfassung deiner Werkstatt-Anfrage</h3>
+        <h3>Deine Werkstatt-Anfrage</h3>
         <dl class="wa-dl" data-wa-structured></dl>
         <p data-wa-summary></p>
         <p class="muted small" data-wa-disclaimer></p>
@@ -193,13 +193,21 @@ import Icon from '@/components/ui/Icon.astro';
           if (res.ok) data = await res.json();
         }
       } catch {
-        /* keep local fallback */
+        if (status) status.textContent = 'Online-Assistent nicht erreichbar – lokale Einordnung genutzt.';
       }
+
+      const structuredMap: Record<string, string> = {
+        ...(data.structured || {}),
+        Fahrzeug: [payload.vehicleMake, payload.vehicleModel].filter(Boolean).join(' ') || 'nicht angegeben',
+        Problem: message,
+        Fehlercode: payload.faultCode || '—',
+        'Betroffener Bereich': data.categoryLabel || '—',
+      };
 
       if (summary) summary.textContent = data.summary;
       if (disclaimer) disclaimer.textContent = data.disclaimer;
       if (structured) {
-        structured.innerHTML = Object.entries(data.structured || {})
+        structured.innerHTML = Object.entries(structuredMap)
           .map(([k, v]) => `<div><dt>${k}</dt><dd>${String(v)}</dd></div>`)
           .join('');
       }

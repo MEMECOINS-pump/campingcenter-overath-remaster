@@ -3,15 +3,13 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/home/Hero.astro';
 import CampingFinderHero from '@/components/home/CampingFinderHero.astro';
 import QuickActions from '@/components/home/QuickActions.astro';
+import RecentlyArrived from '@/components/home/RecentlyArrived.astro';
 import FeaturedVehicles from '@/components/home/FeaturedVehicles.astro';
 import BrandShowcase from '@/components/sections/BrandShowcase.astro';
 import StorySection from '@/components/home/StorySection.astro';
 import AnkaufTeaser from '@/components/home/AnkaufTeaser.astro';
 import WorkshopTeaser from '@/components/home/WorkshopTeaser.astro';
 import RentalTeaser from '@/components/home/RentalTeaser.astro';
-import Journey from '@/components/sections/Journey.astro';
-import TourTeaser from '@/components/home/TourTeaser.astro';
-import PromotionTeaser from '@/components/home/PromotionTeaser.astro';
 import FaqAccordion from '@/components/ui/FaqAccordion.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import ContactSection from '@/components/sections/ContactSection.astro';
@@ -30,15 +28,13 @@ import { faqSchema } from '@/lib/schema';
   <Hero />
   <CampingFinderHero />
   <QuickActions />
+  <RecentlyArrived />
   <FeaturedVehicles />
   <BrandShowcase />
   <AnkaufTeaser />
   <WorkshopTeaser />
   <RentalTeaser />
   <StorySection />
-  <Journey />
-  <TourTeaser />
-  <PromotionTeaser />
 
   <section class="section faq-section" aria-labelledby="faq-title">
     <div class="container faq-grid">

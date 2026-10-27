@@ -25,6 +25,8 @@ export interface NormalizedVehicle {
   sourceProvider: 'mobile.de' | 'fixture';
   sourceVehicleId: string;
   lastSyncedAt: string;
+  /** ISO timestamp when this vehicle first appeared in our inventory (not factory-new). */
+  firstSeenAt: string | null;
   sourceUpdatedAt: string | null;
   syncStatus: SyncStatus;
   lifecycle: VehicleLifecycle;

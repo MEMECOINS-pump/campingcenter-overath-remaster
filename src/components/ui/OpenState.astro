@@ -1,18 +1,8 @@
 ---
-import { computeOpenStatus } from '@/lib/opening-hours';
-
-/** Compact badge – same calculation as header (Europe/Berlin + NRW-Feiertage). */
-const initial = computeOpenStatus();
+/** Compact badge – status only client-side (Europe/Berlin + NRW-Feiertage). */
 ---
 
-<span
-  class="open-state"
-  data-open-state
-  data-state={initial.state}
-  data-reason={initial.reason}
->
-  {initial.label}
-</span>
+<span class="open-state" data-open-state data-state="pending" data-reason="hours">Öffnungszeiten</span>
 
 <style>
   .open-state {
@@ -33,6 +23,10 @@ const initial = computeOpenStatus();
     height: 0.5rem;
     border-radius: 50%;
     background: currentColor;
+  }
+
+  .open-state[data-state='pending'] {
+    opacity: 0.75;
   }
 
   .open-state[data-state='open'] {
@@ -60,7 +54,11 @@ const initial = computeOpenStatus();
       const status = computeOpenStatus();
       el.dataset.state = status.state;
       el.dataset.reason = status.reason;
-      el.textContent = status.label;
+      el.textContent =
+        status.state === 'open' ? `Jetzt geöffnet · bis ${status.closesAt} Uhr` : status.shortLabel === 'Geschlossen' ? 'Aktuell geschlossen' : status.shortLabel;
+      if (status.reason === 'holiday') el.textContent = `Feiertag · Geschlossen`;
+      else if (status.state === 'open') el.textContent = `Jetzt geöffnet`;
+      else el.textContent = 'Aktuell geschlossen';
     });
   }
 

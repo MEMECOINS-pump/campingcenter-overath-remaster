@@ -59,13 +59,19 @@ export async function runVehicleSync(env: Env): Promise<SyncLogEntry> {
       const prev = bySource.get(key);
       if (!prev) {
         log.imported += 1;
-        next.push({ ...raw, lifecycle: 'active' });
+        next.push({
+          ...raw,
+          lifecycle: 'active',
+          firstSeenAt: raw.firstSeenAt ?? raw.sourceUpdatedAt ?? startedAt,
+        });
         continue;
       }
       const merged: NormalizedVehicle = {
         ...prev,
         ...raw,
         internalVehicleId: prev.internalVehicleId || raw.internalVehicleId,
+        // firstSeenAt never moves forward on updates
+        firstSeenAt: prev.firstSeenAt ?? raw.firstSeenAt ?? raw.sourceUpdatedAt ?? startedAt,
         lifecycle: 'active',
       };
       if (fingerprint(prev) === fingerprint(merged)) {

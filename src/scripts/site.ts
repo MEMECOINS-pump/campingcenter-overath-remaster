@@ -171,10 +171,12 @@ function initConsent(): void {
     const state = readConsent();
     (form.elements.namedItem('media') as HTMLInputElement).checked = !!state?.media;
     (form.elements.namedItem('stats') as HTMLInputElement).checked = !!state?.stats;
+    lockScroll(true);
     dialog.showModal();
   });
 
   dialog?.addEventListener('close', () => {
+    lockScroll(false);
     if (!form) return;
     if (dialog.returnValue === 'all') decide(true, true);
     else if (dialog.returnValue === 'save')

@@ -26,6 +26,8 @@ export interface Vehicle extends FilterableVehicle {
   sourceProvider: 'mobile.de' | 'fixture';
   sourceVehicleId: string;
   internalVehicleId: string;
+  /** When this listing first appeared in our Bestand (not factory-new). */
+  firstSeenAt: string | null;
 }
 
 export type { Category, Condition };
@@ -38,10 +40,15 @@ function seatsFromHighlights(highlights: string[]): number | null {
   return null;
 }
 
-type RawVehicle = Omit<Vehicle, 'seats' | 'sleepingPlaces' | 'beds' | 'sourceProvider' | 'sourceVehicleId' | 'internalVehicleId'> & {
+type RawVehicle = Omit<
+  Vehicle,
+  'seats' | 'sleepingPlaces' | 'beds' | 'sourceProvider' | 'sourceVehicleId' | 'internalVehicleId' | 'firstSeenAt'
+> & {
   seats?: number | null;
   sleepingPlaces?: number | null;
   beds?: BedSpec[];
+  firstSeenAt?: string | null;
+  id: string;
 };
 
 function normalizeVehicle(raw: RawVehicle): Vehicle {
@@ -54,7 +61,39 @@ function normalizeVehicle(raw: RawVehicle): Vehicle {
     sourceProvider: 'mobile.de',
     sourceVehicleId: String(raw.id),
     internalVehicleId: `mobile.de:${raw.id}`,
+    firstSeenAt: raw.firstSeenAt ?? null,
   };
+}
+
+const RECENT_MS = 30 * 24 * 60 * 60 * 1000;
+
+/** True when firstSeenAt is set and within the last 30 days (NEU IM BESTAND). */
+export function isNewToInventory(v: Pick<Vehicle, 'firstSeenAt'>, now = Date.now()): boolean {
+  if (!v.firstSeenAt) return false;
+  const t = Date.parse(v.firstSeenAt);
+  if (!Number.isFinite(t)) return false;
+  const age = now - t;
+  return age >= 0 && age <= RECENT_MS;
+}
+
+export interface RecentArrivalSet {
+  vehicles: Vehicle[];
+  /** Only true when firstSeenAt timestamps prove recent listing. */
+  showNewBadge: boolean;
+}
+
+/**
+ * Homepage spotlight. Prefers vehicles with reliable firstSeenAt.
+ * Without dates: highest mobile.de ids as weak “current focus” – never shows NEU IM BESTAND.
+ */
+export function recentlyArrivedVehicles(limit = 4, now = Date.now()): RecentArrivalSet {
+  const dated = vehicles
+    .filter((v) => isNewToInventory(v, now))
+    .sort((a, b) => Date.parse(b.firstSeenAt!) - Date.parse(a.firstSeenAt!));
+  if (dated.length) return { vehicles: dated.slice(0, limit), showNewBadge: true };
+
+  const fallback = [...vehicles].sort((a, b) => Number(b.id) - Number(a.id)).slice(0, limit);
+  return { vehicles: fallback, showNewBadge: false };
 }
 
 export const inventorySource = inventory.source;

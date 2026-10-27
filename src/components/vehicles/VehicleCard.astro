@@ -1,6 +1,6 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
-import { cardFacts, priceLabel, vehicleImage, vehicleSrcset, type Vehicle } from '@/lib/vehicles';
+import { cardFacts, isNewToInventory, priceLabel, vehicleImage, vehicleSrcset, type Vehicle } from '@/lib/vehicles';
 import { url } from '@/lib/url';
 
 interface Props {
@@ -9,8 +9,11 @@ interface Props {
   priority?: boolean;
   headingLevel?: 2 | 3;
   compare?: boolean;
+  /** Only render NEU IM BESTAND when caller confirms dates are reliable. */
+  showNewInventoryBadge?: boolean;
 }
-const { vehicle: v, index = 0, priority = false, headingLevel = 3, compare = true } = Astro.props;
+const { vehicle: v, index = 0, priority = false, headingLevel = 3, compare = true, showNewInventoryBadge = false } = Astro.props;
+const newInventory = showNewInventoryBadge && isNewToInventory(v);
 const Heading = headingLevel === 2 ? 'h2' : 'h3';
 const href = url(`/wohnmobile/${v.slug}/`);
 const cover = v.images[0];
@@ -54,6 +57,7 @@ const cover = v.images[0];
       )
     }
     <div class="vcard-badges">
+      {newInventory && <span class="badge badge-arrived">NEU IM BESTAND</span>}
       <span class:list={['badge', v.condition === 'neu' ? 'badge-new' : 'badge-used']}>{v.condition === 'neu' ? 'Neu' : 'Gebraucht'}</span>
       <span class="badge badge-glass">{v.categoryLabel}</span>
     </div>
@@ -155,6 +159,13 @@ const cover = v.images[0];
   .badge-glass {
     background: rgb(255 255 255 / 0.9);
     color: var(--graphite);
+  }
+
+  .badge-arrived {
+    background: var(--brand);
+    color: var(--graphite);
+    font-weight: 800;
+    letter-spacing: 0.04em;
   }
 
   .vcard-fav {

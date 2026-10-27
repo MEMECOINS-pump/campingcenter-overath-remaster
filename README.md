@@ -12,7 +12,7 @@ Redesign-Präsentation der Website des [Campingcenter Overath](https://ccoverath
 - **Camper-Finder:** fünf Fragen, Ergebnisse aus dem echten Bestand; wenn nichts exakt passt, wird transparent gesagt, welche Kriterien gelockert wurden.
 - **Ankauf:** 7-Schritte-Assistent mit Entwurfsspeicherung, Browser-Zurück-Unterstützung und Foto-Upload (Kamera/Galerie, automatische Verkleinerung, Vorschau, Fortschritt, Entfernen, Wiederholen).
 - **Werkstatt:** alle Leistungen nach Bereichen, Terminanfrage mit bedingten Feldern und Foto-/Dokument-Upload – bewusst ohne Sofortbuchungs-Versprechen.
-- **Weitere Seiten:** Vermietung (ADAC), PANAMA, Marken, Über uns, Kontakt & Anfahrt, Jobs & Bewerbung, 360° Rundgang (lädt erst auf Klick), Fahrzeugwäsche, Rechtliches, 404.
+- **Weitere Seiten:** Vermietung (ADAC), 
 - **Datenschutz:** keine Cookies, keine Tracker. YouTube (nocookie) und Google Maps laden erst nach Klick bzw. Einwilligung. Analyse-Events werden nur nach Einwilligung in `window.dataLayer` geschrieben; es ist kein Analyse-Dienst eingebunden.
 
 ## Technik

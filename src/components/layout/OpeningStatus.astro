@@ -358,6 +358,10 @@ import { url } from '@/lib/url';
     root.querySelectorAll<HTMLElement>('[data-oh-alert-name]').forEach((el) => {
       el.textContent = status.holiday?.name ?? '';
     });
+    // Sticky-Offsets: Feiertagsbanner-Höhe an Chrome-Tokens melden
+    const alertEl = root.querySelector<HTMLElement>('[data-oh-alert]');
+    const alertH = isHoliday && alertEl && !alertEl.hidden ? Math.ceil(alertEl.getBoundingClientRect().height) : 0;
+    document.documentElement.style.setProperty('--header-alert-h', `${alertH}px`);
     root.querySelectorAll<HTMLElement>('[data-oh-next]').forEach((el) => {
       el.hidden = !next;
       el.textContent = next ?? '';
@@ -371,11 +375,17 @@ import { url } from '@/lib/url';
   document.querySelectorAll<HTMLElement>('[data-opening-status]').forEach((root) => {
     apply(root, computeOpenStatus());
     const sheet = root.querySelector<HTMLDialogElement>('[data-oh-sheet]');
-    root.querySelector('[data-oh-open]')?.addEventListener('click', () => sheet?.showModal());
-    root.querySelector('[data-oh-close]')?.addEventListener('click', () => sheet?.close());
+    const setSheet = (open: boolean) => {
+      document.body.classList.toggle('scroll-locked', open);
+      if (open) sheet?.showModal();
+      else sheet?.close();
+    };
+    root.querySelector('[data-oh-open]')?.addEventListener('click', () => setSheet(true));
+    root.querySelector('[data-oh-close]')?.addEventListener('click', () => setSheet(false));
     sheet?.addEventListener('click', (e) => {
-      if (e.target === sheet) sheet.close();
+      if (e.target === sheet) setSheet(false);
     });
+    sheet?.addEventListener('close', () => document.body.classList.remove('scroll-locked'));
   });
 
   window.setInterval(tick, 30_000);

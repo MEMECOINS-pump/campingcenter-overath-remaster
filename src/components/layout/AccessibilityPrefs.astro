@@ -1,0 +1,255 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<div class="a11y" data-a11y>
+  <button type="button" class="a11y-fab" data-a11y-open aria-expanded="false" aria-controls="a11y-panel" title="Barrierefreiheit">
+    <Icon name="shield" />
+    <span class="sr-only">Barrierefreiheits-Einstellungen</span>
+  </button>
+
+  <div class="a11y-panel" id="a11y-panel" data-a11y-panel hidden role="dialog" aria-labelledby="a11y-title">
+    <header class="a11y-head">
+      <h2 id="a11y-title">Darstellung anpassen</h2>
+      <button type="button" class="a11y-close" data-a11y-close aria-label="Schließen">
+        <Icon name="close" />
+      </button>
+    </header>
+    <p class="a11y-lead">Einstellungen gelten nur für dieses Gerät und ersetzen keine barrierefreie Seitenstruktur.</p>
+    <ul class="a11y-list">
+      <li>
+        <button type="button" class="a11y-opt" data-a11y-toggle="text-lg" aria-pressed="false">Schrift vergrößern</button>
+      </li>
+      <li>
+        <button type="button" class="a11y-opt" data-a11y-toggle="contrast" aria-pressed="false">Kontrast erhöhen</button>
+      </li>
+      <li>
+        <button type="button" class="a11y-opt" data-a11y-toggle="reduce-motion" aria-pressed="false">Bewegungen reduzieren</button>
+      </li>
+      <li>
+        <button type="button" class="a11y-opt" data-a11y-toggle="readable" aria-pressed="false">Lesefreundliche Darstellung</button>
+      </li>
+    </ul>
+    <button type="button" class="btn btn-ghost btn-sm a11y-reset" data-a11y-reset>Einstellungen zurücksetzen</button>
+  </div>
+</div>
+
+<style>
+  .a11y {
+    position: fixed;
+    left: 0.75rem;
+    bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + 0.75rem);
+    z-index: calc(var(--z-chat, 70) - 1);
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+    pointer-events: none;
+  }
+
+  .a11y > * {
+    pointer-events: auto;
+  }
+
+  /* Consent oder Chat offen: zurückhaltend */
+  :global(body:has([data-consent-banner]:not([hidden]))) .a11y,
+  :global(body:has(.chatw.is-open)) .a11y {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .a11y-fab {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--graphite);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+  }
+
+  .a11y-fab:hover {
+    border-color: var(--brand);
+  }
+
+  .a11y-panel {
+    width: min(calc(100vw - 1.5rem), 18.5rem);
+    padding: 0.9rem 1rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .a11y-panel[hidden] {
+    display: none !important;
+  }
+
+  .a11y-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .a11y-head h2 {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .a11y-close {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--sand);
+    cursor: pointer;
+  }
+
+  .a11y-lead {
+    margin: 0.55rem 0 0.75rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .a11y-list {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .a11y-opt {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: 0.65rem;
+    background: #fff;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 650;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .a11y-opt[aria-pressed='true'] {
+    border-color: var(--brand);
+    background: var(--brand-soft);
+  }
+
+  .a11y-reset {
+    margin-top: 0.65rem;
+  }
+</style>
+
+<style is:global>
+  html.a11y-text-lg {
+    font-size: 112.5%;
+  }
+
+  html.a11y-contrast {
+    --bg: #f3efe6;
+    --paper: #fffefb;
+    --surface: #fffefb;
+    --text: #121417;
+    --text-muted: #3a4046;
+    --line: #bdb5a8;
+    --brand: #9a5f28;
+  }
+
+  html.a11y-reduce-motion *,
+  html.a11y-reduce-motion *::before,
+  html.a11y-reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.a11y-readable {
+    --font-body: Georgia, 'Times New Roman', serif;
+    letter-spacing: 0.01em;
+    word-spacing: 0.04em;
+  }
+
+  html.a11y-readable body {
+    line-height: 1.75;
+  }
+</style>
+
+<script>
+  const KEY = 'cco-a11y';
+  const FLAGS = ['text-lg', 'contrast', 'reduce-motion', 'readable'] as const;
+  type Flag = (typeof FLAGS)[number];
+
+  function read(): Flag[] {
+    try {
+      const raw = JSON.parse(localStorage.getItem(KEY) || '[]');
+      return Array.isArray(raw) ? raw.filter((x): x is Flag => FLAGS.includes(x)) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function write(flags: Flag[]) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(flags));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function apply(flags: Flag[]) {
+    FLAGS.forEach((f) => document.documentElement.classList.toggle(`a11y-${f}`, flags.includes(f)));
+    document.querySelectorAll<HTMLButtonElement>('[data-a11y-toggle]').forEach((btn) => {
+      const on = flags.includes(btn.dataset.a11yToggle as Flag);
+      btn.setAttribute('aria-pressed', String(on));
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-a11y]').forEach((root) => {
+    const panel = root.querySelector<HTMLElement>('[data-a11y-panel]');
+    const openBtn = root.querySelector<HTMLButtonElement>('[data-a11y-open]');
+    const closeBtn = root.querySelector('[data-a11y-close]');
+    if (!panel || !openBtn) return;
+
+    let flags = read();
+    apply(flags);
+
+    const setOpen = (open: boolean) => {
+      panel.hidden = !open;
+      openBtn.setAttribute('aria-expanded', String(open));
+    };
+
+    openBtn.addEventListener('click', () => setOpen(Boolean(panel.hidden)));
+    closeBtn?.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) setOpen(false);
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-a11y-toggle]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const flag = btn.dataset.a11yToggle as Flag;
+        flags = flags.includes(flag) ? flags.filter((f) => f !== flag) : [...flags, flag];
+        write(flags);
+        apply(flags);
+      });
+    });
+
+    root.querySelector('[data-a11y-reset]')?.addEventListener('click', () => {
+      flags = [];
+      write(flags);
+      apply(flags);
+    });
+  });
+</script>

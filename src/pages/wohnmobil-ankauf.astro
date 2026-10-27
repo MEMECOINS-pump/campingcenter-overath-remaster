@@ -53,6 +53,7 @@ const faqs = [
   title="Wohnmobil verkaufen – Ankauf in Overath"
   description="Wohnmobil, Wohnwagen, Van oder Boot verkaufen: In 7 Schritten zum unverbindlichen Angebot innerhalb von 24 Stunden. Faire Bewertung, deutschlandweite Abholung, Abmeldung inklusive."
   actionBar={false}
+  bodyClass="page-ankauf"
   jsonLd={[
     breadcrumbSchema(crumbs, Astro.site),
     serviceSchema('Ankauf von Wohnmobilen, Wohnwagen, Vans und Booten', ankauf.promise, '/wohnmobil-ankauf/', Astro.site),
@@ -416,7 +417,7 @@ const faqs = [
   }
 
   .ak-wizard-section {
-    scroll-margin-top: var(--header-h, 4.5rem);
+    scroll-margin-top: var(--sticky-top);
   }
 
   .ak-layout {
@@ -432,7 +433,7 @@ const faqs = [
 
     .ak-aside {
       position: sticky;
-      top: calc(var(--header-h, 4.5rem) + 1.5rem);
+      top: calc(var(--sticky-top) + 1.5rem);
     }
   }
 
@@ -445,7 +446,7 @@ const faqs = [
   .wz-progress {
     position: sticky;
     z-index: 4;
-    top: var(--header-h, 4.5rem);
+    top: var(--sticky-top);
     display: grid;
     gap: 0.5rem;
     margin-inline: calc(var(--gutter) * -1);
@@ -499,7 +500,7 @@ const faqs = [
     margin: 0;
     padding: 0;
     border: 0;
-    scroll-margin-top: calc(var(--header-h, 4.5rem) + 5rem);
+    scroll-margin-top: calc(var(--sticky-top) + 5rem);
   }
 
   :global(.js) .wz-step:not(.is-active) {

@@ -144,9 +144,9 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
 
     .sr-aside {
       position: sticky;
-      top: calc(var(--header-h, 4.5rem) + 1rem);
+      top: calc(var(--sticky-top) + 1rem);
       display: block;
-      max-height: calc(100dvh - var(--header-h, 4.5rem) - 2rem);
+      max-height: calc(100dvh - var(--sticky-top) - 2rem);
       overflow-y: auto;
       padding-right: 0.5rem;
       scrollbar-width: thin;
@@ -165,7 +165,7 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
   .sr-toolbar {
     position: sticky;
     z-index: 5;
-    top: var(--header-h, 4.5rem);
+    top: var(--sticky-top);
     display: flex;
     flex-wrap: wrap;
     align-items: center;

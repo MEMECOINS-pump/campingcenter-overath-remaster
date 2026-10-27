@@ -114,6 +114,7 @@ function mapAd(ad: MobileAd, now: string): NormalizedVehicle | null {
     sourceProvider: 'mobile.de',
     sourceVehicleId: sourceId,
     lastSyncedAt: now,
+    firstSeenAt: ad.creationDate ?? null,
     sourceUpdatedAt: ad.modificationDate ?? ad.creationDate ?? null,
     syncStatus: lengthMm || seats || sleepingPlaces ? 'ok' : 'incomplete',
     lifecycle: 'active',

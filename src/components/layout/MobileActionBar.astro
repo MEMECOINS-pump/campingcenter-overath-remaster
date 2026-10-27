@@ -30,7 +30,7 @@ const { inquiryHref = '/kontakt/#formular', inquiryLabel = 'Anfrage' } = Astro.p
     position: fixed;
     inset-inline: 0;
     bottom: 0;
-    z-index: 40;
+    z-index: var(--z-actionbar, 40);
     display: grid;
     grid-template-columns: 1fr 1fr 1.25fr;
     gap: 0.4rem;

@@ -1,0 +1,98 @@
+---
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { recentlyArrivedVehicles, snapshotDate } from '@/lib/vehicles';
+import { formatDateDE } from '@/lib/format';
+import { url } from '@/lib/url';
+
+const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
+---
+
+{
+  arrived.length > 0 && (
+    <section class="section arrived" aria-labelledby="arrived-title">
+      <div class="container">
+        <div class="section-head-row">
+          <SectionHeader
+            id="arrived-title"
+            eyebrow="Frisch eingetroffen"
+            title="Entdecke unsere neuesten Fahrzeuge und finde deinen nächsten Reisebegleiter."
+            lead={
+              showNewBadge
+                ? 'Frisch in unserem Bestand – mit Badge „NEU IM BESTAND“, wenn das Einstelldatum bestätigt ist.'
+                : 'Eine aktuelle Auswahl aus unserem Bestand. Das genaue Einstelldatum folgt mit der Live-Synchronisation.'
+            }
+          />
+          <a class="btn btn-ghost" href={url('/wohnmobile/')}>
+            Zum Bestand <Icon name="arrow-right" class="arrow" />
+          </a>
+        </div>
+
+        <div class="rail" data-rail>
+          <ul class="rail-track" role="list">
+            {arrived.map((v, i) => (
+              <li class="rail-item">
+                <VehicleCard vehicle={v} index={i} priority={i === 0} compare={false} showNewInventoryBadge={showNewBadge} />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p class="arrived-note">Stand {formatDateDE(snapshotDate)} · Angaben laut Fahrzeuginserat.</p>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .arrived {
+    background: var(--sand);
+  }
+
+  .rail {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+
+  .rail-track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(85%, 22.5rem);
+    gap: 1rem;
+    padding: 0.25rem var(--gutter) 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    list-style: none;
+    scrollbar-width: thin;
+  }
+
+  .rail-item {
+    display: flex;
+    scroll-snap-align: start;
+  }
+
+  .rail-item > :global(*) {
+    flex: 1;
+  }
+
+  .arrived-note {
+    margin-top: 0.75rem;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 64em) {
+    .rail {
+      margin-inline: 0;
+    }
+
+    .rail-track {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-columns: unset;
+      overflow: visible;
+      padding-inline: 0;
+    }
+  }
+</style>

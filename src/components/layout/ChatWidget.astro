@@ -158,7 +158,7 @@ import { url } from '@/lib/url';
     position: fixed;
     right: 1rem;
     bottom: var(--cw-gap-bottom);
-    z-index: 80;
+    z-index: var(--z-chat, 70);
     display: grid;
     justify-items: end;
     align-content: end;
@@ -668,7 +668,8 @@ import { url } from '@/lib/url';
     padding: 0.55rem 0;
     background: transparent;
     font: inherit;
-    font-size: 0.9rem;
+    /* ≥16px: verhindert iOS-Zoom beim Fokussieren */
+    font-size: 1rem;
     line-height: 1.35;
     outline: none;
   }

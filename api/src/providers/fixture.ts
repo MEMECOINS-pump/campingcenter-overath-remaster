@@ -12,6 +12,7 @@ export class FixtureProvider implements InventoryProvider {
       ...v,
       sourceProvider: 'fixture',
       lastSyncedAt: now,
+      firstSeenAt: v.firstSeenAt ?? v.sourceUpdatedAt ?? now,
       lifecycle: 'active',
       syncStatus: v.syncStatus ?? 'ok',
     }));

@@ -129,9 +129,12 @@ describe('runCampingFinder', () => {
     expect(r.exact[0]?.reasons.some((x) => x.label.includes('Schlafplätze'))).toBe(true);
   });
 
-  it('excludes vehicles when required bed length is unknown', () => {
+  it('keeps vehicles with unknown bed length but flags confirmation', () => {
     const r = runCampingFinder(list, { bedLength: 'min190', lengthMax: 'any', budget: 'any', condition: 'any' });
-    expect(r.exact.every((m) => m.vehicle.id !== 'd')).toBe(true);
+    const d = r.exact.find((m) => m.vehicle.id === 'd');
+    expect(d).toBeTruthy();
+    expect(d?.needsConfirmation).toBe(true);
+    expect(d?.reasons.some((x) => /Bettlänge/i.test(x.label))).toBe(true);
   });
 
   it('returns empty exact set instead of fake matches', () => {

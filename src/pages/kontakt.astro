@@ -157,7 +157,7 @@ const today = new Date().toISOString().slice(0, 10);
   }
 
   .ct-form-section {
-    scroll-margin-top: var(--header-h, 4.5rem);
+    scroll-margin-top: var(--sticky-top);
   }
 
   .ct-grid {
@@ -174,12 +174,12 @@ const today = new Date().toISOString().slice(0, 10);
 
     .ct-intro {
       position: sticky;
-      top: calc(var(--header-h, 4.5rem) + 1.5rem);
+      top: calc(var(--sticky-top) + 1.5rem);
     }
   }
 
   .ct-card {
-    scroll-margin-top: calc(var(--header-h, 4.5rem) + 1rem);
+    scroll-margin-top: calc(var(--sticky-top) + 1rem);
   }
 
   .ct-notes {

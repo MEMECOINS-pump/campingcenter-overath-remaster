@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer.astro';
 import CookieConsent from '@/components/layout/CookieConsent.astro';
 import CompareTray from '@/components/vehicles/CompareTray.astro';
 import ChatWidget from '@/components/layout/ChatWidget.astro';
+import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
 import { organizationSchema } from '@/lib/schema';
 
 interface Props extends SeoProps {
@@ -53,6 +54,7 @@ const {
     <slot name="sticky" />
     {compareTray && <CompareTray />}
     <ChatWidget />
+    <AccessibilityPrefs />
     <CookieConsent />
     <div class="toast" role="status" aria-live="polite" data-toast></div>
     <script>

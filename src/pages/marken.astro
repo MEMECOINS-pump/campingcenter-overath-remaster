@@ -132,7 +132,7 @@ const inStock = (make?: string) => (make ? vehicles.filter((v) => v.make === mak
     display: grid;
     gap: 1.25rem;
     padding: 1.5rem;
-    scroll-margin-top: calc(var(--header-h, 4.5rem) + 1rem);
+    scroll-margin-top: calc(var(--sticky-top) + 1rem);
   }
 
   .mk-brand:target {

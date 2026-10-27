@@ -60,7 +60,7 @@ import { url } from '@/lib/url';
     position: fixed;
     inset-inline: 0.6rem;
     bottom: calc(var(--actionbar-h) + var(--safe-bottom) + 0.6rem);
-    z-index: 45;
+    z-index: var(--z-cookie, 90);
     max-width: 44rem;
     margin-inline: auto;
     padding: 1rem 1.1rem;

@@ -9,7 +9,7 @@ interface Props {
   title?: string;
   eyebrow?: string;
 }
-const { title = 'Wir freuen uns auf deinen Besuch.', eyebrow = 'Kontakt & Anfahrt' } = Astro.props;
+const { title = 'Wir sind für dich da.', eyebrow = 'Kontakt & Anfahrt' } = Astro.props;
 ---
 
 <section class="section section-sand contact" aria-labelledby="contact-title">
@@ -24,10 +24,10 @@ const { title = 'Wir freuen uns auf deinen Besuch.', eyebrow = 'Kontakt & Anfahr
 
       <div class="contact-actions">
         <a class="btn btn-accent btn-lg" href={company.phone.href} data-track="call_click" data-track-location="contact-section">
-          <Icon name="phone" /> Anrufen
+          <Icon name="phone" /> Jetzt anrufen
         </a>
         <a class="btn btn-lg" href={`mailto:${company.email}`} data-track="email_click" data-track-location="contact-section">
-          <Icon name="mail" /> E-Mail schreiben
+          <Icon name="mail" /> Nachricht schreiben
         </a>
         <a class="btn btn-ghost btn-lg" href={company.directions} target="_blank" rel="noopener" data-track="route_click" data-track-location="contact-section">
           <Icon name="route" /> Route planen
