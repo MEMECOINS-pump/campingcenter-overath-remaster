@@ -7,19 +7,14 @@
  * - every minute boundary
  * - tab visibility restore
  * - View Transitions (cco:refresh-open / window.__ccoRefreshOpen)
+ * Precedence: manual > special > holiday policy > weekly.
  * Pill, hours sheet banner, companion dataset, and open-state badges stay in sync.
  */
-import { schedulePayload } from '@/lib/opening-hours';
-import { holidaysAround } from '@/data/holidays';
+import { openingBootPayload } from '@/lib/opening-hours';
 
 export function buildBootScript(): string {
   const year = new Date().getFullYear();
-  const payload = {
-    schedule: schedulePayload(),
-    holidays: holidaysAround(year)
-      .concat(holidaysAround(year + 1))
-      .filter((h, i, arr) => arr.findIndex((x) => x.date === h.date) === i),
-  };
+  const payload = openingBootPayload(year);
   const json = JSON.stringify(payload).replace(/</g, '\\u003c');
 
   return `(function(){
@@ -73,19 +68,42 @@ function dayHoursFor(day){
   for(var i=0;i<D.schedule.length;i++){if(D.schedule[i].d===day)return D.schedule[i].h;}
   return null;
 }
+function findOverride(list,iso){
+  if(!list)return null;
+  for(var i=0;i<list.length;i++){if(list[i].date===iso)return list[i];}
+  return null;
+}
+/** Precedence: manual > special > holiday policy > weekly */
+function resolveHours(iso,day){
+  var man=findOverride(D.manual,iso);
+  if(man){
+    if(man.closed||!man.hours||!man.hours.length)return{kind:'closed',reason:'manual',label:man.label,hours:null};
+    return{kind:'hours',reason:'manual',label:man.label,hours:man.hours};
+  }
+  var spe=findOverride(D.special,iso);
+  if(spe){
+    if(spe.closed||!spe.hours||!spe.hours.length)return{kind:'closed',reason:'special',label:spe.label,hours:null};
+    return{kind:'hours',reason:'special',label:spe.label,hours:spe.hours};
+  }
+  var hol=D.holidays.find(function(h){return h.date===iso;})||null;
+  var policy=D.holidayPolicy||'closed';
+  if(hol&&policy==='closed')return{kind:'closed',reason:'holiday',label:hol.name,hours:null,holiday:hol};
+  var hours=dayHoursFor(day);
+  if(!hours||!hours.length)return{kind:'closed',reason:'sunday',label:'Planmäßig geschlossen',hours:null,holiday:hol};
+  return{kind:'hours',reason:'hours',label:'',hours:hours,holiday:policy==='weekly'?hol:null};
+}
 function nextOpen(fromIso,fromMin){
   for(var offset=0;offset<14;offset++){
     var iso=addDays(fromIso,offset);
-    if(D.holidays.some(function(h){return h.date===iso;}))continue;
     var di=new Date(Number(iso.slice(0,4)),Number(iso.slice(5,7))-1,Number(iso.slice(8,10))).getDay();
     var day=days[di];
-    var hours=dayHoursFor(day);
-    if(!hours||!hours[0])continue;
+    var plan=resolveHours(iso,day);
+    if(plan.kind!=='hours'||!plan.hours||!plan.hours[0])continue;
     if(offset===0){
-      for(var j=0;j<hours.length;j++){if(toMin(hours[j][0])>fromMin)return 'öffnet heute um '+hours[j][0]+' Uhr';}
+      for(var j=0;j<plan.hours.length;j++){if(toMin(plan.hours[j][0])>fromMin)return 'öffnet heute um '+plan.hours[j][0]+' Uhr';}
       continue;
     }
-    var first=hours[0][0];
+    var first=plan.hours[0][0];
     if(offset===1)return 'öffnet morgen um '+first+' Uhr';
     var when=new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long'}).format(new Date(Number(iso.slice(0,4)),Number(iso.slice(5,7))-1,Number(iso.slice(8,10))));
     return 'öffnet am '+when+' um '+first+' Uhr';
@@ -96,41 +114,53 @@ function todayHoursLabel(hours){
   if(!hours||!hours.length)return 'Heute planmäßig geschlossen';
   return 'Regulär heute: '+hours.map(function(h){return h[0]+'\u2013'+h[1];}).join(' \u00b7 ')+' Uhr';
 }
+function overrideHoursLabel(plan){
+  return plan.label+': '+plan.hours.map(function(h){return h[0]+'\u2013'+h[1];}).join(' \u00b7 ')+' Uhr';
+}
 function compute(){
   var now=berlin();
-  var hol=D.holidays.find(function(h){return h.date===now.iso;})||null;
-  var dayHours=dayHoursFor(now.day);
-  var slot=null;
-  if(!hol&&dayHours){
-    for(var j=0;j<dayHours.length;j++){
-      var a=toMin(dayHours[j][0]),b=toMin(dayHours[j][1]);
-      if(now.minutes>=a&&now.minutes<b){slot=dayHours[j];break;}
-    }
-  }
+  var plan=resolveHours(now.iso,now.day);
   var opensNext=nextOpen(now.iso,now.minutes);
-  var todayLabel=hol
-    ?('Heute Feiertag: '+hol.name+' \u2013 wir haben geschlossen')
-    :todayHoursLabel(dayHours);
-  var state,reason,label,sub='',alertName='',bannerTitle,nextLine='';
-  if(hol){
-    state='closed';reason='holiday';
-    label='Geschlossen wegen Feiertag: '+hol.name;
-    alertName=hol.name;
-    sub='Gesetzlicher Feiertag (NRW)'+(opensNext?' \u00b7 '+opensNext:'');
+  var state,reason,label,sub='',alertName='',bannerTitle,nextLine='',todayLabel;
+  if(plan.kind==='closed'){
+    state='closed';reason=plan.reason;
+    if(reason==='holiday'){
+      label='Geschlossen wegen Feiertag: '+plan.label;
+      alertName=plan.label;
+      sub='Gesetzlicher Feiertag (NRW)'+(opensNext?' \u00b7 '+opensNext:'');
+      todayLabel='Heute Feiertag: '+plan.label+' \u2013 wir haben geschlossen';
+    }else if(reason==='manual'||reason==='special'){
+      label=plan.label;
+      todayLabel=plan.label;
+      sub=opensNext||'';
+    }else{
+      label='Aktuell geschlossen';
+      todayLabel=plan.label||todayHoursLabel(null);
+      sub=opensNext||'';
+    }
     bannerTitle=label;
     nextLine=opensNext||'';
-  }else if(slot){
-    state='open';reason='hours';
-    label='Heute geöffnet \u00b7 bis '+slot[1]+' Uhr';
-    bannerTitle=label;
-    nextLine='';
   }else{
-    state='closed';
-    reason=(now.day==='Sunday'||!dayHours)?'sunday':'outside';
-    label='Aktuell geschlossen';
-    sub=opensNext||'';
-    bannerTitle=label;
-    nextLine=opensNext||'';
+    var slot=null;
+    for(var j=0;j<plan.hours.length;j++){
+      var a=toMin(plan.hours[j][0]),b=toMin(plan.hours[j][1]);
+      if(now.minutes>=a&&now.minutes<b){slot=plan.hours[j];break;}
+    }
+    todayLabel=(plan.reason==='manual'||plan.reason==='special')?overrideHoursLabel(plan):todayHoursLabel(plan.hours);
+    if(slot){
+      state='open';reason=plan.reason;
+      label='Heute geöffnet \u00b7 bis '+slot[1]+' Uhr';
+      bannerTitle=label;
+      nextLine='';
+      sub='';
+    }else{
+      state='closed';
+      reason=(plan.reason==='manual'||plan.reason==='special')?plan.reason:((now.day==='Sunday'||!dayHoursFor(now.day))?'sunday':'outside');
+      label='Aktuell geschlossen';
+      sub=opensNext||'';
+      bannerTitle=label;
+      nextLine=opensNext||'';
+    }
   }
   return{state:state,reason:reason,label:label,sub:sub,alertName:alertName,todayLabel:todayLabel,bannerTitle:bannerTitle,nextLine:nextLine};
 }

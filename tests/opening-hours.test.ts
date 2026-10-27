@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { easterSunday, holidayOn, nrwHolidaysForYear } from '@/data/holidays';
-import { computeOpenStatus } from '@/lib/opening-hours';
+import { computeOpenStatus, resolveDayPlan } from '@/lib/opening-hours';
+import type { OpenPlanContext } from '@/lib/opening-hours';
 
 /** Build a Date that is this wall-clock time in Europe/Berlin. */
 function berlinDate(isoDate: string, hh: number, mm: number): Date {
@@ -97,5 +98,81 @@ describe('computeOpenStatus with holidays', () => {
       expect(s.opensNext).toBeTruthy();
       expect(s.opensNext).not.toMatch(/heute/i);
     }
+  });
+});
+
+describe('opening precedence manual > special > holiday > weekly', () => {
+  it('manual closed beats holiday and weekly', () => {
+    // 2026-01-07 Wednesday (normal open day)
+    const ctx: OpenPlanContext = {
+      manual: [{ date: '2026-01-07', closed: true, label: 'Betriebsintern geschlossen' }],
+    };
+    const s = computeOpenStatus(berlinDate('2026-01-07', 10, 0), undefined, ctx);
+    expect(s.state).toBe('closed');
+    expect(s.reason).toBe('manual');
+    expect(s.label).toContain('Betriebsintern');
+  });
+
+  it('manual open hours beat NRW holiday closure', () => {
+    const ctx: OpenPlanContext = {
+      manual: [
+        {
+          date: '2026-01-01',
+          hours: [{ opens: '10:00', closes: '14:00' }],
+          label: 'Neujahrs-Sonderöffnung',
+        },
+      ],
+    };
+    const s = computeOpenStatus(berlinDate('2026-01-01', 11, 0), undefined, ctx);
+    expect(s.state).toBe('open');
+    expect(s.reason).toBe('manual');
+    expect(s.label).toMatch(/geöffnet/i);
+  });
+
+  it('special day beats holiday when no manual', () => {
+    const ctx: OpenPlanContext = {
+      special: [{ date: '2026-10-03', closed: true, label: 'Inventur' }],
+    };
+    const plan = resolveDayPlan('2026-10-03', 'Saturday', 2026, ctx);
+    expect(plan.kind).toBe('closed');
+    expect(plan.reason).toBe('special');
+  });
+
+  it('special open hours beat weekly when no manual', () => {
+    // Sunday normally closed
+    const ctx: OpenPlanContext = {
+      special: [
+        {
+          date: '2026-01-11',
+          hours: [{ opens: '11:00', closes: '15:00' }],
+          label: 'Tag der offenen Tür',
+        },
+      ],
+    };
+    const s = computeOpenStatus(berlinDate('2026-01-11', 12, 0), undefined, ctx);
+    expect(s.state).toBe('open');
+    expect(s.reason).toBe('special');
+  });
+
+  it('holiday policy closed still closes without overrides', () => {
+    const plan = resolveDayPlan('2026-05-01', 'Friday', 2026, { holidayPolicy: 'closed' });
+    expect(plan.kind).toBe('closed');
+    expect(plan.reason).toBe('holiday');
+  });
+
+  it('manual wins over special on same date', () => {
+    const ctx: OpenPlanContext = {
+      manual: [{ date: '2026-01-10', closed: true, label: 'Manuell zu' }],
+      special: [
+        {
+          date: '2026-01-10',
+          hours: [{ opens: '09:00', closes: '13:00' }],
+          label: 'Special offen',
+        },
+      ],
+    };
+    const plan = resolveDayPlan('2026-01-10', 'Saturday', 2026, ctx);
+    expect(plan.kind).toBe('closed');
+    expect(plan.reason).toBe('manual');
   });
 });

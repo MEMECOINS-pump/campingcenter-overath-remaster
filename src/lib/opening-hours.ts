@@ -1,5 +1,29 @@
 import { openingHours, type OpeningPeriod } from '@/data/company';
-import { holidayOn, type PublicHoliday } from '@/data/holidays';
+import { holidayOn, holidaysAround, type PublicHoliday } from '@/data/holidays';
+import {
+  holidayOpenPolicy as defaultHolidayPolicy,
+  manualOpenOverrides as defaultManual,
+  specialOpenDays as defaultSpecial,
+  type DayHours,
+  type HolidayOpenPolicy,
+  type ManualOpenOverride,
+  type SpecialOpenDay,
+} from '@/data/opening-overrides';
+
+export type OpenReason = 'manual' | 'special' | 'holiday' | 'hours' | 'sunday' | 'outside';
+
+/** Optional injection for tests / future admin payloads. */
+export interface OpenPlanContext {
+  manual?: ManualOpenOverride[];
+  special?: SpecialOpenDay[];
+  holidayPolicy?: HolidayOpenPolicy;
+}
+
+const defaultCtx = (): Required<OpenPlanContext> => ({
+  manual: defaultManual,
+  special: defaultSpecial,
+  holidayPolicy: defaultHolidayPolicy,
+});
 
 export type OpenStatus =
   | {
@@ -9,7 +33,7 @@ export type OpenStatus =
       closesAt: string;
       todayLabel: string;
       holiday: null;
-      reason: 'hours';
+      reason: OpenReason;
     }
   | {
       state: 'closed';
@@ -18,7 +42,7 @@ export type OpenStatus =
       opensNext: string | null;
       todayLabel: string;
       holiday: PublicHoliday | null;
-      reason: 'holiday' | 'hours' | 'sunday' | 'outside';
+      reason: OpenReason;
     };
 
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -71,6 +95,10 @@ function formatTodayHours(p: OpeningPeriod | undefined): string {
   return `Regulär heute: ${p.hours.map((h) => `${h.opens}–${h.closes}`).join(' · ')} Uhr`;
 }
 
+function formatOverrideHours(hours: DayHours): string {
+  return hours.map((h) => `${h.opens}–${h.closes}`).join(' · ') + ' Uhr';
+}
+
 function addCalendarDays(isoDate: string, days: number): string {
   const [y, m, d] = isoDate.split('-').map(Number);
   const dt = new Date(y!, m! - 1, d! + days);
@@ -79,27 +107,75 @@ function addCalendarDays(isoDate: string, days: number): string {
 
 function weekdayIndexFromIso(isoDate: string): number {
   const [y, m, d] = isoDate.split('-').map(Number);
-  return new Date(y!, m! - 1, d!).getDay(); // 0=Sun … local, but we built from Y-M-D as civil date
+  return new Date(y!, m! - 1, d!).getDay();
 }
 
-function nextOpenLabel(fromIso: string, fromMinutes: number, schedule: OpeningPeriod[] = openingHours): string | null {
+type DayPlan =
+  | { kind: 'closed'; reason: OpenReason; label: string; holiday: PublicHoliday | null }
+  | { kind: 'hours'; reason: OpenReason; hours: DayHours; label: string; holiday: PublicHoliday | null };
+
+/**
+ * Precedence: manual > special > holiday policy > weekly.
+ */
+export function resolveDayPlan(
+  isoDate: string,
+  weekdayName: string,
+  year = Number(isoDate.slice(0, 4)),
+  ctx: OpenPlanContext = {},
+): DayPlan {
+  const { manual, special, holidayPolicy } = { ...defaultCtx(), ...ctx };
+
+  const manualHit = manual.find((o) => o.date === isoDate);
+  if (manualHit) return planFromOverride(manualHit, 'manual');
+
+  const specialHit = special.find((o) => o.date === isoDate);
+  if (specialHit) return planFromOverride(specialHit, 'special');
+
+  const holiday = holidayOn(isoDate, year);
+  if (holiday && holidayPolicy === 'closed') {
+    return {
+      kind: 'closed',
+      reason: 'holiday',
+      label: holiday.name,
+      holiday,
+    };
+  }
+
+  const weekly = periodForDay(weekdayName);
+  if (!weekly?.hours[0]) {
+    return { kind: 'closed', reason: 'sunday', label: 'Planmäßig geschlossen', holiday };
+  }
+  return {
+    kind: 'hours',
+    reason: 'hours',
+    hours: weekly.hours,
+    label: formatTodayHours(weekly),
+    holiday: holidayPolicy === 'weekly' ? holiday : null,
+  };
+}
+
+function planFromOverride(o: ManualOpenOverride | SpecialOpenDay, reason: 'manual' | 'special'): DayPlan {
+  if (o.closed || !o.hours?.length) {
+    return { kind: 'closed', reason, label: o.label, holiday: null };
+  }
+  return { kind: 'hours', reason, hours: o.hours, label: o.label, holiday: null };
+}
+
+function nextOpenLabel(fromIso: string, fromMinutes: number, ctx: OpenPlanContext = {}): string | null {
   for (let offset = 0; offset < 14; offset++) {
     const iso = addCalendarDays(fromIso, offset);
-    const hol = holidayOn(iso);
-    if (hol) continue;
-
-    const dayIndex = weekdayIndexFromIso(iso); // 0 Sun
+    const dayIndex = weekdayIndexFromIso(iso);
     const day = dayNames[dayIndex]!;
-    const period = periodForDay(day, schedule);
-    if (!period?.hours[0]) continue;
+    const plan = resolveDayPlan(iso, day, Number(iso.slice(0, 4)), ctx);
+    if (plan.kind !== 'hours' || !plan.hours[0]) continue;
 
     if (offset === 0) {
-      const later = period.hours.find((h) => toMin(h.opens) > fromMinutes);
+      const later = plan.hours.find((h) => toMin(h.opens) > fromMinutes);
       if (later) return `öffnet heute um ${later.opens} Uhr`;
       continue;
     }
 
-    const first = period.hours[0];
+    const first = plan.hours[0];
     if (offset === 1) return `öffnet morgen um ${first.opens} Uhr`;
     const when = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }).format(
       new Date(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))),
@@ -109,46 +185,83 @@ function nextOpenLabel(fromIso: string, fromMinutes: number, schedule: OpeningPe
   return null;
 }
 
-export function computeOpenStatus(date = new Date(), schedule: OpeningPeriod[] = openingHours): OpenStatus {
+export function computeOpenStatus(
+  date = new Date(),
+  _schedule: OpeningPeriod[] = openingHours,
+  ctx: OpenPlanContext = {},
+): OpenStatus {
   const now = berlinParts(date);
-  const holiday = holidayOn(now.isoDate, now.year);
-  const today = periodForDay(now.day, schedule);
-  const opensNext = nextOpenLabel(now.isoDate, now.minutes, schedule);
+  const plan = resolveDayPlan(now.isoDate, now.day, now.year, ctx);
+  const opensNext = nextOpenLabel(now.isoDate, now.minutes, ctx);
 
-  if (holiday) {
+  if (plan.kind === 'closed') {
+    if (plan.reason === 'holiday') {
+      return {
+        state: 'closed',
+        reason: 'holiday',
+        holiday: plan.holiday,
+        opensNext,
+        shortLabel: 'FEIERTAG · Geschlossen',
+        todayLabel: `Heute Feiertag: ${plan.label} – wir haben geschlossen`,
+        label: `Geschlossen wegen Feiertag: ${plan.label}`,
+      };
+    }
+    if (plan.reason === 'manual' || plan.reason === 'special') {
+      return {
+        state: 'closed',
+        reason: plan.reason,
+        holiday: null,
+        opensNext,
+        shortLabel: 'Geschlossen',
+        todayLabel: plan.label,
+        label: plan.label,
+      };
+    }
     return {
       state: 'closed',
-      reason: 'holiday',
-      holiday,
+      reason: plan.reason,
+      holiday: null,
       opensNext,
-      shortLabel: `FEIERTAG · Geschlossen`,
-      todayLabel: `Heute Feiertag: ${holiday.name} – wir haben geschlossen`,
-      label: `Geschlossen wegen Feiertag: ${holiday.name}`,
+      shortLabel: 'Geschlossen',
+      todayLabel: plan.label,
+      label: 'Aktuell geschlossen',
     };
   }
 
-  const openSlot = today?.hours.find((h) => now.minutes >= toMin(h.opens) && now.minutes < toMin(h.closes));
+  const openSlot = plan.hours.find((h) => now.minutes >= toMin(h.opens) && now.minutes < toMin(h.closes));
   if (openSlot) {
+    const todayLabel =
+      plan.reason === 'manual' || plan.reason === 'special'
+        ? `${plan.label}: ${formatOverrideHours(plan.hours)}`
+        : plan.label;
     return {
       state: 'open',
-      reason: 'hours',
+      reason: plan.reason,
       holiday: null,
       closesAt: openSlot.closes,
       shortLabel: 'Geöffnet',
-      todayLabel: formatTodayHours(today),
+      todayLabel,
       label: `Heute geöffnet · bis ${openSlot.closes} Uhr`,
     };
   }
 
-  const reason: 'sunday' | 'outside' | 'hours' = now.day === 'Sunday' || !today ? 'sunday' : 'outside';
+  const reason: OpenReason =
+    plan.reason === 'manual' || plan.reason === 'special'
+      ? plan.reason
+      : now.day === 'Sunday' || !periodForDay(now.day)
+        ? 'sunday'
+        : 'outside';
+
   return {
     state: 'closed',
     reason,
     holiday: null,
     opensNext,
     shortLabel: 'Geschlossen',
-    todayLabel: formatTodayHours(today),
-    // opensNext belongs only in the secondary line (data-oh-sub) — never duplicate in label
+    todayLabel:
+      plan.reason === 'manual' || plan.reason === 'special'
+        ? `${plan.label}: ${formatOverrideHours(plan.hours)}`
+        : plan.label,
     label: 'Aktuell geschlossen',
   };
 }
@@ -162,6 +275,30 @@ export function schedulePayload(schedule: OpeningPeriod[] = openingHours) {
       label: formatHoursLabel(p),
     })),
   );
+}
+
+/** Inline-Boot: Wochenplan + Feiertage + Overrides + Policy. */
+export function openingBootPayload(year = new Date().getFullYear()) {
+  const { manual, special, holidayPolicy } = defaultCtx();
+  return {
+    schedule: schedulePayload(),
+    holidays: holidaysAround(year)
+      .concat(holidaysAround(year + 1))
+      .filter((h, i, arr) => arr.findIndex((x) => x.date === h.date) === i),
+    holidayPolicy,
+    manual: manual.map((o) => ({
+      date: o.date,
+      closed: Boolean(o.closed || !o.hours?.length),
+      hours: (o.hours ?? []).map((h) => [h.opens, h.closes] as [string, string]),
+      label: o.label,
+    })),
+    special: special.map((o) => ({
+      date: o.date,
+      closed: Boolean(o.closed || !o.hours?.length),
+      hours: (o.hours ?? []).map((h) => [h.opens, h.closes] as [string, string]),
+      label: o.label,
+    })),
+  };
 }
 
 function formatHoursLabel(p: OpeningPeriod): string {
