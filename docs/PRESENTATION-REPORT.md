@@ -87,5 +87,7 @@ Companion hub cards remaining: **Camping-Beratung (KI)**, **Barrierefreiheit**, 
 ## Deploy
 
 - Branch: `main`
-- CI gate: `npm run ci` green before push
+- Tip SHA: `0748428` (plus `9a910e6`, `d5d84be` cutover commits)
+- CI & Deploy run: success (build + Pages)
 - URL: https://memecoins-pump.github.io/campingcenter-overath-remaster/
+- Live smoke: DE homepage + PrestigeStrip + Companion chrome OK; `/wohnmobile/` OK; `/en/` → **404**
