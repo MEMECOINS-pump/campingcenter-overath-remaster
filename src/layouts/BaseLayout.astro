@@ -51,7 +51,8 @@ const boot = buildBootScript();
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
     <Header overlay={overlayHeader} />
     <MobileMenu />
-    <main id="main" tabindex="-1" transition:animate="none">
+    {/* No transition:animate — Astro would inject an unhashed <style> that CSP blocks. */}
+    <main id="main" tabindex="-1" data-cco-main>
       <slot />
     </main>
     <Footer />

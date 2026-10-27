@@ -1,5 +1,6 @@
 // Post-build checks on dist/: metadata, internal links, CSP compatibility, structured data.
 // Usage: node scripts/verify-dist.mjs   (reads BASE_PATH / SITE_URL like astro.config.mjs)
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
@@ -68,6 +69,19 @@ for (const file of htmlFiles) {
   if (h1 !== 1) fail(name, `${h1} × <h1>`);
   if (/\sstyle="/.test(html)) fail(name, 'Inline-style-Attribut (durch CSP blockiert)');
   if (!/http-equiv="content-security-policy"/i.test(html)) fail(name, 'CSP-Meta-Tag fehlt');
+  // Every inline <style> body must appear as a sha256-… token in style-src / style-src-elem.
+  {
+    const csp = html.match(/http-equiv="content-security-policy" content="([^"]+)"/i)?.[1] ?? '';
+    const allowed = new Set(
+      [...csp.matchAll(/'sha256-([^']+)'/g)].map((m) => m[1]),
+    );
+    for (const m of html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)) {
+      const digest = createHash('sha256').update(m[1]).digest('base64');
+      if (!allowed.has(digest)) {
+        fail(name, `Inline-<style> ohne CSP-Hash (sha256-${digest.slice(0, 12)}…, ${m[1].length} Bytes)`);
+      }
+    }
+  }
   if (/<img(?![^>]*\salt[\s=>])[^>]*>/.test(html)) fail(name, '<img> ohne alt');
 
   for (const m of html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)) {

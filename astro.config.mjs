@@ -80,6 +80,12 @@ export default defineConfig({
         "form-action 'self' https://formspree.io mailto:",
         'upgrade-insecure-requests',
       ],
+      // JS sets CSS vars for progress bars / chat resize / compare cols.
+      // Keep hashed style-src for <style> elements; allow only style attributes.
+      // View-transition CSS for main lives in global.css (no Astro-injected <style>).
+      styleDirective: {
+        resources: [{ resource: "'unsafe-inline'", kind: 'attribute' }],
+      },
     },
   },
   integrations: [

@@ -75,7 +75,9 @@
   /* chrome — no full-width utility bar. Narrow layouts keep one compact status row. */
   --header-h: 4rem;
   --header-utility-h: 2.75rem;
+  /* Holiday alert height: CSS-only (CSP blocks JS style.setProperty). */
   --header-alert-h: 0px;
+  --header-alert-h-active: 2.75rem;
   --actionbar-h: 0px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -97,6 +99,39 @@
   --z-cookie: 90;
 
   color-scheme: light;
+}
+
+/* CSP-safe holiday alert height (no JS style.setProperty). */
+html:has([data-oh-alert]:not([hidden])) {
+  --header-alert-h: var(--header-alert-h-active);
+}
+
+/* Soft-nav: disable main morph without Astro-injected VT <style> (CSP style-src hashes). */
+main#main[data-cco-main] {
+  view-transition-name: cco-main;
+}
+
+@layer astro {
+  ::view-transition-old(cco-main) {
+    animation: none;
+    opacity: 0;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-new(cco-main) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-group(cco-main) {
+    animation: none;
+  }
+}
+
+[data-astro-transition-fallback='old'] main#main[data-cco-main],
+[data-astro-transition-fallback='new'] main#main[data-cco-main] {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 @media (min-width: 64em) {

@@ -133,7 +133,7 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
     root.hidden = !show;
     empty.hidden = show;
     if (emptyTitle) emptyTitle.textContent = known.length === 1 ? 'Noch ein Fahrzeug fehlt.' : 'Noch keine Fahrzeuge im Vergleich.';
-    root.style.setProperty('--cols', String(Math.max(2, known.length)));
+    root.dataset.cols = String(Math.max(2, known.length));
 
     root.querySelectorAll<HTMLElement>('[data-cmp-row]').forEach((row) => {
       const cells = new Map(Array.from(row.querySelectorAll<HTMLElement>(':scope > [data-col]')).map((c) => [c.dataset.col, c]));
@@ -175,6 +175,18 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
 
   .cmp {
     --cols: 2;
+  }
+
+  .cmp[data-cols='2'] {
+    --cols: 2;
+  }
+
+  .cmp[data-cols='3'] {
+    --cols: 3;
+  }
+
+  .cmp[data-cols='4'] {
+    --cols: 4;
   }
 
   .cmp-empty {

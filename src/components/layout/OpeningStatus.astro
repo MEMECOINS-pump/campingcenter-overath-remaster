@@ -87,9 +87,11 @@ import { url } from '@/lib/url';
   .oh-alert {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
     gap: 0.35rem 0.55rem;
+    min-height: var(--header-alert-h-active);
+    box-sizing: border-box;
     padding: 0.35rem 0.85rem;
     background: #c2410c;
     color: #fff;

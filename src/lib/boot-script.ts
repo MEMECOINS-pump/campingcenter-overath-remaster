@@ -191,8 +191,7 @@ function paintOpen(status){
       alert.hidden=reason!=='holiday';
       var nm=root.querySelector('[data-oh-alert-name]');
       if(nm)nm.textContent=alertName;
-      var h=(reason==='holiday'&&!alert.hidden)?Math.ceil(alert.getBoundingClientRect().height):0;
-      html.style.setProperty('--header-alert-h',h+'px');
+      /* --header-alert-h comes from CSS :has([data-oh-alert]:not([hidden])). */
     }
   });
   document.querySelectorAll('span[data-open-state], .open-state[data-open-state]').forEach(function(el){
