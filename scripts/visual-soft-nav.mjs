@@ -1,18 +1,13 @@
 /**
  * Soft-nav visual FOUC check (crumbs / phero / btn-light).
- * Usage:
- *   node scripts/visual-soft-nav.mjs http://127.0.0.1:4174
- *   BASE_PATH=/campingcenter-overath-remaster node scripts/visual-soft-nav.mjs https://memecoins-pump.github.io/campingcenter-overath-remaster
+ * Pass the site root (including base path for GitHub Pages):
+ *   node scripts/visual-soft-nav.mjs http://127.0.0.1:4174/
+ *   node scripts/visual-soft-nav.mjs https://memecoins-pump.github.io/campingcenter-overath-remaster/
  */
 import { chromium } from '@playwright/test';
 
-const origin = (process.argv[2] || 'http://127.0.0.1:4174').replace(/\/$/, '');
-const basePath = (process.env.BASE_PATH || '/').replace(/\/?$/, '/') === '/' ? '' : process.env.BASE_PATH.replace(/\/$/, '');
-
-function url(p) {
-  const path = p.startsWith('/') ? p : `/${p}`;
-  return `${origin}${basePath}${path}`;
-}
+const root = (process.argv[2] || 'http://127.0.0.1:4174/').replace(/\/?$/, '/');
+const url = (p) => new URL(String(p).replace(/^\//, ''), root).href;
 
 const routes = [
   '/werkstatt-kundendienst/',
@@ -43,9 +38,7 @@ for (const route of routes) {
     document.body.appendChild(a);
     a.click();
   }, target);
-  await page.waitForURL((u) => u.href.replace(/\/$/, '') === target.replace(/\/$/, '') || u.pathname.endsWith(route), {
-    timeout: 15000,
-  });
+  await page.waitForURL((u) => u.href.replace(/\/$/, '') === target.replace(/\/$/, ''), { timeout: 15000 });
   await page.waitForTimeout(120);
   const info = await page.evaluate(() => {
     const crumbs = document.querySelector('.crumbs');
@@ -80,7 +73,7 @@ for (const route of routes) {
       info.btnFg &&
       /rgb\(255,\s*255,\s*255\)/.test(info.btnBg) &&
       /rgb\(255,\s*255,\s*255\)/.test(info.btnFg)) ||
-    (!info.hasPhero && !info.hasPageHero && route !== '/');
+    (!info.hasPhero && !info.hasPageHero);
   if (fail) failed += 1;
   console.log(`${fail ? 'FAIL' : 'OK  '} ${route} → ${info.path}`, JSON.stringify(info));
 }
