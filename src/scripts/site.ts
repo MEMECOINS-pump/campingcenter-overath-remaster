@@ -183,6 +183,7 @@ function initConsent(): void {
     lockScroll(false);
     if (!form) return;
     if (dialog.returnValue === 'all') decide(true, true);
+    else if (dialog.returnValue === 'necessary') decide(false, false);
     else if (dialog.returnValue === 'save')
       decide(
         (form.elements.namedItem('media') as HTMLInputElement).checked,

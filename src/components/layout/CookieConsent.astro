@@ -12,9 +12,9 @@ import { url } from '@/lib/url';
       </p>
     </div>
     <div class="cb-actions">
-      <button type="button" class="btn btn-ghost btn-sm" data-consent-action="necessary">Nur notwendige</button>
+      <button type="button" class="btn btn-sm" data-consent-action="all">Alle akzeptieren</button>
       <button type="button" class="btn btn-ghost btn-sm" data-consent-open>Einstellungen</button>
-      <button type="button" class="btn btn-ghost btn-sm" data-consent-action="all">Alle akzeptieren</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-action="necessary">Nur notwendige</button>
     </div>
   </div>
 </section>
@@ -49,8 +49,9 @@ import { url } from '@/lib/url';
     </label>
 
     <div class="cd-actions">
-      <button type="submit" class="btn btn-ghost" value="save">Auswahl speichern</button>
-      <button type="submit" class="btn btn-ghost" value="all">Alle akzeptieren</button>
+      <button type="submit" class="btn" value="all">Alle akzeptieren</button>
+      <button type="submit" class="btn btn-ghost" value="save">Speichern</button>
+      <button type="submit" class="btn btn-ghost" value="necessary">Nur essenzielle</button>
     </div>
   </form>
 </dialog>
@@ -80,10 +81,6 @@ import { url } from '@/lib/url';
     margin-bottom: 0.2rem;
   }
 
-  .cb-actions :global(.btn) {
-    padding-inline: 0.75rem;
-  }
-
   .cb-text p {
     font-size: var(--fs-sm);
     color: var(--text-muted);
@@ -92,22 +89,20 @@ import { url } from '@/lib/url';
 
   .cb-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 0.5rem;
   }
 
-  .cb-actions [data-consent-action='all'] {
-    grid-column: 1 / -1;
+  .cb-actions :global(.btn) {
+    width: 100%;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    justify-content: center;
   }
 
   @media (min-width: 36em) {
     .cb-actions {
-      grid-template-columns: repeat(3, auto);
-      justify-content: end;
-    }
-
-    .cb-actions [data-consent-action='all'] {
-      grid-column: auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
@@ -220,7 +215,19 @@ import { url } from '@/lib/url';
 
   .cd-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .cd-actions :global(.btn) {
+    width: 100%;
+    min-height: 2.85rem;
+    justify-content: center;
+  }
+
+  @media (min-width: 36em) {
+    .cd-actions {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 </style>
