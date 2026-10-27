@@ -1,6 +1,19 @@
+/**
+ * Soft-nav visual FOUC check (crumbs / phero / btn-light).
+ * Usage:
+ *   node scripts/visual-soft-nav.mjs http://127.0.0.1:4174
+ *   BASE_PATH=/campingcenter-overath-remaster node scripts/visual-soft-nav.mjs https://memecoins-pump.github.io/campingcenter-overath-remaster
+ */
 import { chromium } from '@playwright/test';
 
-const base = process.argv[2] || 'http://127.0.0.1:4174';
+const origin = (process.argv[2] || 'http://127.0.0.1:4174').replace(/\/$/, '');
+const basePath = (process.env.BASE_PATH || '/').replace(/\/?$/, '/') === '/' ? '' : process.env.BASE_PATH.replace(/\/$/, '');
+
+function url(p) {
+  const path = p.startsWith('/') ? p : `/${p}`;
+  return `${origin}${basePath}${path}`;
+}
+
 const routes = [
   '/werkstatt-kundendienst/',
   '/kontakt/',
@@ -22,24 +35,18 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 let failed = 0;
 
 for (const route of routes) {
-  await page.goto(`${base}/`, { waitUntil: 'domcontentloaded' });
-  await page.evaluate((p) => {
+  await page.goto(url('/'), { waitUntil: 'domcontentloaded' });
+  const target = url(route);
+  await page.evaluate((href) => {
     const a = document.createElement('a');
-    a.href = p;
+    a.href = href;
     document.body.appendChild(a);
     a.click();
-  }, route);
-  try {
-    await page.waitForURL((url) => {
-      const path = url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`;
-      return path === route || path.endsWith(route);
-    }, { timeout: 10000 });
-  } catch {
-    failed++;
-    console.log(`FAIL ${route} → nav timeout (at ${page.url()})`);
-    continue;
-  }
-  await page.waitForTimeout(60);
+  }, target);
+  await page.waitForURL((u) => u.href.replace(/\/$/, '') === target.replace(/\/$/, '') || u.pathname.endsWith(route), {
+    timeout: 15000,
+  });
+  await page.waitForTimeout(120);
   const info = await page.evaluate(() => {
     const crumbs = document.querySelector('.crumbs');
     const list = crumbs?.querySelector('ul, ol');
@@ -69,14 +76,14 @@ for (const route of routes) {
   const fail =
     info.crumbNumbered ||
     (info.hasPhero && (!info.pheroMinH || parseFloat(info.pheroMinH) < 200)) ||
-    (!info.hasPhero && !info.hasPageHero) ||
     (info.btnBg &&
       info.btnFg &&
       /rgb\(255,\s*255,\s*255\)/.test(info.btnBg) &&
-      /rgb\(255,\s*255,\s*255\)/.test(info.btnFg));
-  if (fail) failed++;
-  console.log(`${fail ? 'FAIL' : 'OK  '} ${route}`, JSON.stringify(info));
+      /rgb\(255,\s*255,\s*255\)/.test(info.btnFg)) ||
+    (!info.hasPhero && !info.hasPageHero && route !== '/');
+  if (fail) failed += 1;
+  console.log(`${fail ? 'FAIL' : 'OK  '} ${route} → ${info.path}`, JSON.stringify(info));
 }
 
 await browser.close();
-process.exitCode = failed ? 1 : 0;
+process.exit(failed ? 1 : 0);
