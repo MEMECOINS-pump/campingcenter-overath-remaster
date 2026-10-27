@@ -119,17 +119,19 @@ const cover = v.images[0];
     box-shadow: var(--shadow-sm);
     transition:
       transform var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease);
+      box-shadow var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
   }
 
   @media (hover: hover) {
     .vcard:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
       box-shadow: var(--shadow);
+      border-color: var(--brand-soft);
     }
 
     .vcard:hover .vcard-media img {
-      transform: scale(1.035);
+      transform: scale(1.04);
     }
   }
 

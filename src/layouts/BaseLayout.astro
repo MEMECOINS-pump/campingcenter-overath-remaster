@@ -65,7 +65,7 @@ const boot = buildBootScript();
     {compareTray && <CompareTray />}
     <CampingCompanion lang={lang} transition:persist="cco-companion" />
     <ChatWidget lang={lang} transition:persist="cco-chat" />
-    <CookieConsent lang={lang} transition:persist="cco-consent" />
+    <CookieConsent lang={lang} />
     <div class="toast" role="status" aria-live="polite" data-toast transition:persist="cco-toast"></div>
     <script>
       import '@/scripts/site';

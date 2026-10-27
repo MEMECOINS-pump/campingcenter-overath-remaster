@@ -140,6 +140,27 @@ body {
   padding-bottom: calc(var(--actionbar-h) + var(--safe-bottom));
 }
 
+/* Softer page swaps (View Transitions) */
+@keyframes cco-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cco-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: 160ms var(--ease) both cco-fade-out;
+  }
+  ::view-transition-new(root) {
+    animation: 220ms var(--ease-out) both cco-fade-in;
+  }
+}
+
 img,
 picture,
 video,
@@ -1201,6 +1222,17 @@ body.scroll-locked {
   body.page-ankauf.bar-hidden,
   body.page-ankauf.kb-open {
     --actionbar-h: 0px;
+  }
+}
+
+/* Early consent: boot sets .needs-consent before paint – lift FABs without waiting for site.ts */
+html.needs-consent {
+  --consent-lift: min(42vh, 12.5rem);
+}
+
+@media (min-width: 64em) {
+  html.needs-consent {
+    --consent-lift: min(38vh, 11rem);
   }
 }
 
