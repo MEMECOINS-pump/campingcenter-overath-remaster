@@ -142,6 +142,17 @@ describe('runCampingFinder', () => {
     expect(r.hasExact).toBe(false);
     expect(r.exact).toHaveLength(0);
   });
+
+  it('applies family-mode soft boost for 4+ persons without inventing specs', () => {
+    const family = runCampingFinder(list, { persons: '4', sleeps: '4', budget: 'any', condition: 'any', lengthMax: 'any' });
+    const soloish = runCampingFinder(list, { persons: '2', sleeps: '4', budget: 'any', condition: 'any', lengthMax: 'any' });
+    const familyAlkoven = family.exact.find((m) => m.vehicle.id === 'c');
+    const soloAlkoven = soloish.exact.find((m) => m.vehicle.id === 'c');
+    expect(familyAlkoven).toBeTruthy();
+    expect(soloAlkoven).toBeTruthy();
+    expect((familyAlkoven?.score ?? 0) > (soloAlkoven?.score ?? 0)).toBe(true);
+    expect(familyAlkoven?.reasons.some((x) => /familie/i.test(x.label))).toBe(true);
+  });
 });
 
 describe('runFinder legacy bridge', () => {

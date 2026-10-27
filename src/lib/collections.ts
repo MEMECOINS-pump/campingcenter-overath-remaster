@@ -7,7 +7,7 @@ const KEYS: Record<CollectionName, string> = {
   compare: 'cco:compare',
 };
 
-export const COMPARE_MAX = 3;
+export const COMPARE_MAX = 4;
 export const COLLECTION_EVENT = 'cco:collection';
 
 export function readCollection(name: CollectionName): string[] {

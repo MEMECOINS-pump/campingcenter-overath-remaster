@@ -13,11 +13,18 @@ describe('CampingCompanion hub', () => {
 
     expect(companion).toContain('data-companion');
     expect(companion).toContain('companion-fab');
-    expect(companion).toContain('Dein Reisebegleiter');
-    expect(companion).toMatch(/Hilfe.*Barrierefreiheit/);
+    expect(companion).toContain('Hilfe & Service');
+    expect(companion).toContain('Assistenten-Zentrum');
+    expect(companion).toContain('Camping-KI');
+    expect(companion).toContain('Kontakt & Service');
+    expect(companion).toMatch(/Premium Kompass/);
+    expect(companion).not.toContain('Minimalist motorhome');
+    expect(companion).not.toMatch(/<rect x="4" y="18" width="28"/);
     expect(companion).toContain('data-companion-action="chat"');
     expect(companion).toContain('data-companion-action="a11y"');
+    expect(companion).toContain('data-companion-action="contact"');
     expect(companion).not.toContain('data-companion-action="lang"');
+    expect(companion).not.toContain('companion-lang-');
     expect(companion).toContain('cco:open-chat');
 
     expect(chat).not.toContain('chatw-fab');

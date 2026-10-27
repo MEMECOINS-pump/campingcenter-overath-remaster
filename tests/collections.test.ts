@@ -20,12 +20,13 @@ describe('collections', () => {
   });
 
   it(`limits the comparison to ${COMPARE_MAX} vehicles`, () => {
-    for (const id of ['a', 'b', 'c']) expect(toggleItem('compare', id)).toBe(true);
-    expect(toggleItem('compare', 'd')).toBeNull();
-    expect(readCollection('compare')).toEqual(['a', 'b', 'c']);
+    expect(COMPARE_MAX).toBe(4);
+    for (const id of ['a', 'b', 'c', 'd']) expect(toggleItem('compare', id)).toBe(true);
+    expect(toggleItem('compare', 'e')).toBeNull();
+    expect(readCollection('compare')).toEqual(['a', 'b', 'c', 'd']);
     removeItem('compare', 'b');
-    expect(toggleItem('compare', 'd')).toBe(true);
-    expect(readCollection('compare')).toEqual(['a', 'c', 'd']);
+    expect(toggleItem('compare', 'e')).toBe(true);
+    expect(readCollection('compare')).toEqual(['a', 'c', 'd', 'e']);
   });
 
   it('notifies listeners and survives corrupt storage', () => {

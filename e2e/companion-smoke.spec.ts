@@ -19,6 +19,8 @@ test.describe('CampingCompanion smoke', () => {
     await expect(page.locator('[data-companion-action="lang"]')).toHaveCount(0);
     await expect(page.locator('[data-companion-action="chat"]')).toBeVisible();
     await expect(page.locator('[data-companion-action="a11y"]')).toBeVisible();
+    await expect(page.locator('[data-companion-action="contact"]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Hilfe & Service' })).toBeVisible();
 
     await page.locator('[data-companion-close]').click();
     await expect(page.locator('[data-companion-panel]')).not.toHaveAttribute('open');

@@ -306,6 +306,24 @@ function softScore<T extends FilterableVehicle>(v: T, a: FinderAnswers): { score
     }
   }
 
+  // Family-Mode: Soft-Boost bei 4 / 5+ Personen (kein Hard-Filter, keine erfundenen Specs)
+  const familyMode = a.persons === '4' || a.persons === '5plus';
+  if (familyMode) {
+    if (v.beds.some((b) => b.type === 'etagenbett' || b.type === 'hubbett')) {
+      score += 2;
+      reasons.push({ label: 'familienfreundliche Bettform', ok: true });
+    }
+    if (v.category === 'alkoven') {
+      score += 1.5;
+      reasons.push({ label: 'Alkoven – oft familientauglich', ok: true });
+    }
+    const minSleeps = personsToMin(a.persons);
+    if (minSleeps !== null && v.sleepingPlaces != null && v.sleepingPlaces >= minSleeps + 1) {
+      score += 1;
+      reasons.push({ label: 'Reserve an Schlafplätzen', ok: true });
+    }
+  }
+
   if (a.lengthMax === 'any' && v.lengthMm != null) score += 0.5;
   if (v.price > 0) score += 0.25;
   return { score, reasons };
