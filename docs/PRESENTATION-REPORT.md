@@ -73,16 +73,15 @@ Companion hub cards remaining: **Camping-Beratung (KI)**, **Barrierefreiheit**, 
 | `npm run ci` (check, lint, unit, build, verify-dist) | Green |
 | No `/en/` in dist | Confirmed |
 | Companion DE markup (chat + a11y, no lang) | Confirmed in `dist/index.html` |
-| Live smoke after Pages deploy | Pending deploy watch |
+| Live smoke after Pages deploy | Green — homepage `lang=de`, companion FAB, no Sprache card, no `/en/` |
 | Mail delivery / AI worker secrets | Not tested live (needs real keys) |
 | Playwright e2e against production | Specs updated; full e2e not required for `npm run ci` |
 
 ## Remaining
 
-1. Watch GitHub Pages workflow after push; re-smoke live homepage, Companion, Wohnmobile.
-2. Confirm Formspree/AI worker env on Pages if client wants live AI answers (local rules still answer offline).
-3. Optional: deeper mobile device QA (320/375/430) and rental form submit with real inbox.
-4. Do not reintroduce `/en/` or `cco:lang` redirects.
+1. Confirm Formspree/AI worker env on Pages if client wants live AI answers (local rules still answer offline).
+2. Optional: deeper mobile device QA (320/375/430) and rental form submit with real inbox.
+3. Do not reintroduce `/en/` or `cco:lang` redirects.
 
 ## Deploy
 
