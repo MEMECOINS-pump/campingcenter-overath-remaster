@@ -274,13 +274,36 @@ function initReveal(): void {
   items.forEach((el) => io.observe(el));
 }
 
+/** Hours pill opens the sheet. Status text is painted by the boot script. */
+function initOpeningSheet(): void {
+  $$<HTMLElement>('[data-opening-status]').forEach((root) => {
+    if (root.hasAttribute('data-bound')) return;
+    root.setAttribute('data-bound', '');
+    const sheet = root.querySelector<HTMLDialogElement>('[data-oh-sheet]');
+    const opener = root.querySelector<HTMLButtonElement>('[data-oh-open]');
+    if (!sheet || !opener) return;
+    const setExpanded = (open: boolean) => opener.setAttribute('aria-expanded', String(open));
+    opener.addEventListener('click', () => {
+      openModal(sheet, opener);
+      setExpanded(true);
+    });
+    root.querySelector('[data-oh-close]')?.addEventListener('click', () => sheet.close());
+    sheet.addEventListener('click', (e) => {
+      if (e.target === sheet) sheet.close();
+    });
+    sheet.addEventListener('close', () => setExpanded(false));
+  });
+}
+
 initHeader();
 initMenu();
 initKeyboardAwareness();
 initConsent();
 initCollections();
 initReveal();
+initOpeningSheet();
 bindTrackAttributes();
+document.addEventListener('astro:page-load', initOpeningSheet);
 
 document.addEventListener('astro:after-swap', () => {
   const html = document.documentElement;
