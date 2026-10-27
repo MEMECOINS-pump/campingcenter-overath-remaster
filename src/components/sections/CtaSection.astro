@@ -1,6 +1,7 @@
 ---
 import Photo from '@/components/ui/Photo.astro';
 import Icon from '@/components/ui/Icon.astro';
+import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
 
 interface Props {
@@ -8,12 +9,15 @@ interface Props {
   text?: string;
   primary?: { label: string; href: string };
   secondary?: { label: string; href: string };
+  lang?: Locale;
 }
+const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+const L = (path: string) => url(localizedPath(path, lang));
 const {
-  title = 'Bereit für dein nächstes Abenteuer?',
-  text = 'Ob kaufen, mieten oder erst einmal beraten lassen – wir helfen dir dabei, den Camper zu finden, der zu deinem Leben passt.',
-  primary = { label: 'Fahrzeuge entdecken', href: '/wohnmobile/' },
-  secondary = { label: 'Beratung vereinbaren', href: '/kontakt/#beratung' },
+  title = t(lang, 'ctaTitle'),
+  text = t(lang, 'ctaText'),
+  primary = { label: t(lang, 'heroCtaVehicles'), href: '/wohnmobile/' },
+  secondary = { label: t(lang, 'heroCtaAdvice'), href: '/kontakt/#beratung' },
 } = Astro.props;
 ---
 
@@ -26,10 +30,10 @@ const {
     <h2 id="cta-title">{title}</h2>
     <p>{text}</p>
     <div class="btn-row">
-      <a class="btn btn-accent btn-lg" href={url(primary.href)} data-track="cta_click" data-track-location="final-cta">
+      <a class="btn btn-accent btn-lg" href={L(primary.href)} data-track="cta_click" data-track-location="final-cta">
         {primary.label} <Icon name="arrow-right" class="arrow" />
       </a>
-      <a class="btn btn-glass btn-lg" href={url(secondary.href)} data-track="cta_click" data-track-location="final-cta">{secondary.label}</a>
+      <a class="btn btn-glass btn-lg" href={L(secondary.href)} data-track="cta_click" data-track-location="final-cta">{secondary.label}</a>
     </div>
   </div>
 </section>
@@ -52,7 +56,6 @@ const {
     z-index: -1;
   }
 
-  .cta-media :global(picture),
   .cta-media :global(img) {
     width: 100%;
     height: 100%;
@@ -60,28 +63,30 @@ const {
   }
 
   .cta-shade {
-    background: rgb(14 12 10 / 0.6);
+    background: linear-gradient(to top, rgb(14 12 10 / 0.88), rgb(14 12 10 / 0.45));
   }
 
   .cta-inner {
     display: grid;
-    align-content: center;
+    gap: 1rem;
     justify-items: center;
-    gap: 1.1rem;
-    padding-block: var(--section);
+    align-content: center;
+    padding-block: clamp(3rem, 2rem + 5vw, 5rem);
   }
 
-  .cta h2 {
-    font-size: var(--fs-3xl);
+  .cta-inner h2 {
+    max-width: 16ch;
+    margin: 0;
+    color: #fff;
   }
 
-  .cta p {
+  .cta-inner p {
     max-width: 36rem;
-    font-size: var(--fs-lg);
+    margin: 0;
     color: rgb(255 255 255 / 0.9);
   }
 
-  .cta .btn-row {
+  .cta-inner .btn-row {
     justify-content: center;
     margin-top: 0.75rem;
   }

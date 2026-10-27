@@ -1,7 +1,7 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
 import { cardFacts, isNewToInventory, priceLabel, vehicleImage, vehicleSrcset, type Vehicle } from '@/lib/vehicles';
-import { getLangFromPath, type Locale } from '@/i18n';
+import { getLangFromPath, localizedPath, type Locale } from '@/i18n';
 import { glossary, g, translateCategoryLabel, translateCondition } from '@/i18n/glossary';
 import { url } from '@/lib/url';
 
@@ -27,7 +27,7 @@ const {
 const lang = langProp ?? getLangFromPath(Astro.url.pathname);
 const newInventory = showNewInventoryBadge && isNewToInventory(v);
 const Heading = headingLevel === 2 ? 'h2' : 'h3';
-const href = url(`/wohnmobile/${v.slug}/`);
+const href = url(localizedPath(`/wohnmobile/${v.slug}/`, lang));
 const cover = v.images[0];
 ---
 

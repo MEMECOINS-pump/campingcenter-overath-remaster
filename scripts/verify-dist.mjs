@@ -14,7 +14,7 @@ const requiredRoutes = [
   'datenschutz/', 'agb/', 'barrierefreiheitserklaerung/', 'download/', 'danke/',
   // EN counterparts (chrome + page bodies)
   'en/', 'en/kontakt/', 'en/wohnmobile/', 'en/vermietung-wohnmobile/', 'en/wohnmobil-ankauf/',
-  'en/werkstatt-kundendienst/', 'en/ueber-uns/', 'en/camper-finder/', 'en/marken/',
+  'en/werkstatt-kundendienst/', 'en/ueber-uns/', 'en/camper-finder/', 'en/marken/', 'en/merkliste/',
 ];
 const requiredFiles = ['404.html', 'robots.txt', 'sitemap-index.xml', '.nojekyll', 'site.webmanifest'];
 
@@ -44,6 +44,7 @@ for (const f of requiredFiles) if (!existsSync(join(DIST, f))) fail(f, 'Pflichtd
 function target(href) {
   if (!href.startsWith(base) || href.startsWith('//')) return null;
   const path = decodeURIComponent(href.slice(base.length).split(/[?#]/)[0]);
+  if (path === '404' || path === '404/') return join(DIST, '404.html');
   if (!path || path.endsWith('/')) return join(DIST, path, 'index.html');
   return join(DIST, path);
 }

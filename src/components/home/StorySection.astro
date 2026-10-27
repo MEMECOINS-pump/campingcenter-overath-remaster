@@ -2,29 +2,44 @@
 import Photo from '@/components/ui/Photo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { story } from '@/data/content';
-import { company } from '@/data/company';
+import { storyEn } from '@/data/content-en';
+import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
+
+interface Props {
+  lang?: Locale;
+}
+const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+const L = (path: string) => url(localizedPath(path, lang));
+const copy = lang === 'en' ? storyEn : story;
 ---
 
 <section class="section section-sand story" aria-labelledby="story-title">
   <div class="container split">
     <div class="story-media reveal">
       <div class="story-main">
-        <Photo src="team" alt="Das Team des Campingcenter Overath vor einem Wohnmobil" sizes="(min-width: 60em) 40vw, 92vw" widths={[480, 768, 1080]} />
+        <Photo
+          src="team"
+          alt={lang === 'en' ? 'The Campingcenter Overath team in front of a motorhome' : 'Das Team des Campingcenter Overath vor einem Wohnmobil'}
+          sizes="(min-width: 60em) 40vw, 92vw"
+          widths={[480, 768, 1080]}
+        />
       </div>
       <div class="story-badge">
-        <strong>{company.foundedStatement}</strong>
-        <span>Camping-Kompetenz in der Weberstraße</span>
+        <strong>{t(lang, 'brandFounded')}</strong>
+        <span>{t(lang, 'storyBadge')}</span>
       </div>
     </div>
     <div class="story-copy">
-      <p class="eyebrow">Über uns</p>
-      <h2 id="story-title">Von Campern für Camper.</h2>
-      <p class="lead">{story.lead}</p>
-      <p>{story.body[0]}</p>
+      <p class="eyebrow">{t(lang, 'storyEyebrow')}</p>
+      <h2 id="story-title">{t(lang, 'storyTitle')}</h2>
+      <p class="lead">{copy.lead}</p>
+      <p>{copy.body[0]}</p>
       <div class="btn-row">
-        <a class="btn" href={url('/ueber-uns/')}>Unsere Geschichte <Icon name="arrow-right" class="arrow" /></a>
-        <a class="btn btn-ghost" href={url('/kontakt/')}>Besuch uns in Overath</a>
+        <a class="btn" href={L('/ueber-uns/')}>
+          {t(lang, 'storyCta')} <Icon name="arrow-right" class="arrow" />
+        </a>
+        <a class="btn btn-ghost" href={L('/kontakt/')}>{t(lang, 'storyVisit')}</a>
       </div>
     </div>
   </div>
@@ -39,48 +54,39 @@ import { url } from '@/lib/url';
   .story-main {
     overflow: hidden;
     border-radius: var(--radius-lg);
-    aspect-ratio: 4 / 3;
-    box-shadow: var(--shadow);
   }
 
   .story-main :global(img) {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
   }
 
   .story-badge {
     position: absolute;
-    right: 1rem;
+    left: 1rem;
     bottom: 0;
     display: grid;
     gap: 0.15rem;
-    max-width: 15rem;
-    padding: 1rem 1.2rem;
+    max-width: 16rem;
+    padding: 0.9rem 1rem;
     border-radius: var(--radius);
-    background: var(--graphite);
-    color: #fff;
-    box-shadow: var(--shadow-lg);
+    background: var(--white);
+    box-shadow: var(--shadow-md);
   }
 
   .story-badge strong {
-    font-family: var(--font-head);
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: #ffc778;
+    font-size: 1.05rem;
   }
 
   .story-badge span {
-    font-size: var(--fs-sm);
-    color: rgb(255 255 255 / 0.85);
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
   }
 
   .story-copy {
     display: grid;
-    gap: 1.1rem;
-  }
-
-  .story-copy .btn-row {
-    margin-top: 0.5rem;
+    gap: 1rem;
+    align-content: start;
   }
 </style>

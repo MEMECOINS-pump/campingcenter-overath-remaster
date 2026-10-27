@@ -101,22 +101,26 @@ const secondary = [
           {
             openingHours.map((p) => (
               <div>
-                <dt>{p.shortDays}</dt>
-                <dd>{formatHours(p)}</dd>
+                <dt>{lang === 'en' ? (p.schemaDays.includes('Saturday') ? 'Sat' : 'Mon–Fri') : p.shortDays}</dt>
+                <dd>
+                  {lang === 'en'
+                    ? p.hours.map((h) => `${h.opens}–${h.closes}`).join(' / ')
+                    : formatHours(p)}
+                </dd>
               </div>
             ))
           }
           <div>
-            <dt>So / Feiertag</dt>
-            <dd>geschlossen</dd>
+            <dt>{t(lang, 'daysSundayHoliday')}</dt>
+            <dd>{t(lang, 'closed')}</dd>
           </div>
         </dl>
       </section>
     </div>
 
     <div class="mm-bottom">
-      <a class="btn btn-accent btn-block btn-lg" href={url('/kontakt/#beratung')} data-track="cta_click" data-track-location="mobile-menu">
-        Beratung vereinbaren
+      <a class="btn btn-accent btn-block btn-lg" href={L('/kontakt/#beratung')} data-track="cta_click" data-track-location="mobile-menu">
+        {t(lang, 'bookAdvice')}
       </a>
     </div>
   </div>

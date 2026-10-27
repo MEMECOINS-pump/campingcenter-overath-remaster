@@ -45,4 +45,13 @@ test.describe('CampingCompanion smoke', () => {
     await contrast.click();
     await expect(page.locator('html')).not.toHaveClass(/a11y-contrast/);
   });
+
+  test('pref en redirects DE home to /en/ and keeps nav under /en', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('cco:lang', 'en'));
+    await page.goto(path('/'));
+    await expect(page).toHaveURL(/\/en\/?$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', /en/);
+    const href = await page.locator('a.header-cta').first().getAttribute('href');
+    expect(href || '').toMatch(/\/en\//);
+  });
 });

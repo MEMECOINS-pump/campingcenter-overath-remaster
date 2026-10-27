@@ -45,4 +45,21 @@ describe('i18n routing', () => {
     expect(formatLengthLocalized(6990, 'de')).toBe('6,99 m');
     expect(formatLengthLocalized(6990, 'en')).toBe('6.99 m');
   });
+
+  it('localizes vehicle detail and wishlist routes', () => {
+    expect(localizedPath('/wohnmobile/demo-slug/', 'en')).toBe('/en/wohnmobile/demo-slug/');
+    expect(localizedPath('/merkliste/', 'en')).toBe('/en/merkliste/');
+    expect(switchLocalePath('/wohnmobile/demo-slug/', 'en')).toBe('/en/wohnmobile/demo-slug/');
+  });
+
+  it('has English UI for chrome, home, detail, wishlist', () => {
+    const keys = ['heroTitle', 'footerAllMh', 'detailEnquire', 'detailSpecs', 'wishlistH1', 'wishlistEmptyTitle', 'brandMotto', 'favSave'] as const;
+    for (const key of keys) {
+      const en = t('en', key);
+      const de = t('de', key);
+      expect(en.length).toBeGreaterThan(0);
+      expect(en).not.toBe(de);
+      expect(en).not.toMatch(/[\u00e4\u00f6\u00fc\u00c4\u00d6\u00dc\u00df]/);
+    }
+  });
 });

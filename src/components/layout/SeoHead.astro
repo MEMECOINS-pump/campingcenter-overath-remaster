@@ -4,6 +4,7 @@ import { absoluteUrl, url } from '@/lib/url';
 import { company } from '@/data/company';
 import {
   getLangFromPath,
+  hasEnRoute,
   localizedPath,
   ogLocale,
   stripLocale,
@@ -45,7 +46,8 @@ const ogImage = image
   ? new URL(image, Astro.site ?? 'http://localhost:4321').href
   : absoluteUrl('/og-default.jpg', Astro.site);
 const deHref = absoluteUrl(localizedPath(barePath, 'de'), Astro.site);
-const enHref = absoluteUrl(localizedPath(barePath, 'en'), Astro.site);
+const bareNorm = barePath.endsWith('/') || barePath === '/' ? barePath : `${barePath}/`;
+const enHref = absoluteUrl(hasEnRoute(bareNorm) ? localizedPath(barePath, 'en') : localizedPath(barePath, 'de'), Astro.site);
 const altDe =
   imageAlt ??
   (lang === 'en'

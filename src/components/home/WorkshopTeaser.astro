@@ -3,7 +3,17 @@ import Photo from '@/components/ui/Photo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { serviceGroups, workshopHighlights } from '@/data/services';
+import { serviceGroupsEn, workshopHighlightsEn } from '@/data/content-en';
+import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
+
+interface Props {
+  lang?: Locale;
+}
+const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+const L = (path: string) => url(localizedPath(path, lang));
+const highlights = lang === 'en' ? workshopHighlightsEn : workshopHighlights;
+const groups = lang === 'en' ? serviceGroupsEn : serviceGroups;
 ---
 
 <section class="section workshop" aria-labelledby="workshop-title">
@@ -12,13 +22,13 @@ import { url } from '@/lib/url';
       <div class="ws-copy">
         <SectionHeader
           id="workshop-title"
-          eyebrow="Werkstatt & Kundendienst"
-          title="Dein Camper verdient den besten Service."
-          lead="Vom Sicherheitscheck bis zur Nachrüstung: Unsere Fachwerkstatt kümmert sich um Wohnmobile und Wohnwagen – spezialisiert auf Nässe- und GFK-Schäden."
+          eyebrow={t(lang, 'wsTeaserEyebrow')}
+          title={t(lang, 'wsTeaserTitle')}
+          lead={t(lang, 'wsTeaserLead')}
         />
         <ul class="ws-highlights">
           {
-            workshopHighlights.map((h) => (
+            highlights.map((h) => (
               <li>
                 <Icon name="check" />
                 <div>
@@ -30,22 +40,29 @@ import { url } from '@/lib/url';
           }
         </ul>
         <div class="btn-row">
-          <a class="btn btn-accent" href={url('/werkstatt-kundendienst/#termin')} data-track="cta_click" data-track-location="workshop-teaser">
-            Werkstatt-Termin anfragen
+          <a class="btn btn-accent" href={L('/werkstatt-kundendienst/#termin')} data-track="cta_click" data-track-location="workshop-teaser">
+            {t(lang, 'wsTeaserCta')}
           </a>
-          <a class="btn btn-ghost" href={url('/werkstatt-kundendienst/')}>Werkstatt entdecken <Icon name="arrow-right" class="arrow" /></a>
+          <a class="btn btn-ghost" href={L('/werkstatt-kundendienst/')}>
+            {t(lang, 'wsTeaserMore')} <Icon name="arrow-right" class="arrow" />
+          </a>
         </div>
       </div>
       <div class="ws-media reveal">
-        <Photo src="workshop-interior" alt="Blick in die Werkstatt des Campingcenter Overath" sizes="(min-width: 64em) 36vw, 92vw" widths={[480, 768, 1080]} />
+        <Photo
+          src="workshop-interior"
+          alt={lang === 'en' ? 'Inside the Campingcenter Overath workshop' : 'Blick in die Werkstatt des Campingcenter Overath'}
+          sizes="(min-width: 64em) 36vw, 92vw"
+          widths={[480, 768, 1080]}
+        />
       </div>
     </div>
 
     <ul class="ws-groups" role="list">
       {
-        serviceGroups.map((g) => (
+        groups.map((g) => (
           <li>
-            <a href={url(`/werkstatt-kundendienst/#${g.id}`)}>
+            <a href={L(`/werkstatt-kundendienst/#${g.id}`)}>
               <Icon name={g.icon} />
               <span>{g.title}</span>
             </a>

@@ -33,16 +33,16 @@ const faqs = faqsFor(lang);
   jsonLd={[faqSchema(faqs)]}
 >
   <Hero lang={lang} />
-  <PrestigeStrip />
-  <CampingFinderHero />
-  <QuickActions />
-  <RecentlyArrived />
-  <FeaturedVehicles />
-  <BrandShowcase />
-  <AnkaufTeaser />
-  <WorkshopTeaser />
-  <RentalTeaser />
-  <StorySection />
+  <PrestigeStrip lang={lang} />
+  <CampingFinderHero lang={lang} />
+  <QuickActions lang={lang} />
+  <RecentlyArrived lang={lang} />
+  <FeaturedVehicles lang={lang} />
+  <BrandShowcase lang={lang} />
+  <AnkaufTeaser lang={lang} />
+  <WorkshopTeaser lang={lang} />
+  <RentalTeaser lang={lang} />
+  <StorySection lang={lang} />
 
   <section class="section faq-section" aria-labelledby="faq-title">
     <div class="container faq-grid">
@@ -56,8 +56,8 @@ const faqs = faqsFor(lang);
     </div>
   </section>
 
-  <ContactSection />
-  <CtaSection />
+  <ContactSection lang={lang} />
+  <CtaSection lang={lang} />
 </BaseLayout>
 
 <style>

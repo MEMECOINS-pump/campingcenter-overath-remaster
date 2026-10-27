@@ -30,7 +30,7 @@ const L = (path: string) => url(localizedPath(path, lang));
     <div class="hero-copy">
       <p class="hero-brand">
         <span class="hero-brand-name">{company.name}</span>
-        <span class="hero-brand-claim">{company.claim}</span>
+        <span class="hero-brand-claim">{t(lang, 'brandClaim')}</span>
       </p>
       <h1 id="hero-title" class="display">{t(lang, 'heroTitle')}</h1>
       <p class="hero-lead">{t(lang, 'heroLead')}</p>

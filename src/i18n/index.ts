@@ -38,8 +38,6 @@ export const enRoutes = new Set<string>([
   '/camper-finder/',
   '/marken/',
   '/merkliste/',
-  '/vergleich/',
-  '/404/',
 ]);
 
 /** True when an English counterpart exists for this bare path. */
@@ -50,6 +48,8 @@ export function hasEnRoute(barePath: string): boolean {
   if (/^\/wohnmobile\/[^/]+\/$/.test(bare)) return true;
   return false;
 }
+
+/* Note: /vergleich/ stays DE-only until an EN compare page ships. */
 
 /** Serialize for boot-script redirect (exact paths only; slug pattern is inlined in boot). */
 export function enRoutesPayload(): string[] {

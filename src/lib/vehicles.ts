@@ -1,7 +1,7 @@
 import inventory from '@/data/inventory.json';
 import { formatKm, formatLength, formatPrice, formatWeight } from './format';
 import type { Locale } from '@/i18n/locales';
-import { glossary, g, translateTransmission } from '@/i18n/glossary';
+import { glossary, g, translateCategoryLabel, translateTransmission } from '@/i18n/glossary';
 import type { BedSpec, Category, Condition, FilterableVehicle } from './filter';
 
 export * from './filter';
@@ -124,22 +124,69 @@ export interface SpecRow {
 }
 
 /** Only rows the listing actually provides; missing values are omitted, not guessed. */
-export function specRows(v: Vehicle): SpecRow[] {
+export function specRows(v: Vehicle, lang: Locale = 'de'): SpecRow[] {
+  const L = lang === 'en'
+    ? {
+        condition: 'Condition',
+        category: 'Body type',
+        modelYear: 'Model year',
+        firstRegistration: 'First registration',
+        mileage: 'Mileage',
+        power: 'Power',
+        fuel: 'Fuel',
+        transmission: 'Transmission',
+        length: 'Length',
+        weight: 'Gross vehicle weight',
+        emission: 'Emission class',
+        owners: 'Previous owners',
+        hu: 'MOT',
+        color: 'Colour',
+        neu: 'New vehicle',
+        used: 'Used',
+        onRequest: 'on request',
+        huNew: 'new',
+        huUntil: (d: string) => `until ${d}`,
+      }
+    : {
+        condition: 'Zustand',
+        category: 'Fahrzeugart',
+        modelYear: 'Modelljahr',
+        firstRegistration: 'Erstzulassung',
+        mileage: 'Kilometerstand',
+        power: 'Leistung',
+        fuel: 'Kraftstoff',
+        transmission: 'Getriebe',
+        length: 'Länge',
+        weight: 'Zul. Gesamtgewicht',
+        emission: 'Schadstoffklasse',
+        owners: 'Vorbesitzer',
+        hu: 'HU',
+        color: 'Farbe',
+        neu: 'Neufahrzeug',
+        used: 'Gebraucht',
+        onRequest: 'auf Anfrage',
+        huNew: 'neu',
+        huUntil: (d: string) => `bis ${d}`,
+      };
   const rows: (SpecRow | null)[] = [
-    { key: 'condition', label: 'Zustand', value: v.condition === 'neu' ? 'Neufahrzeug' : 'Gebraucht' },
-    { key: 'category', label: 'Fahrzeugart', value: v.categoryLabel },
-    v.modelYear ? { key: 'modelYear', label: 'Modelljahr', value: String(v.modelYear) } : null,
-    v.firstRegistration ? { key: 'firstRegistration', label: 'Erstzulassung', value: v.firstRegistration } : null,
-    v.mileageKm !== null ? { key: 'mileage', label: 'Kilometerstand', value: formatKm(v.mileageKm) } : null,
-    v.powerKw ? { key: 'power', label: 'Leistung', value: `${v.powerKw} kW (${v.powerPs} PS)` } : null,
-    v.fuel ? { key: 'fuel', label: 'Kraftstoff', value: v.fuel } : null,
-    { key: 'transmission', label: 'Getriebe', value: v.transmission ?? 'auf Anfrage' },
-    v.lengthMm ? { key: 'length', label: 'Länge', value: formatLength(v.lengthMm) } : null,
-    v.grossWeightKg ? { key: 'weight', label: 'Zul. Gesamtgewicht', value: formatWeight(v.grossWeightKg) } : null,
-    v.emissionClass ? { key: 'emission', label: 'Schadstoffklasse', value: v.emissionClass } : null,
-    v.previousOwners !== null ? { key: 'owners', label: 'Vorbesitzer', value: String(v.previousOwners) } : null,
-    v.huUntil ? { key: 'hu', label: 'HU', value: v.huUntil === 'neu' ? 'neu' : `bis ${v.huUntil}` } : null,
-    v.color ? { key: 'color', label: 'Farbe', value: v.color } : null,
+    { key: 'condition', label: L.condition, value: v.condition === 'neu' ? L.neu : L.used },
+    { key: 'category', label: L.category, value: translateCategoryLabel(v.categoryLabel, lang) },
+    v.modelYear ? { key: 'modelYear', label: L.modelYear, value: String(v.modelYear) } : null,
+    v.firstRegistration ? { key: 'firstRegistration', label: L.firstRegistration, value: v.firstRegistration } : null,
+    v.mileageKm !== null ? { key: 'mileage', label: L.mileage, value: formatKm(v.mileageKm, lang) } : null,
+    v.powerKw ? { key: 'power', label: L.power, value: `${v.powerKw} kW (${v.powerPs} PS)` } : null,
+    v.fuel ? { key: 'fuel', label: L.fuel, value: v.fuel } : null,
+    {
+      key: 'transmission',
+      label: L.transmission,
+      value: translateTransmission(v.transmission, lang) ?? L.onRequest,
+    },
+    v.lengthMm ? { key: 'length', label: L.length, value: formatLength(v.lengthMm, lang) } : null,
+    v.grossWeightKg ? { key: 'weight', label: L.weight, value: formatWeight(v.grossWeightKg, lang) } : null,
+    v.emissionClass ? { key: 'emission', label: L.emission, value: v.emissionClass } : null,
+    v.previousOwners !== null ? { key: 'owners', label: L.owners, value: String(v.previousOwners) } : null,
+    v.huUntil ? { key: 'hu', label: L.hu, value: v.huUntil === 'neu' ? L.huNew : L.huUntil(v.huUntil) } : null,
+    v.color ? { key: 'color', label: L.color, value: v.color } : null,
   ];
   return rows.filter((r): r is SpecRow => r !== null);
 }

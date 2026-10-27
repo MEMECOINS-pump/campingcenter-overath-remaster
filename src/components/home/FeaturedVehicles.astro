@@ -3,8 +3,15 @@ import VehicleCard from '@/components/vehicles/VehicleCard.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { snapshotDate, vehicles } from '@/lib/vehicles';
-import { formatDateDE } from '@/lib/format';
+import { formatDateLocalized } from '@/lib/format';
+import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
+
+interface Props {
+  lang?: Locale;
+}
+const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+const L = (path: string) => url(localizedPath(path, lang));
 
 const used = vehicles.filter((v) => v.condition === 'gebraucht').slice(0, 3);
 const fresh = vehicles.filter((v) => v.condition === 'neu').slice(0, 3);
@@ -18,11 +25,13 @@ const newCount = vehicles.length - usedCount;
     <div class="section-head-row">
       <SectionHeader
         id="featured-title"
-        eyebrow="Aktuell im Bestand"
-        title="Fahrzeuge, die auf ihre nächste Reise warten."
-        lead={`${usedCount} gebrauchte und ${newCount} neue Wohnmobile im aktuellen Bestand – zum Anschauen, Probesitzen und Beraten-Lassen in Overath.`}
+        eyebrow={t(lang, 'featuredEyebrow')}
+        title={t(lang, 'featuredTitle')}
+        lead={t(lang, 'featuredLead').replace('{used}', String(usedCount)).replace('{neu}', String(newCount))}
       />
-      <a class="btn btn-ghost" href={url('/wohnmobile/')}>Alle {vehicles.length} Fahrzeuge <Icon name="arrow-right" class="arrow" /></a>
+      <a class="btn btn-ghost" href={L('/wohnmobile/')}>
+        {t(lang, 'featuredAll').replace('{n}', String(vehicles.length))} <Icon name="arrow-right" class="arrow" />
+      </a>
     </div>
 
     <div class="rail" data-rail>
@@ -30,14 +39,14 @@ const newCount = vehicles.length - usedCount;
         {
           featured.map((v, i) => (
             <li class="rail-item">
-              <VehicleCard vehicle={v} index={i} />
+              <VehicleCard vehicle={v} index={i} lang={lang} />
             </li>
           ))
         }
       </ul>
     </div>
     <p class="featured-note">
-      Stand {formatDateDE(snapshotDate)} · Angaben laut Fahrzeuginserat. Verfügbarkeit bitte telefonisch bestätigen lassen.
+      {t(lang, 'asOf')} {formatDateLocalized(snapshotDate, lang)} · {t(lang, 'featuredNote')}
     </p>
   </div>
 </section>

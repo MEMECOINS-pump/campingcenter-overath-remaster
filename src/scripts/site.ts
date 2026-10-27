@@ -445,9 +445,7 @@ const EN_EXACT = new Set([
   '/ueber-uns/',
   '/camper-finder/',
   '/marken/',
-  '/404/',
   '/merkliste/',
-  '/vergleich/',
 ]);
 
 function hasEnBare(bare: string): boolean {
