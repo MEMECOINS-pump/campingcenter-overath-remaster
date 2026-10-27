@@ -281,3 +281,29 @@ initConsent();
 initCollections();
 initReveal();
 bindTrackAttributes();
+
+document.addEventListener('astro:after-swap', () => {
+  const html = document.documentElement;
+  const label = html.dataset.ccoOpenLabel;
+  const state = html.dataset.ccoOpen;
+  const reason = html.dataset.ccoOpenReason;
+  if (label) {
+    $$('[data-oh-line]').forEach((el) => {
+      el.textContent = label;
+    });
+  }
+  if (state) {
+    $$('[data-opening-status], [data-oh-open]').forEach((el) => {
+      el.dataset.state = state;
+      if (reason) el.dataset.reason = reason;
+    });
+  }
+  const n = html.dataset.ccoFavCount;
+  if (n) {
+    $$('[data-fav-count]').forEach((el) => {
+      if (el === html || el === document.documentElement) return;
+      el.textContent = n;
+      (el as HTMLElement).hidden = false;
+    });
+  }
+});

@@ -10,6 +10,7 @@ api/.wrangler/
 # asset download cache (re-creatable via `npm run assets`)
 .asset-cache/
 .tmp-challenger-extract/
+.tmp-*
 
 # environment / secrets
 .env

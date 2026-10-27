@@ -4,7 +4,21 @@ import astro from 'eslint-plugin-astro';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['dist/', '.astro/', '.asset-cache/', 'node_modules/', 'public/', 'api/', 'DC-BOT-MIETBOT/', '_audit-legacy/'] },
+  {
+    ignores: [
+      'dist/',
+      '.astro/',
+      '.asset-cache/',
+      'node_modules/',
+      'public/',
+      'api/',
+      'DC-BOT-MIETBOT/',
+      '_audit-legacy/',
+      '.tmp-*/',
+      '.tmp-*',
+      'scripts/locks/',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...astro.configs.recommended,

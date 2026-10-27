@@ -2,120 +2,47 @@
 import Logo from '@/components/brand/Logo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import OpeningStatus from '@/components/layout/OpeningStatus.astro';
-import * as navigation from '@/data/navigation';
-import type { NavItem } from '@/data/navigation';
+import { mainNav, moreNav } from '@/data/navigation';
 import { company } from '@/data/company';
-import { getLangFromPath, localizedPath, stripLocale, t, type Locale } from '@/i18n';
-import { url } from '@/lib/url';
-
-interface Props {
-  overlay?: boolean;
-  lang?: Locale;
-}
-const { overlay = false, lang: langProp } = Astro.props;
-const lang = langProp ?? getLangFromPath(Astro.url.pathname);
-const navApi = navigation as typeof navigation & {
-  mainNavFor?: (locale: Locale) => NavItem[];
-  moreNavFor?: (locale: Locale) => NavItem[];
-};
-const mainNav = navApi.mainNavFor?.(lang) ?? navApi.mainNav;
-const moreNav = navApi.moreNavFor?.(lang) ?? navApi.moreNav;
-const L = (path: string) => url(localizedPath(path, lang));
-const current = stripLocale(Astro.url.pathname);
+import { stripBase, url } from '@/lib/url';
+interface Props { overlay?: boolean; }
+const { overlay = false } = Astro.props;
+const current = stripBase(Astro.url.pathname);
 const isActive = (href: string, children?: { href: string }[]) =>
   current === href || (href !== '/' && current.startsWith(href)) || !!children?.some((c) => current.startsWith(c.href));
 ---
-
 <header class="site-header" data-header data-overlay={overlay ? 'true' : undefined}>
-  <OpeningStatus lang={lang}>
-    <a slot="leading" class="header-logo" href={L('/')} aria-label={`${company.name} – ${t(lang, 'homeAria')}`}>
+  <OpeningStatus>
+    <a slot="leading" class="header-logo" href={url('/')} aria-label={`${company.name} – Startseite`}>
       <Logo tone={overlay ? 'light' : 'dark'} />
     </a>
     <div slot="trailing" class="header-end">
-    <nav class="desktop-nav" aria-label={t(lang, 'mainNavAria')}>
-      <ul class="nav-list">
-        {
-          mainNav.map((item) =>
-            item.children ? (
-              <li class="nav-item has-menu" data-dropdown>
-                <button
-                  type="button"
-                  class="nav-link"
-                  aria-expanded="false"
-                  aria-controls={`dd-${item.href}`}
-                  aria-current={isActive(item.href, item.children) ? 'true' : undefined}
-                >
-                  {item.label}
-                  <Icon name="chevron-down" class="nav-caret" />
-                </button>
-                <div class="dropdown" id={`dd-${item.href}`} hidden>
-                  <ul>
-                    {item.children.map((child) => (
-                      <li>
-                        <a href={L(child.href)} aria-current={current === child.href ? 'page' : undefined}>
-                          <span class="dd-label">{child.label}</span>
-                          {child.hint && <span class="dd-hint">{child.hint}</span>}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-            ) : (
-              <li class="nav-item">
-                <a class="nav-link" href={L(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
-                  {item.label}
-                </a>
-              </li>
-            ),
-          )
-        }
-        <li class="nav-item has-menu" data-dropdown>
-          <button type="button" class="nav-link" aria-expanded="false" aria-controls="dd-mehr">
-            {t(lang, 'more')}
-            <Icon name="chevron-down" class="nav-caret" />
-          </button>
-          <div class="dropdown dropdown-end" id="dd-mehr" hidden>
-            <ul>
-              {
-                moreNav.map((child) => (
-                  <li>
-                    <a href={L(child.href)} aria-current={current === child.href ? 'page' : undefined}>
-                      <span class="dd-label">{child.label}</span>
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </nav>
-
-    <div class="header-actions">
-      <a class="header-fav" href={L('/merkliste/')} aria-label={t(lang, 'favorites')} data-fav-link>
-        <Icon name="heart" />
-        <span class="fav-count" data-fav-count hidden>0</span>
-      </a>
-      <a class="header-phone" href={company.phone.href} data-track="call_click" data-track-location="header">
-        <Icon name="phone" />
-        <span>{company.phone.display}</span>
-      </a>
-      <a class="btn btn-accent btn-sm header-cta" href={L('/kontakt/') + '#beratung'} data-track="cta_click" data-track-location="header">
-        {t(lang, 'bookAdvice')}
-      </a>
-      <a class="icon-btn header-call-mobile" href={company.phone.href} aria-label={`${t(lang, 'callAria')}: ${company.phone.display}`} data-track="call_click" data-track-location="header-mobile">
-        <Icon name="phone" />
-      </a>
-      <button type="button" class="icon-btn header-menu-btn" aria-haspopup="dialog" aria-controls="mobile-menu" aria-expanded="false" data-menu-open>
-        <Icon name="menu" />
-        <span class="sr-only">{t(lang, 'menu')}</span>
-      </button>
-    </div>
+      <nav class="desktop-nav" aria-label="Hauptnavigation">
+        <ul class="nav-list">
+          {mainNav.map((item) => item.children ? (
+            <li class="nav-item has-menu" data-dropdown>
+              <button type="button" class="nav-link" aria-expanded="false" aria-controls={`dd-${item.href}`} aria-current={isActive(item.href, item.children) ? 'true' : undefined}>{item.label}<Icon name="chevron-down" class="nav-caret" /></button>
+              <div class="dropdown" id={`dd-${item.href}`} hidden><ul>{item.children.map((child) => (<li><a href={url(child.href)} aria-current={current === child.href ? 'page' : undefined}><span class="dd-label">{child.label}</span>{child.hint && <span class="dd-hint">{child.hint}</span>}</a></li>))}</ul></div>
+            </li>
+          ) : (
+            <li class="nav-item"><a class="nav-link" href={url(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a></li>
+          ))}
+          <li class="nav-item has-menu" data-dropdown>
+            <button type="button" class="nav-link" aria-expanded="false" aria-controls="dd-mehr">Mehr<Icon name="chevron-down" class="nav-caret" /></button>
+            <div class="dropdown dropdown-end" id="dd-mehr" hidden><ul>{moreNav.map((child) => (<li><a href={url(child.href)} aria-current={current === child.href ? 'page' : undefined}><span class="dd-label">{child.label}</span></a></li>))}</ul></div>
+          </li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <a class="header-fav" href={url('/merkliste/')} aria-label="Merkliste" data-fav-link><Icon name="heart" /><span class="fav-count" data-fav-count hidden>0</span></a>
+        <a class="header-phone" href={company.phone.href} data-track="call_click" data-track-location="header"><Icon name="phone" /><span>{company.phone.display}</span></a>
+        <a class="btn btn-accent btn-sm header-cta" href={url('/kontakt/') + '#beratung'} data-track="cta_click" data-track-location="header">Beratung vereinbaren</a>
+        <a class="icon-btn header-call-mobile" href={company.phone.href} aria-label={`Anrufen: ${company.phone.display}`} data-track="call_click" data-track-location="header-mobile"><Icon name="phone" /></a>
+        <button type="button" class="icon-btn header-menu-btn" aria-haspopup="dialog" aria-controls="mobile-menu" aria-expanded="false" data-menu-open><Icon name="menu" /><span class="sr-only">Menü</span></button>
+      </div>
     </div>
   </OpeningStatus>
 </header>
-
 <style>
   .site-header {
     position: sticky;
@@ -424,3 +351,6 @@ const isActive = (href: string, children?: { href: string }[]) =>
     }
   }
 </style>
+
+
+

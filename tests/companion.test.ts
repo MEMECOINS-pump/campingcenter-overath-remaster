@@ -13,11 +13,11 @@ describe('CampingCompanion hub', () => {
 
     expect(companion).toContain('data-companion');
     expect(companion).toContain('companion-fab');
-    expect(companion).toContain("t(lang, 'companionTitle')");
-    expect(companion).toContain("t(lang, 'companionFabAria')");
+    expect(companion).toContain('Dein Reisebegleiter');
+    expect(companion).toMatch(/Hilfe.*Barrierefreiheit/);
     expect(companion).toContain('data-companion-action="chat"');
     expect(companion).toContain('data-companion-action="a11y"');
-    expect(companion).toContain('data-companion-action="lang"');
+    expect(companion).not.toContain('data-companion-action="lang"');
     expect(companion).toContain('cco:open-chat');
 
     expect(chat).not.toContain('chatw-fab');
@@ -28,25 +28,29 @@ describe('CampingCompanion hub', () => {
     expect(layout).toContain('CampingCompanion');
     expect(layout).toContain('ChatWidget');
     expect(companion).toContain('AccessibilityPrefs');
+    expect(layout).toMatch(/lang="de"/);
   });
 
-  it('keeps boot-before-paint a11y key', () => {
+  it('keeps boot-before-paint a11y key without locale redirects', () => {
     const boot = readFileSync(join(root, 'src/lib/boot-script.ts'), 'utf8');
-    expect(boot).toContain("cco:a11y");
-    expect(boot).toContain('cco:lang');
+    expect(boot).toContain('cco:a11y');
+    expect(boot).toContain('ccoFavCount');
+    expect(boot).not.toContain('cco:lang');
+    expect(boot).not.toContain('enRoutes');
   });
 
-  it('boot opening labels support English', () => {
+  it('boot opening labels stay German', () => {
     const boot = readFileSync(join(root, 'src/lib/boot-script.ts'), 'utf8');
-    expect(boot).toContain('Currently closed');
-    expect(boot).toContain('Open today');
-    expect(boot).toContain('Public holiday');
+    expect(boot).toContain('Aktuell geschlossen');
+    expect(boot).toContain('Heute geöffnet');
+    expect(boot).toContain('Feiertag');
+    expect(boot).not.toContain('Currently closed');
   });
 
   it('chat lazy-loads assist rules', () => {
     const chat = readFileSync(join(root, 'src/components/layout/ChatWidget.astro'), 'utf8');
     expect(chat).toContain("import('@/lib/camping-assist')");
     expect(chat).toContain('loadAssist');
-    expect(chat).toContain('campingQuickPrompts(lang)');
+    expect(chat).toContain('CAMPING_QUICK_PROMPTS');
   });
 });

@@ -12,9 +12,6 @@ const requiredRoutes = [
   'marken/', 'la-strada-konfigurator/', 'ueber-uns/', 'kontakt/', 'jobs/', 'rechnungswesen/', 'reinigungskraft/', 'bewerbung/',
   '360-rundgang/', 'fahrzeugwaesche-herbst/', 'camper-finder/', 'merkliste/', 'vergleich/', 'impressum/',
   'datenschutz/', 'agb/', 'barrierefreiheitserklaerung/', 'download/', 'danke/',
-  // EN counterparts (chrome + page bodies)
-  'en/', 'en/kontakt/', 'en/wohnmobile/', 'en/vermietung-wohnmobile/', 'en/wohnmobil-ankauf/',
-  'en/werkstatt-kundendienst/', 'en/ueber-uns/', 'en/camper-finder/', 'en/marken/', 'en/merkliste/',
 ];
 const requiredFiles = ['404.html', 'robots.txt', 'sitemap-index.xml', '.nojekyll', 'site.webmanifest'];
 
@@ -61,7 +58,7 @@ for (const file of htmlFiles) {
     continue;
   }
 
-  if (!/<html lang="(de|en)/.test(html)) fail(name, 'lang="de|en" fehlt');
+  if (!/<html lang="de/.test(html)) fail(name, 'lang="de" fehlt');
   if (!/<title>[^<]{10,}<\/title>/.test(html)) fail(name, '<title> fehlt oder zu kurz');
   const desc = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
   if (desc.length < 50) fail(name, `meta description zu kurz (${desc.length})`);

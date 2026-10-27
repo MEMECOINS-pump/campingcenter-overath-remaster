@@ -2,29 +2,19 @@
 import Icon from '@/components/ui/Icon.astro';
 import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
 import { company } from '@/data/company';
-import { getLangFromPath, localizedPath, switchLocalePath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
 
-interface Props {
-  lang?: Locale;
-}
-
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
-const switchToDe = url(switchLocalePath(Astro.url.pathname, 'de'));
-const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
 ---
 
 <div
   class="companion"
   data-companion
-  data-lang={lang}
-  data-i18n-open={t(lang, 'companionOpenNow')}
-  data-i18n-closed={t(lang, 'companionClosedNow')}
-  data-i18n-holiday={t(lang, 'companionHolidayClosed')}
-  data-i18n-title={t(lang, 'companionTitle')}
-  data-i18n-a11y={t(lang, 'companionCardA11y')}
-  data-i18n-lang={t(lang, 'companionCardLang')}
-  data-i18n-offline={t(lang, 'companionAiOfflineTitle')}
+  data-i18n-open={'Jetzt geöffnet'}
+  data-i18n-closed={'Aktuell geschlossen'}
+  data-i18n-holiday={'Feiertag · Geschlossen'}
+  data-i18n-title={'Dein Reisebegleiter'}
+  data-i18n-a11y={'Barrierefreiheit'}
+  data-i18n-offline={'Beratung gerade nicht erreichbar'}
 >
   <button
     type="button"
@@ -33,7 +23,7 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
     aria-haspopup="dialog"
     aria-expanded="false"
     aria-controls="companion-panel"
-    aria-label={t(lang, 'companionFabAria')}
+    aria-label={'Hilfe, Camping-KI und Barrierefreiheit öffnen'}
   >
     <span class="companion-fab-mark" aria-hidden="true">
       <!-- Minimalist motorhome + subtle compass cue -->
@@ -60,16 +50,16 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
   >
     <div class="companion-sheet">
       <header class="companion-head">
-        <button type="button" class="companion-back" data-companion-back hidden aria-label={t(lang, 'companionBack')}>
+        <button type="button" class="companion-back" data-companion-back hidden aria-label={'Zurück'}>
           <Icon name="chevron-left" />
-          <span>{t(lang, 'companionBack')}</span>
+          <span>{'Zurück'}</span>
         </button>
         <div class="companion-head-copy">
           <p class="companion-kicker">Campingcenter Overath</p>
-          <h2 id="companion-title" data-companion-heading>{t(lang, 'companionTitle')}</h2>
-          <p class="companion-sub" data-companion-sub>{t(lang, 'companionSubtitle')}</p>
+          <h2 id="companion-title" data-companion-heading>{'Dein Reisebegleiter'}</h2>
+          <p class="companion-sub" data-companion-sub>{'Wie können wir dir helfen?'}</p>
         </div>
-        <button type="button" class="companion-x" data-companion-close aria-label={t(lang, 'companionClose')}>
+        <button type="button" class="companion-x" data-companion-close aria-label={'Schließen'}>
           <Icon name="close" />
         </button>
       </header>
@@ -78,7 +68,7 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
         <div class="companion-view is-active" data-companion-view="hub">
           <div class="companion-status" data-companion-status>
             <span class="companion-status-dot" aria-hidden="true"></span>
-            <span data-companion-status-label>{t(lang, 'companionClosedNow')}</span>
+            <span data-companion-status-label>{'Aktuell geschlossen'}</span>
           </div>
 
           <ul class="companion-cards">
@@ -86,8 +76,8 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
               <button type="button" class="companion-card" data-companion-action="chat">
                 <span class="companion-card-icon" aria-hidden="true"><Icon name="sparkle" /></span>
                 <span class="companion-card-text">
-                  <span class="companion-card-title">{t(lang, 'companionCardAdvice')}</span>
-                  <span class="companion-card-hint">{t(lang, 'companionCardAdviceHint')}</span>
+                  <span class="companion-card-title">{'Camping-Beratung'}</span>
+                  <span class="companion-card-hint">{'Frag unsere Camping-KI zu Kauf, Miete, Ankauf und Service.'}</span>
                 </span>
                 <Icon name="chevron-right" class="companion-card-chevron" />
               </button>
@@ -96,26 +86,16 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
               <button type="button" class="companion-card" data-companion-action="a11y">
                 <span class="companion-card-icon" aria-hidden="true"><Icon name="a11y-compass" /></span>
                 <span class="companion-card-text">
-                  <span class="companion-card-title">{t(lang, 'companionCardA11y')}</span>
-                  <span class="companion-card-hint">{t(lang, 'companionCardA11yHint')}</span>
-                </span>
-                <Icon name="chevron-right" class="companion-card-chevron" />
-              </button>
-            </li>
-            <li>
-              <button type="button" class="companion-card" data-companion-action="lang">
-                <span class="companion-card-icon" aria-hidden="true"><Icon name="compass" /></span>
-                <span class="companion-card-text">
-                  <span class="companion-card-title">{t(lang, 'companionCardLang')}</span>
-                  <span class="companion-card-hint">{t(lang, 'companionCardLangHint')}</span>
+                  <span class="companion-card-title">{'Barrierefreiheit'}</span>
+                  <span class="companion-card-hint">{'Schrift, Kontrast, Bewegung und Lesbarkeit anpassen.'}</span>
                 </span>
                 <Icon name="chevron-right" class="companion-card-chevron" />
               </button>
             </li>
           </ul>
 
-          <section class="companion-contact" aria-label={t(lang, 'companionQuickContact')}>
-            <h3 class="companion-section-title">{t(lang, 'companionQuickContact')}</h3>
+          <section class="companion-contact" aria-label={'Schnellkontakt'}>
+            <h3 class="companion-section-title">{'Schnellkontakt'}</h3>
             <div class="companion-contact-row">
               <a
                 class="btn btn-accent companion-contact-btn"
@@ -124,16 +104,16 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
                 data-track-location="companion"
               >
                 <Icon name="phone" />
-                {t(lang, 'companionCallNow')}
+                {'Jetzt anrufen'}
               </a>
               <a
                 class="btn companion-contact-btn"
-                href={url(localizedPath('/kontakt/', lang))}
+                href={url('/kontakt/')}
                 data-track="cta_click"
                 data-track-location="companion"
               >
                 <Icon name="mail" />
-                {t(lang, 'companionWriteMessage')}
+                {'Nachricht schreiben'}
               </a>
             </div>
             <p class="companion-contact-meta">
@@ -145,47 +125,20 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
         </div>
 
         <div class="companion-view" data-companion-view="a11y" hidden>
-          <AccessibilityPrefs lang={lang} embedded />
+          <AccessibilityPrefs embedded />
           <p class="companion-a11y-note">
-            <a href={url(localizedPath('/barrierefreiheit/', lang))}>{t(lang, 'a11yStatement')}</a>
+            <a href={url('/barrierefreiheit/')}>{'Erklärung zur Barrierefreiheit'}</a>
           </p>
         </div>
 
-        <div class="companion-view" data-companion-view="lang" hidden>
-          <p class="companion-lang-lead">{t(lang, 'companionLangLead')}</p>
-          <div class="companion-lang-list" role="radiogroup" aria-label={t(lang, 'companionCardLang')}>
-            <a
-              class="companion-lang-opt"
-              href={switchToDe}
-              data-companion-lang="de"
-              data-lang-switch="de"
-              aria-current={lang === 'de' ? 'true' : undefined}
-            >
-              <span class="companion-lang-code">DE</span>
-              <span class="companion-lang-label">Deutsch</span>
-              {lang === 'de' && <span class="companion-lang-check" aria-hidden="true">✓</span>}
-            </a>
-            <a
-              class="companion-lang-opt"
-              href={switchToEn}
-              data-companion-lang="en"
-              data-lang-switch="en"
-              aria-current={lang === 'en' ? 'true' : undefined}
-            >
-              <span class="companion-lang-code">EN</span>
-              <span class="companion-lang-label">English</span>
-              {lang === 'en' && <span class="companion-lang-check" aria-hidden="true">✓</span>}
-            </a>
-          </div>
-        </div>
-
+        
         <div class="companion-view" data-companion-view="offline" hidden>
           <div class="companion-offline">
-            <h3>{t(lang, 'companionAiOfflineTitle')}</h3>
-            <p>{t(lang, 'companionAiOfflineBody')}</p>
+            <h3>{'Beratung gerade nicht erreichbar'}</h3>
+            <p>{'Die Camping-KI ist momentan offline. Ruf uns an oder schreib uns – wir helfen persönlich weiter.'}</p>
             <div class="companion-contact-row">
-              <a class="btn btn-accent" href={company.phone.href}>{t(lang, 'companionCallNow')}</a>
-              <a class="btn" href={url(localizedPath('/kontakt/', lang))}>{t(lang, 'companionWriteMessage')}</a>
+              <a class="btn btn-accent" href={company.phone.href}>{'Jetzt anrufen'}</a>
+              <a class="btn" href={url('/kontakt/')}>{'Nachricht schreiben'}</a>
             </div>
           </div>
         </div>
@@ -195,8 +148,6 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
 </div>
 
 <script>
-  const LANG_KEY = 'cco:lang';
-
   document.querySelectorAll<HTMLElement>('[data-companion]').forEach((root) => {
     const panel = root.querySelector<HTMLDialogElement>('[data-companion-panel]');
     const openBtn = root.querySelector<HTMLButtonElement>('[data-companion-open]');
@@ -208,12 +159,11 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
     const statusBox = root.querySelector<HTMLElement>('[data-companion-status]');
     if (!panel || !openBtn) return;
 
-    const currentLang = root.dataset.lang || 'de';
+    const currentLang = 'de';
     const i18nTitle = root.dataset.i18nTitle || '';
     const titles: Record<string, string> = {
       hub: i18nTitle,
       a11y: root.dataset.i18nA11y || '',
-      lang: root.dataset.i18nLang || '',
       offline: root.dataset.i18nOffline || '',
     };
 
@@ -296,22 +246,6 @@ const switchToEn = url(switchLocalePath(Astro.url.pathname, 'en'));
           return;
         }
         if (action === 'a11y') setView('a11y');
-        if (action === 'lang') setView('lang');
-      });
-    });
-
-    root.querySelectorAll<HTMLAnchorElement>('[data-lang-switch]').forEach((link) => {
-      link.addEventListener('click', (e) => {
-        const next = link.dataset.langSwitch;
-        if (next !== 'de' && next !== 'en') return;
-        e.preventDefault();
-        try {
-          localStorage.setItem(LANG_KEY, next);
-        } catch {
-          /* ignore */
-        }
-        const href = link.getAttribute('href');
-        if (href) location.assign(href);
       });
     });
 

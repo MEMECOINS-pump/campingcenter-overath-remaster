@@ -1,5 +1,3 @@
-import type { Locale } from '@/i18n';
-
 export type FinderOption = { value: string; label: string; text: string };
 export type FinderQuestion = {
   name: string;
@@ -193,6 +191,6 @@ const QUESTIONS: QRow[] = [
   },
 ];
 
-export function finderQuestionsFor(lang: Locale): FinderQuestion[] {
-  return QUESTIONS.map((q) => q[lang] || q.de);
+export function finderQuestions(): FinderQuestion[] {
+  return QUESTIONS.map((q) => ('de' in q ? q.de : q));
 }

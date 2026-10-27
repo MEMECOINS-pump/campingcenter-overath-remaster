@@ -14,13 +14,6 @@ export default defineConfig({
   trailingSlash: 'always',
   output: 'static',
   compressHTML: true,
-  i18n: {
-    defaultLocale: 'de',
-    locales: ['de', 'en'],
-    routing: {
-      prefixDefaultLocale: false,
-    },
-  },
   build: {
     format: 'directory',
     inlineStylesheets: 'auto',

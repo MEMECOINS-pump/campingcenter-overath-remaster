@@ -48,7 +48,7 @@ try{
 }catch(e){}
 try{
   var favs=JSON.parse(localStorage.getItem('cco:favorites')||'[]');
-  if(Array.isArray(favs)&&favs.length){html.dataset.favCount=String(favs.length);}
+  if(Array.isArray(favs)&&favs.length){html.dataset.ccoFavCount=String(favs.length);}
 }catch(e){}
 function berlin(){
   var parts=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Berlin',weekday:'long',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
@@ -107,6 +107,11 @@ html.dataset.ccoOpenLabel=label;
 html.dataset.ccoOpenAlert=alertName;
 if(window.scrollY>24)html.classList.add('boot-scrolled');
 function paint(){
+  if(html.dataset.favCount){
+    if(!html.dataset.ccoFavCount)html.dataset.ccoFavCount=html.dataset.favCount;
+    delete html.dataset.favCount;
+  }
+
   document.querySelectorAll('[data-opening-status]').forEach(function(root){
     root.dataset.state=state;root.dataset.reason=reason;
     root.querySelectorAll('[data-oh-line]').forEach(function(el){el.textContent=label;});
@@ -133,8 +138,13 @@ function paint(){
   }
   var header=document.querySelector('[data-header][data-overlay]');
   if(header&&html.classList.contains('boot-scrolled'))header.classList.add('is-solid');
-  var n=html.dataset.favCount;
-  if(n){document.querySelectorAll('[data-fav-count]').forEach(function(el){el.textContent=n;el.hidden=false;});}
+  var n=html.dataset.ccoFavCount;
+  if(n){
+    document.querySelectorAll('[data-fav-count]').forEach(function(el){
+      if(el===html||el===document.documentElement)return;
+      el.textContent=n;el.hidden=false;
+    });
+  }
 }
 if(document.body)paint();
 else document.addEventListener('DOMContentLoaded',paint);

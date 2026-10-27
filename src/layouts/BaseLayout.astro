@@ -1,5 +1,6 @@
 ---
 import '@/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import SeoHead, { type SeoProps } from '@/components/layout/SeoHead.astro';
 import Header from '@/components/layout/Header.astro';
 import MobileMenu from '@/components/layout/MobileMenu.astro';
@@ -8,7 +9,7 @@ import Footer from '@/components/layout/Footer.astro';
 import CookieConsent from '@/components/layout/CookieConsent.astro';
 import CompareTray from '@/components/vehicles/CompareTray.astro';
 import ChatWidget from '@/components/layout/ChatWidget.astro';
-import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
+import CampingCompanion from '@/components/layout/CampingCompanion.astro';
 import { organizationSchema } from '@/lib/schema';
 import { buildBootScript } from '@/lib/boot-script';
 
@@ -39,27 +40,28 @@ const boot = buildBootScript();
 ---
 
 <!doctype html>
-<html lang="de-DE">
+<html lang="de">
   <head>
     <script is:inline set:html={boot} />
     <SeoHead {...seo} jsonLd={[organizationSchema(Astro.site), ...jsonLd]} />
+    <ClientRouter fallback="swap" />
     <slot name="head" />
   </head>
   <body class={bodyClass} data-actionbar={actionBar || Astro.slots.has('sticky') ? '' : undefined}>
     <a class="skip-link" href="#main">Zum Inhalt springen</a>
     <Header overlay={overlayHeader} />
     <MobileMenu />
-    <main id="main" tabindex="-1">
+    <main id="main" tabindex="-1" transition:animate="fade">
       <slot />
     </main>
     <Footer />
     {actionBar && <MobileActionBar inquiryHref={inquiryHref} inquiryLabel={inquiryLabel} />}
     <slot name="sticky" />
     {compareTray && <CompareTray />}
-    <ChatWidget />
-    <AccessibilityPrefs />
+    <CampingCompanion transition:persist="cco-companion" />
+    <ChatWidget transition:persist="cco-chat" />
     <CookieConsent />
-    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <div class="toast" role="status" aria-live="polite" data-toast transition:persist="cco-toast"></div>
     <script>
       import '@/scripts/site';
     </script>
