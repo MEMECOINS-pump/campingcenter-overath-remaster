@@ -55,26 +55,12 @@ if (form && results) {
   let lastAnswers: FinderAnswers = {};
   let lastIds: string[] = [];
 
-  const i18n = {
-    next: form.dataset.i18nNext || 'Weiter',
-    show: form.dataset.i18nShow || 'Empfehlungen zeigen',
-    step: form.dataset.i18nStep || '{n} von {total}',
-    pick: form.dataset.i18nPick || 'Bitte wähle eine Option.',
-    results: form.dataset.i18nResults || 'Deine Empfehlungen',
-    empty: form.dataset.i18nEmpty || 'Mit den aktuellen Angaben gab es keinen exakten Treffer. Wir beraten dich gern persönlich.',
-    emptyBlocked:
-      form.dataset.i18nEmptyBlocked ||
-      'Mit den aktuellen Angaben gab es keinen exakten Treffer (u. a. {reasons}). Wir beraten dich gern persönlich.',
-    why: form.dataset.i18nWhy || 'Warum passt dieses Fahrzeug zu dir?',
-    lang: form.dataset.lang === 'en' ? 'en' : 'de',
-  };
-
   const show = (i: number, focus = true) => {
     step = i;
     steps.forEach((s, k) => s.classList.toggle('is-active', k === i));
     if (back) back.hidden = i === 0;
-    if (nextLabel) nextLabel.textContent = i === steps.length - 1 ? i18n.show : i18n.next;
-    if (stepLabel) stepLabel.textContent = i18n.step.replace('{n}', String(i + 1)).replace('{total}', String(steps.length));
+    if (nextLabel) nextLabel.textContent = i === steps.length - 1 ? 'Empfehlungen zeigen' : 'Weiter';
+    if (stepLabel) stepLabel.textContent = `${i + 1} von ${steps.length}`;
     if (bar) bar.style.width = `${((i + 1) / steps.length) * 100}%`;
     track('camping_finder_step', { step: i + 1 });
     if (focus) {
@@ -119,36 +105,28 @@ if (form && results) {
 
     if (r.hasExact) {
       if (empty) empty.hidden = true;
-      if (title) title.textContent = i18n.results;
+      if (title) title.textContent = 'Deine Empfehlungen';
       if (summary) {
-        summary.textContent =
-          i18n.lang === 'en'
-            ? `${r.exact.length} matching vehicles from current stock — with clear reasons.`
-            : `${r.exact.length} passende Fahrzeuge aus dem aktuellen Bestand – mit nachvollziehbaren Gründen.`;
+        summary.textContent = `${r.exact.length} passende Fahrzeuge aus dem aktuellen Bestand – mit nachvollziehbaren Gründen.`;
       }
       r.exact.forEach((m) => {
         m.vehicle.el.hidden = false;
         grid?.append(m.vehicle.el);
         const host = reasonsHost(m.vehicle.id);
         if (host) {
-          const confirm =
-            i18n.lang === 'en'
-              ? '<li>• Please have technical details confirmed.</li>'
-              : '<li>• Technische Angabe bitte bestätigen lassen.</li>';
-          host.innerHTML = `<p class="finder-why-label">${i18n.why}</p><ul>${m.reasons
+          host.innerHTML = `<p class="finder-why-label">Warum passt dieses Fahrzeug zu dir?</p><ul>${m.reasons
             .map((x) => `<li>${x.ok ? '✓' : '•'} ${x.label}</li>`)
-            .join('')}${m.needsConfirmation ? confirm : ''}</ul>`;
+            .join('')}${m.needsConfirmation ? '<li>• Technische Angabe bitte bestätigen lassen.</li>' : ''}</ul>`;
         }
       });
       track('camping_finder_results', { count: r.exact.length, exact: 1 });
     } else {
       if (empty) empty.hidden = false;
-      if (title)
-        title.textContent = i18n.lang === 'en' ? 'We will find a solution together.' : 'Wir finden gemeinsam eine Lösung.';
+      if (title) title.textContent = 'Wir finden gemeinsam eine Lösung.';
       if (summary) {
         summary.textContent = r.blockedBy.length
-          ? i18n.emptyBlocked.replace('{reasons}', r.blockedBy.join(', '))
-          : i18n.empty;
+          ? `Mit den aktuellen Angaben gab es keinen exakten Treffer (u. a. ${r.blockedBy.join(', ')}). Wir beraten dich gern persönlich.`
+          : 'Mit den aktuellen Angaben gab es keinen exakten Treffer. Wir beraten dich gern persönlich.';
       }
       track('camping_finder_results', { count: 0, exact: 0 });
     }
@@ -163,7 +141,7 @@ if (form && results) {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!answered(step)) {
-      setError(step, i18n.pick);
+      setError(step, 'Bitte wähle eine Option.');
       return;
     }
     setError(step, '');

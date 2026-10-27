@@ -1,7 +1,5 @@
 import inventory from '@/data/inventory.json';
 import { formatKm, formatLength, formatPrice, formatWeight } from './format';
-import type { Locale } from '@/i18n/locales';
-import { glossary, g, translateCategoryLabel, translateTransmission } from '@/i18n/glossary';
 import type { BedSpec, Category, Condition, FilterableVehicle } from './filter';
 
 export * from './filter';
@@ -124,92 +122,37 @@ export interface SpecRow {
 }
 
 /** Only rows the listing actually provides; missing values are omitted, not guessed. */
-export function specRows(v: Vehicle, lang: Locale = 'de'): SpecRow[] {
-  const L = lang === 'en'
-    ? {
-        condition: 'Condition',
-        category: 'Body type',
-        modelYear: 'Model year',
-        firstRegistration: 'First registration',
-        mileage: 'Mileage',
-        power: 'Power',
-        fuel: 'Fuel',
-        transmission: 'Transmission',
-        length: 'Length',
-        weight: 'Gross vehicle weight',
-        emission: 'Emission class',
-        owners: 'Previous owners',
-        hu: 'MOT',
-        color: 'Colour',
-        neu: 'New vehicle',
-        used: 'Used',
-        onRequest: 'on request',
-        huNew: 'new',
-        huUntil: (d: string) => `until ${d}`,
-      }
-    : {
-        condition: 'Zustand',
-        category: 'Fahrzeugart',
-        modelYear: 'Modelljahr',
-        firstRegistration: 'Erstzulassung',
-        mileage: 'Kilometerstand',
-        power: 'Leistung',
-        fuel: 'Kraftstoff',
-        transmission: 'Getriebe',
-        length: 'Länge',
-        weight: 'Zul. Gesamtgewicht',
-        emission: 'Schadstoffklasse',
-        owners: 'Vorbesitzer',
-        hu: 'HU',
-        color: 'Farbe',
-        neu: 'Neufahrzeug',
-        used: 'Gebraucht',
-        onRequest: 'auf Anfrage',
-        huNew: 'neu',
-        huUntil: (d: string) => `bis ${d}`,
-      };
+export function specRows(v: Vehicle): SpecRow[] {
   const rows: (SpecRow | null)[] = [
-    { key: 'condition', label: L.condition, value: v.condition === 'neu' ? L.neu : L.used },
-    { key: 'category', label: L.category, value: translateCategoryLabel(v.categoryLabel, lang) },
-    v.modelYear ? { key: 'modelYear', label: L.modelYear, value: String(v.modelYear) } : null,
-    v.firstRegistration ? { key: 'firstRegistration', label: L.firstRegistration, value: v.firstRegistration } : null,
-    v.mileageKm !== null ? { key: 'mileage', label: L.mileage, value: formatKm(v.mileageKm, lang) } : null,
-    v.powerKw ? { key: 'power', label: L.power, value: `${v.powerKw} kW (${v.powerPs} PS)` } : null,
-    v.fuel ? { key: 'fuel', label: L.fuel, value: v.fuel } : null,
-    {
-      key: 'transmission',
-      label: L.transmission,
-      value: translateTransmission(v.transmission, lang) ?? L.onRequest,
-    },
-    v.lengthMm ? { key: 'length', label: L.length, value: formatLength(v.lengthMm, lang) } : null,
-    v.grossWeightKg ? { key: 'weight', label: L.weight, value: formatWeight(v.grossWeightKg, lang) } : null,
-    v.emissionClass ? { key: 'emission', label: L.emission, value: v.emissionClass } : null,
-    v.previousOwners !== null ? { key: 'owners', label: L.owners, value: String(v.previousOwners) } : null,
-    v.huUntil ? { key: 'hu', label: L.hu, value: v.huUntil === 'neu' ? L.huNew : L.huUntil(v.huUntil) } : null,
-    v.color ? { key: 'color', label: L.color, value: v.color } : null,
+    { key: 'condition', label: 'Zustand', value: v.condition === 'neu' ? 'Neufahrzeug' : 'Gebraucht' },
+    { key: 'category', label: 'Fahrzeugart', value: v.categoryLabel },
+    v.modelYear ? { key: 'modelYear', label: 'Modelljahr', value: String(v.modelYear) } : null,
+    v.firstRegistration ? { key: 'firstRegistration', label: 'Erstzulassung', value: v.firstRegistration } : null,
+    v.mileageKm !== null ? { key: 'mileage', label: 'Kilometerstand', value: formatKm(v.mileageKm) } : null,
+    v.powerKw ? { key: 'power', label: 'Leistung', value: `${v.powerKw} kW (${v.powerPs} PS)` } : null,
+    v.fuel ? { key: 'fuel', label: 'Kraftstoff', value: v.fuel } : null,
+    { key: 'transmission', label: 'Getriebe', value: v.transmission ?? 'auf Anfrage' },
+    v.lengthMm ? { key: 'length', label: 'Länge', value: formatLength(v.lengthMm) } : null,
+    v.grossWeightKg ? { key: 'weight', label: 'Zul. Gesamtgewicht', value: formatWeight(v.grossWeightKg) } : null,
+    v.emissionClass ? { key: 'emission', label: 'Schadstoffklasse', value: v.emissionClass } : null,
+    v.previousOwners !== null ? { key: 'owners', label: 'Vorbesitzer', value: String(v.previousOwners) } : null,
+    v.huUntil ? { key: 'hu', label: 'HU', value: v.huUntil === 'neu' ? 'neu' : `bis ${v.huUntil}` } : null,
+    v.color ? { key: 'color', label: 'Farbe', value: v.color } : null,
   ];
   return rows.filter((r): r is SpecRow => r !== null);
 }
 
-export function cardFacts(v: Vehicle, lang: Locale = 'de'): string[] {
-  const cond =
-    v.condition === 'neu'
-      ? v.modelYear
-        ? `${g(lang, glossary.condition.neu)} · ${g(lang, glossary.card.modelYear)} ${v.modelYear}`
-        : g(lang, glossary.card.newVehicle)
-      : v.firstRegistration
-        ? `${g(lang, glossary.card.firstReg)} ${v.firstRegistration}`
-        : g(lang, glossary.card.used);
+export function cardFacts(v: Vehicle): string[] {
   return [
-    cond,
-    v.mileageKm && v.mileageKm > 0 ? formatKm(v.mileageKm, lang) : null,
-    v.lengthMm ? formatLength(v.lengthMm, lang) : null,
-    translateTransmission(v.transmission, lang),
+    v.condition === 'neu' ? (v.modelYear ? `Neu · MJ ${v.modelYear}` : 'Neufahrzeug') : v.firstRegistration ? `EZ ${v.firstRegistration}` : 'Gebraucht',
+    v.mileageKm && v.mileageKm > 0 ? formatKm(v.mileageKm) : null,
+    v.lengthMm ? formatLength(v.lengthMm) : null,
+    v.transmission ?? null,
     v.powerPs ? `${v.powerPs} PS` : null,
   ].filter((x): x is string => Boolean(x));
 }
 
-export const priceLabel = (v: Vehicle, lang: Locale = 'de'): string => formatPrice(v.price, lang);
+export const priceLabel = (v: Vehicle): string => formatPrice(v.price);
 
 export function facetCounts<K extends keyof Vehicle>(list: Vehicle[], key: K): { value: string; count: number }[] {
   const map = new Map<string, number>();
@@ -234,7 +177,7 @@ export interface VehicleLite extends FilterableVehicle {
   specs: SpecRow[];
 }
 
-export const toLite = (v: Vehicle, lang: Locale = 'de'): VehicleLite => ({
+export const toLite = (v: Vehicle): VehicleLite => ({
   id: v.id,
   slug: v.slug,
   title: v.title,
@@ -252,7 +195,7 @@ export const toLite = (v: Vehicle, lang: Locale = 'de'): VehicleLite => ({
   sleepingPlaces: v.sleepingPlaces,
   beds: v.beds,
   image: v.images[0] ? vehicleImage(v.images[0], 640) : null,
-  priceLabel: priceLabel(v, lang),
-  facts: cardFacts(v, lang),
+  priceLabel: priceLabel(v),
+  facts: cardFacts(v),
   specs: specRows(v),
 });

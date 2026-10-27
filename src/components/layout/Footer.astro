@@ -2,63 +2,47 @@
 import Logo from '@/components/brand/Logo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { company, openingHours, formatHours } from '@/data/company';
-import { legalNavFor } from '@/data/navigation';
-import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
+import { legalNav } from '@/data/navigation';
 import { url } from '@/lib/url';
-
-interface Props {
-  lang?: Locale;
-}
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
-const L = (path: string) => url(localizedPath(path, lang));
-const legalNav = legalNavFor(lang);
 
 const groups = [
   {
-    title: t(lang, 'footerVehicles'),
+    title: 'Fahrzeuge',
     links: [
-      { label: t(lang, 'footerAllMh'), href: '/wohnmobile/' },
-      { label: t(lang, 'navUsed'), href: '/wohnmobil-verkauf/' },
-      { label: t(lang, 'navFinder'), href: '/camper-finder/' },
-      { label: t(lang, 'navBrands'), href: '/marken/' },
-      { label: t(lang, 'navConfigurator'), href: '/la-strada-konfigurator/' },
-      { label: t(lang, 'navWishlist'), href: '/merkliste/' },
+      { label: 'Alle Wohnmobile', href: '/wohnmobile/' },
+      { label: 'Gebrauchte Wohnmobile', href: '/wohnmobil-verkauf/' },
+      { label: 'Camper-Finder', href: '/camper-finder/' },
+      { label: 'Marken', href: '/marken/' },
+      { label: 'La Strada Konfigurator', href: '/la-strada-konfigurator/' },
+      { label: 'Merkliste', href: '/merkliste/' },
     ],
   },
   {
-    title: t(lang, 'footerService'),
+    title: 'Service',
     links: [
-      { label: t(lang, 'footerSell'), href: '/wohnmobil-ankauf/' },
-      { label: t(lang, 'footerRent'), href: '/vermietung-wohnmobile/' },
-      { label: t(lang, 'footerWorkshop'), href: '/werkstatt-kundendienst/' },
-      { label: t(lang, 'navWash'), href: '/fahrzeugwaesche-herbst/' },
-      { label: t(lang, 'navTour'), href: '/360-rundgang/' },
+      { label: 'Wohnmobil verkaufen', href: '/wohnmobil-ankauf/' },
+      { label: 'Wohnmobil mieten', href: '/vermietung-wohnmobile/' },
+      { label: 'Werkstatt & Kundendienst', href: '/werkstatt-kundendienst/' },
+      { label: 'Fahrzeugwäsche', href: '/fahrzeugwaesche-herbst/' },
+      { label: '360° Rundgang', href: '/360-rundgang/' },
     ],
   },
   {
-    title: t(lang, 'footerCompany'),
+    title: 'Unternehmen',
     links: [
-      { label: t(lang, 'navAbout'), href: '/ueber-uns/' },
-      { label: t(lang, 'navJobs'), href: '/jobs/' },
-      { label: t(lang, 'footerContactRoute'), href: '/kontakt/' },
+      { label: 'Über uns', href: '/ueber-uns/' },
+      { label: 'Jobs', href: '/jobs/' },
+      { label: 'Kontakt & Anfahrt', href: '/kontakt/' },
     ],
   },
 ];
-
-const dayLabel = (days: string) => {
-  if (days.includes('Montag') || days.includes('Monday')) return t(lang, 'footerDaysMonFri');
-  if (days.includes('Samstag') || days.includes('Saturday')) return t(lang, 'footerDaysSat');
-  return days;
-};
 ---
 
 <footer class="site-footer">
   <div class="container footer-grid">
     <div class="footer-brand">
       <Logo tone="light" />
-      <p class="footer-motto">
-        {t(lang, 'brandMotto')}. {t(lang, 'brandFounded')} {t(lang, 'footerMottoSuffix')}
-      </p>
+      <p class="footer-motto">{company.motto}. {company.foundedStatement} in Overath – Vertragshändler, ADAC-Mietstation und Fachwerkstatt für Wohnmobile und Wohnwagen.</p>
       <address class="footer-address">
         <strong>{company.legalName}</strong><br />
         {company.address.street}<br />
@@ -66,36 +50,30 @@ const dayLabel = (days: string) => {
       </address>
       <ul class="footer-contact">
         <li>
-          <a href={company.phone.href} data-track="call_click" data-track-location="footer"
-            ><Icon name="phone" /> {company.phone.display}</a
-          >
+          <a href={company.phone.href} data-track="call_click" data-track-location="footer"><Icon name="phone" /> {company.phone.display}</a>
         </li>
         <li>
-          <a href={`mailto:${company.email}`} data-track="email_click" data-track-location="footer"
-            ><Icon name="mail" /> {company.email}</a
-          >
+          <a href={`mailto:${company.email}`} data-track="email_click" data-track-location="footer"><Icon name="mail" /> {company.email}</a>
         </li>
         <li>
-          <a href={company.directions} target="_blank" rel="noopener" data-track="route_click" data-track-location="footer"
-            ><Icon name="route" /> {t(lang, 'planRoute')}</a
-          >
+          <a href={company.directions} target="_blank" rel="noopener" data-track="route_click" data-track-location="footer"><Icon name="route" /> Route planen</a>
         </li>
       </ul>
     </div>
 
     <div class="footer-hours">
-      <h2 class="footer-title">{t(lang, 'openingHours')}</h2>
+      <h2 class="footer-title">Öffnungszeiten</h2>
       <dl>
         {
           openingHours.map((p) => (
             <div>
-              <dt>{dayLabel(p.days)}</dt>
+              <dt>{p.days}</dt>
               <dd>{formatHours(p)}</dd>
             </div>
           ))
         }
       </dl>
-      <p class="footer-note">{t(lang, 'closedSundayHoliday')}</p>
+      <p class="footer-note">Sonntags und an gesetzlichen Feiertagen (NRW) geschlossen.</p>
     </div>
 
     {
@@ -105,7 +83,7 @@ const dayLabel = (days: string) => {
           <ul>
             {g.links.map((l) => (
               <li>
-                <a href={L(l.href)}>{l.label}</a>
+                <a href={url(l.href)}>{l.label}</a>
               </li>
             ))}
           </ul>
@@ -122,22 +100,20 @@ const dayLabel = (days: string) => {
       {
         legalNav.map((l) => (
           <li>
-            <a href={L(l.href)}>{l.label}</a>
+            <a href={url(l.href)}>{l.label}</a>
           </li>
         ))
       }
-      <li><button type="button" class="footer-consent" data-consent-open>{t(lang, 'cookieSettings')}</button></li>
+      <li><button type="button" class="footer-consent" data-consent-open>Cookie-Einstellungen</button></li>
       <li>
-        <a href={company.social.facebook} target="_blank" rel="noopener" class="footer-social"
-          ><Icon name="facebook" label={`${company.name} Facebook`} /></a
-        >
+        <a href={company.social.facebook} target="_blank" rel="noopener" class="footer-social"><Icon name="facebook" label="Campingcenter Overath auf Facebook" /></a>
       </li>
     </ul>
   </div>
   <div class="container footer-disclaimer">
     <p>
-      {t(lang, 'footerDisclaimer')}{' '}
-      <a href={company.officialWebsite} rel="noopener">ccoverath.de</a>. {t(lang, 'footerDisclaimerEnd')}
+      Redesign-Präsentation. Die offizielle Website des Campingcenter Overath ist{" "}
+      <a href={company.officialWebsite} rel="noopener">ccoverath.de</a>. Maßgeblich sind die dort und im Autohaus gemachten Angaben.
     </p>
   </div>
 </footer>

@@ -1,8 +1,6 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
 import { cardFacts, isNewToInventory, priceLabel, vehicleImage, vehicleSrcset, type Vehicle } from '@/lib/vehicles';
-import { getLangFromPath, localizedPath, type Locale } from '@/i18n';
-import { glossary, g, translateCategoryLabel, translateCondition } from '@/i18n/glossary';
 import { url } from '@/lib/url';
 
 interface Props {
@@ -13,21 +11,11 @@ interface Props {
   compare?: boolean;
   /** Only render NEU IM BESTAND when caller confirms dates are reliable. */
   showNewInventoryBadge?: boolean;
-  lang?: Locale;
 }
-const {
-  vehicle: v,
-  index = 0,
-  priority = false,
-  headingLevel = 3,
-  compare = true,
-  showNewInventoryBadge = false,
-  lang: langProp,
-} = Astro.props;
-const lang = langProp ?? getLangFromPath(Astro.url.pathname);
+const { vehicle: v, index = 0, priority = false, headingLevel = 3, compare = true, showNewInventoryBadge = false } = Astro.props;
 const newInventory = showNewInventoryBadge && isNewToInventory(v);
 const Heading = headingLevel === 2 ? 'h2' : 'h3';
-const href = url(localizedPath(`/wohnmobile/${v.slug}/`, lang));
+const href = url(`/wohnmobile/${v.slug}/`);
 const cover = v.images[0];
 ---
 
@@ -59,21 +47,21 @@ const cover = v.images[0];
           sizes="(min-width: 80em) 24rem, (min-width: 48em) 45vw, 92vw"
           width="640"
           height="480"
-          alt={`${v.title} – ${g(lang, glossary.card.exteriorAlt)}`}
+          alt={`${v.title} – Außenansicht`}
           loading={priority ? 'eager' : 'lazy'}
           fetchpriority={priority ? 'high' : 'auto'}
           decoding="async"
         />
       ) : (
-        <div class="vcard-noimg">{g(lang, glossary.card.imagesFollow)}</div>
+        <div class="vcard-noimg">Bilder folgen</div>
       )
     }
     <div class="vcard-badges">
-      {newInventory && <span class="badge badge-arrived">{g(lang, glossary.card.newInStock)}</span>}
-      <span class:list={['badge', v.condition === 'neu' ? 'badge-new' : 'badge-used']}>{translateCondition(v.condition, lang)}</span>
-      <span class="badge badge-glass">{translateCategoryLabel(v.categoryLabel, lang)}</span>
+      {newInventory && <span class="badge badge-arrived">NEU IM BESTAND</span>}
+      <span class:list={['badge', v.condition === 'neu' ? 'badge-new' : 'badge-used']}>{v.condition === 'neu' ? 'Neu' : 'Gebraucht'}</span>
+      <span class="badge badge-glass">{v.categoryLabel}</span>
     </div>
-    <button type="button" class="vcard-fav" data-fav-toggle={v.id} aria-pressed="false" aria-label={`${v.title} ${g(lang, glossary.card.save)}`}>
+    <button type="button" class="vcard-fav" data-fav-toggle={v.id} aria-pressed="false" aria-label={`${v.title} merken`}>
       <Icon name="heart" />
     </button>
     {v.images.length > 1 && <span class="vcard-count"><Icon name="image" /> {v.images.length}</span>}
@@ -84,22 +72,22 @@ const cover = v.images[0];
     <Heading class="vcard-title">
       <a href={href} data-track="vehicle_card_click" data-track-label={v.id}><span class="sr-only">{v.make}{" "}</span>{v.model}</a>
     </Heading>
-    <ul class="vcard-facts" aria-label={g(lang, glossary.card.factsAria)}>
-      {cardFacts(v, lang).map((f) => <li>{f}</li>)}
+    <ul class="vcard-facts" aria-label="Eckdaten">
+      {cardFacts(v).map((f) => <li>{f}</li>)}
     </ul>
     <div class="vcard-foot">
       <p class="vcard-price">
-        <span class="sr-only">{g(lang, glossary.card.priceAria)}</span>
-        {priceLabel(v, lang)}
-        {v.vatDeductible && <small>{g(lang, glossary.card.vatDeductible)}</small>}
+        <span class="sr-only">Preis:</span>
+        {priceLabel(v)}
+        {v.vatDeductible && <small>MwSt. ausweisbar</small>}
       </p>
-      <span class="vcard-cta" aria-hidden="true">{g(lang, glossary.card.details)} <Icon name="arrow-right" /></span>
+      <span class="vcard-cta" aria-hidden="true">Details ansehen <Icon name="arrow-right" /></span>
     </div>
     {
       compare && (
         <button type="button" class="vcard-compare" data-compare-toggle={v.id} aria-pressed="false">
           <Icon name="compare" />
-          <span data-label>{g(lang, glossary.card.compare)}</span>
+          <span data-label>Vergleichen</span>
           <span class="sr-only">: {v.title}</span>
         </button>
       )
@@ -119,19 +107,17 @@ const cover = v.images[0];
     box-shadow: var(--shadow-sm);
     transition:
       transform var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease),
-      border-color var(--dur) var(--ease);
+      box-shadow var(--dur) var(--ease);
   }
 
   @media (hover: hover) {
     .vcard:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       box-shadow: var(--shadow);
-      border-color: var(--brand-soft);
     }
 
     .vcard:hover .vcard-media img {
-      transform: scale(1.04);
+      transform: scale(1.035);
     }
   }
 

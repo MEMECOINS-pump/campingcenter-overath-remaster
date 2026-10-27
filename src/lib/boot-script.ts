@@ -4,7 +4,6 @@
  */
 import { schedulePayload } from '@/lib/opening-hours';
 import { holidaysAround } from '@/data/holidays';
-import { enRoutesPayload } from '@/i18n';
 
 export function buildBootScript(): string {
   const year = new Date().getFullYear();
@@ -13,7 +12,6 @@ export function buildBootScript(): string {
     holidays: holidaysAround(year)
       .concat(holidaysAround(year + 1))
       .filter((h, i, arr) => arr.findIndex((x) => x.date === h.date) === i),
-    enRoutes: enRoutesPayload(),
   };
   const json = JSON.stringify(payload).replace(/</g, '\\u003c');
 
@@ -50,46 +48,8 @@ try{
 }catch(e){}
 try{
   var favs=JSON.parse(localStorage.getItem('cco:favorites')||'[]');
-  /* Never use data-fav-count on <html> — paint() would match html and wipe the document via textContent. */
-  if(Array.isArray(favs)&&favs.length){html.dataset.ccoFavCount=String(favs.length);}
+  if(Array.isArray(favs)&&favs.length){html.dataset.favCount=String(favs.length);}
 }catch(e){}
-var langPref='';
-try{
-  langPref=localStorage.getItem('cco:lang')||'';
-  if(langPref==='de'||langPref==='en')html.dataset.ccoLang=langPref;
-}catch(e){}
-/* Locale persistence: sync URL ↔ cco:lang and redirect before paint when an EN page exists. */
-(function(){
-  var path=location.pathname||'/';
-  var base='${(process.env.BASE_PATH || '/').replace(/\/$/, '')}';
-  var rel=path;
-  if(base&&base!=='/'&&rel.indexOf(base)===0)rel=rel.slice(base.length)||'/';
-  if(rel.charAt(0)!=='/')rel='/'+rel;
-  var isEnPath=rel==='/en'||rel==='/en/'||rel.indexOf('/en/')===0;
-  var bare=isEnPath?(rel==='/en'||rel==='/en/'?'/':rel.slice(3)):(rel||'/');
-  if(bare.indexOf('?')>=0)bare=bare.split('?')[0];
-  if(bare.indexOf('#')>=0)bare=bare.split('#')[0];
-  if(bare.length>1&&bare.slice(-1)!=='/')bare+='/';
-  if(isEnPath&&langPref!=='en'){
-    try{localStorage.setItem('cco:lang','en');}catch(e){}
-    langPref='en';html.dataset.ccoLang='en';
-  }
-  function hasEn(b){
-    if((D.enRoutes||[]).indexOf(b)>=0)return true;
-    return /^\\/wohnmobile\\/[^/]+\\/$/.test(b);
-  }
-  if(langPref==='en'&&!isEnPath&&hasEn(bare)){
-    var dest=(base||'')+(bare==='/'?'/en/':'/en'+bare)+location.search+location.hash;
-    location.replace(dest);
-    return;
-  }
-  if(langPref==='de'&&isEnPath){
-    var destDe=(base||'')+bare+location.search+location.hash;
-    location.replace(destDe);
-    return;
-  }
-})();
-var bootEn=langPref==='en'||((html.getAttribute('lang')||'').indexOf('en')===0);
 function berlin(){
   var parts=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Berlin',weekday:'long',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
   var g=function(t){var x=parts.find(function(p){return p.type===t;});return x?x.value:'';};
@@ -112,15 +72,13 @@ function nextOpen(fromIso,fromMin){
     for(var i=0;i<D.schedule.length;i++){if(D.schedule[i].d===day){hours=D.schedule[i].h;break;}}
     if(!hours||!hours[0])continue;
     if(offset===0){
-      for(var j=0;j<hours.length;j++){
-        if(toMin(hours[j][0])>fromMin)return bootEn?('opens today at '+hours[j][0]):('öffnet heute um '+hours[j][0]+' Uhr');
-      }
+      for(var j=0;j<hours.length;j++){if(toMin(hours[j][0])>fromMin)return 'öffnet heute um '+hours[j][0]+' Uhr';}
       continue;
     }
     var first=hours[0][0];
-    if(offset===1)return bootEn?('opens tomorrow at '+first):('öffnet morgen um '+first+' Uhr');
-    var when=new Intl.DateTimeFormat(bootEn?'en-GB':'de-DE',{weekday:'long',day:'numeric',month:'long'}).format(new Date(Number(iso.slice(0,4)),Number(iso.slice(5,7))-1,Number(iso.slice(8,10))));
-    return bootEn?('opens '+when+' at '+first):('öffnet am '+when+' um '+first+' Uhr');
+    if(offset===1)return 'öffnet morgen um '+first+' Uhr';
+    var when=new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long'}).format(new Date(Number(iso.slice(0,4)),Number(iso.slice(5,7))-1,Number(iso.slice(8,10))));
+    return 'öffnet am '+when+' um '+first+' Uhr';
   }
   return '';
 }
@@ -137,12 +95,11 @@ if(!hol&&dayHours){
     if(now.minutes>=a&&now.minutes<b){slot=dayHours[j];break;}
   }
 }
-var isEn=bootEn;
 var state,reason,label,sub='',alertName='';
 var opensNext=nextOpen(now.iso,now.minutes);
-if(hol){state='closed';reason='holiday';label=isEn?('Closed for public holiday: '+hol.name):('Geschlossen wegen Feiertag: '+hol.name);alertName=hol.name;sub=(isEn?'Public holiday (NRW)':'Gesetzlicher Feiertag (NRW)')+(opensNext?' · '+opensNext:'');}
-else if(slot){state='open';reason='hours';label=isEn?('Open today · until '+slot[1]):('Heute geöffnet · bis '+slot[1]+' Uhr');}
-else{state='closed';reason=(now.day==='Sunday'||!dayHours)?'sunday':'outside';label=isEn?'Currently closed':'Aktuell geschlossen';sub=opensNext||'';}
+if(hol){state='closed';reason='holiday';label='Geschlossen wegen Feiertag: '+hol.name;alertName=hol.name;sub='Gesetzlicher Feiertag (NRW)'+(opensNext?' · '+opensNext:'');}
+else if(slot){state='open';reason='hours';label='Heute geöffnet · bis '+slot[1]+' Uhr';}
+else{state='closed';reason=(now.day==='Sunday'||!dayHours)?'sunday':'outside';label='Aktuell geschlossen';sub=opensNext||'';}
 /* Use cco* keys — never data-open-state on <html> (would match badges and wipe the document via textContent). */
 html.dataset.ccoOpen=state;
 html.dataset.ccoOpenReason=reason;
@@ -150,11 +107,6 @@ html.dataset.ccoOpenLabel=label;
 html.dataset.ccoOpenAlert=alertName;
 if(window.scrollY>24)html.classList.add('boot-scrolled');
 function paint(){
-  /* Migrate legacy attribute that wiped the DOM when favorites existed */
-  if(html.dataset.favCount){
-    if(!html.dataset.ccoFavCount)html.dataset.ccoFavCount=html.dataset.favCount;
-    delete html.dataset.favCount;
-  }
   document.querySelectorAll('[data-opening-status]').forEach(function(root){
     root.dataset.state=state;root.dataset.reason=reason;
     root.querySelectorAll('[data-oh-line]').forEach(function(el){el.textContent=label;});
@@ -173,7 +125,7 @@ function paint(){
   });
   document.querySelectorAll('span[data-open-state], .open-state[data-open-state]').forEach(function(el){
     el.dataset.state=state;el.dataset.reason=reason;
-    el.textContent=reason==='holiday'?(isEn?'Public holiday · Closed':'Feiertag · Geschlossen'):(state==='open'?(isEn?'Open now':'Jetzt geöffnet'):(isEn?'Currently closed':'Aktuell geschlossen'));
+    el.textContent=reason==='holiday'?'Feiertag · Geschlossen':(state==='open'?'Jetzt geöffnet':'Aktuell geschlossen');
   });
   if(html.classList.contains('needs-consent')){
     var banner=document.querySelector('[data-consent-banner]');
@@ -181,13 +133,8 @@ function paint(){
   }
   var header=document.querySelector('[data-header][data-overlay]');
   if(header&&html.classList.contains('boot-scrolled'))header.classList.add('is-solid');
-  var n=html.dataset.ccoFavCount;
-  if(n){
-    document.querySelectorAll('[data-fav-count]').forEach(function(el){
-      if(el===html||el===document.documentElement)return;
-      el.textContent=n;el.hidden=false;
-    });
-  }
+  var n=html.dataset.favCount;
+  if(n){document.querySelectorAll('[data-fav-count]').forEach(function(el){el.textContent=n;el.hidden=false;});}
 }
 if(document.body)paint();
 else document.addEventListener('DOMContentLoaded',paint);

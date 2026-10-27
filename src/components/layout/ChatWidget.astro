@@ -1,61 +1,53 @@
 ---
-/**
- * Camping KI chat — opened only via CampingCompanion (`cco:open-chat`).
- * No separate FAB; assist rules are lazy-loaded on first open/ask.
- */
 import Icon from '@/components/ui/Icon.astro';
-import { campingQuickPrompts } from '@/lib/camping-assist';
+import { CAMPING_QUICK_PROMPTS } from '@/lib/camping-assist';
 import { challengerManualHighlights, challengerManuals } from '@/data/challenger-manuals';
-import { getLangFromPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
-
-interface Props {
-  lang?: Locale;
-}
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
 ---
 
-<div class="chatw" data-chat-widget data-size="md" data-lang={lang}>
+<div class="chatw" data-chat-widget data-size="md">
   <div class="chatw-panel" data-chat-panel hidden id="chatw-panel" role="dialog" aria-labelledby="chatw-title">
     <header class="chatw-head">
       <div class="chatw-brand">
         <span class="chatw-avatar" aria-hidden="true"><Icon name="van" /></span>
         <div class="chatw-brand-text">
-          <p class="chatw-kicker">{t(lang, 'chatKicker')}</p>
-          <h2 class="chatw-title" id="chatw-title">{t(lang, 'chatTitle')}</h2>
+          <p class="chatw-kicker">ccoverath KI</p>
+          <h2 class="chatw-title" id="chatw-title">Camping-Assistent</h2>
         </div>
       </div>
       <div class="chatw-tools">
-        <div class="chatw-sizes" role="group" aria-label={t(lang, 'chatWindowSize')}>
-          <button type="button" class="chatw-size-btn" data-chat-size="sm" aria-label="S" title="S">S</button>
-          <button type="button" class="chatw-size-btn is-active" data-chat-size="md" aria-label="M" title="M">M</button>
-          <button type="button" class="chatw-size-btn" data-chat-size="lg" aria-label="L" title="L">L</button>
-          <button type="button" class="chatw-size-btn" data-chat-size="xl" aria-label="XL" title="XL">XL</button>
+        <div class="chatw-sizes" role="group" aria-label="Fenstergröße">
+          <button type="button" class="chatw-size-btn" data-chat-size="sm" aria-label="Klein" title="Klein">S</button>
+          <button type="button" class="chatw-size-btn is-active" data-chat-size="md" aria-label="Mittel" title="Mittel">M</button>
+          <button type="button" class="chatw-size-btn" data-chat-size="lg" aria-label="Groß" title="Groß">L</button>
+          <button type="button" class="chatw-size-btn" data-chat-size="xl" aria-label="Sehr groß" title="Sehr groß">XL</button>
         </div>
-        <button type="button" class="chatw-x" data-chat-close aria-label={t(lang, 'chatClose')}>
+        <button type="button" class="chatw-x" data-chat-close aria-label="Assistent schließen">
           <Icon name="close" />
         </button>
       </div>
     </header>
 
-    <div class="chatw-tabs" role="tablist" aria-label={t(lang, 'chatTitle')}>
+    <div class="chatw-tabs" role="tablist" aria-label="Assistent-Bereiche">
       <button type="button" class="chatw-tab is-active" role="tab" aria-selected="true" data-chat-tab="chat" id="chatw-tab-chat">
-        {t(lang, 'chatTabChat')}
+        Chat
       </button>
       <button type="button" class="chatw-tab" role="tab" aria-selected="false" data-chat-tab="manuals" id="chatw-tab-manuals">
-        {t(lang, 'chatTabManuals')}
+        Wartungshefte
       </button>
     </div>
 
     <div class="chatw-pane" data-chat-pane="chat" role="tabpanel" aria-labelledby="chatw-tab-chat">
       <div class="chatw-body" data-chat-body>
         <div class="chatw-msg chatw-msg-bot is-latest" data-chat-msg>
-          <p class="chatw-msg-lead">{t(lang, 'chatHello')}</p>
-          <p>{t(lang, 'chatIntro')}</p>
+          <p class="chatw-msg-lead">Hallo – wie kann ich helfen?</p>
+          <p>
+            Fragen zu <strong>Challenger</strong>, Kauf, Miete, Ankauf, Öffnungszeiten oder Service. Kurze Stichworte reichen.
+          </p>
         </div>
         <div class="chatw-chips" data-chat-chips>
           {
-            campingQuickPrompts(lang).map((q) => (
+            CAMPING_QUICK_PROMPTS.map((q) => (
               <button type="button" class="chatw-chip" data-chat-chip data-text={q.text}>
                 {q.label}
               </button>
@@ -66,20 +58,20 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
       </div>
 
       <form class="chatw-composer" data-chat-form>
-        <label class="sr-only" for="chatw-input">{t(lang, 'chatSend')}</label>
+        <label class="sr-only" for="chatw-input">Nachricht</label>
         <div class="chatw-input-wrap">
           <textarea
             id="chatw-input"
             name="message"
             rows="1"
-            placeholder={t(lang, 'chatPlaceholder')}
+            placeholder="Nachricht an ccoverath KI …"
             data-chat-input
             maxlength="800"></textarea>
-          <button type="submit" class="chatw-send" data-chat-send aria-label={t(lang, 'chatSend')}>
+          <button type="submit" class="chatw-send" data-chat-send aria-label="Senden">
             <Icon name="arrow-right" />
           </button>
         </div>
-        <p class="chatw-hint">{t(lang, 'chatHint')}</p>
+        <p class="chatw-hint">Enter senden · Shift+Enter neue Zeile · Größe oben mit S–XL</p>
       </form>
     </div>
 
@@ -128,7 +120,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
                   data-track="cta_click"
                   data-track-location="chat-manual"
                 >
-                  {t(lang, 'chatOpenPdf')}
+                  PDF öffnen
                   <Icon name="external" />
                 </a>
               </li>
@@ -143,8 +135,16 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
       </div>
     </div>
 
-    <div class="chatw-resize" data-chat-resize title="Resize" aria-hidden="true"></div>
+    <div class="chatw-resize" data-chat-resize title="Ziehen zum Vergrößern" aria-hidden="true"></div>
   </div>
+
+  <button type="button" class="chatw-fab" data-chat-toggle aria-expanded="false" aria-controls="chatw-panel">
+    <span class="chatw-fab-icon" aria-hidden="true"><Icon name="van" /></span>
+    <span class="chatw-fab-copy">
+      <span class="chatw-fab-eyebrow">ccoverath</span>
+      <span class="chatw-fab-label">Camping-KI</span>
+    </span>
+  </button>
 </div>
 
 <style>
@@ -193,16 +193,14 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
     --cw-h: min(52rem, var(--cw-max-h));
   }
 
-  /* Offen: Actionbar aus, Fenster bleibt im Viewport (FAB removed — Companion launches) */
+  /* Offen: FAB weg, Actionbar aus, Fenster bleibt im Viewport */
   .chatw.is-open {
     --cw-gap-bottom: calc(var(--safe-bottom) + 0.75rem);
     --cw-max-h: calc(100dvh - var(--cw-gap-bottom) - 0.5rem);
   }
 
-  .chatw:not(.is-open) {
-    width: 0;
-    height: 0;
-    overflow: visible;
+  .chatw.is-open .chatw-fab {
+    display: none;
   }
 
   @media (max-width: 40em) {
@@ -214,6 +212,74 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
       --cw-w: 100%;
       --cw-h: var(--cw-max-h);
     }
+  }
+
+  .chatw-fab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 3.35rem;
+    padding: 0.4rem 1.1rem 0.4rem 0.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--graphite);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+    box-shadow: 0 12px 32px -14px rgb(28 32 36 / 0.55);
+    transition:
+      transform 0.18s ease,
+      background 0.18s ease;
+  }
+
+  .chatw-fab:hover {
+    transform: translateY(-2px);
+    background: #2a3036;
+  }
+
+  .chatw-fab[aria-expanded='true'] {
+    background: var(--brand);
+    color: var(--graphite);
+  }
+
+  .chatw-fab-icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--brand);
+    color: var(--graphite);
+    flex: none;
+  }
+
+  .chatw-fab[aria-expanded='true'] .chatw-fab-icon {
+    background: rgb(28 32 36 / 0.12);
+  }
+
+  .chatw-fab-icon :global(.icon) {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+
+  .chatw-fab-copy {
+    display: grid;
+    gap: 0.05rem;
+    text-align: left;
+    line-height: 1.15;
+  }
+
+  .chatw-fab-eyebrow {
+    font-size: 0.62rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .chatw-fab-label {
+    font-size: 0.95rem;
+    font-weight: 800;
   }
 
   .chatw-panel {
@@ -834,33 +900,12 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
 
 <script>
   import { track } from '@/lib/analytics';
-  import type { CampingAssistResult } from '@/lib/camping-assist';
+  import { assistCamping, type CampingAssistResult } from '@/lib/camping-assist';
   import { url } from '@/lib/url';
 
   const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
   const SIZE_KEY = 'cco-chat-size';
   const THINK_MS = 700;
-  const MSG_SHORT_DE =
-    'Schreib bitte etwas genauer – z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“.';
-  const MSG_SHORT_EN =
-    'Please be a bit more specific — e.g. “Challenger 240”, “rent” or “opening hours”.';
-  const THINK_DE = 'ccoverath KI denkt';
-  const THINK_EN = 'ccoverath AI is thinking';
-
-  type AssistFn = (message: string, lang?: 'de' | 'en') => CampingAssistResult;
-  let assistCampingLazy: AssistFn | null = null;
-  let assistLoad: Promise<AssistFn> | null = null;
-
-  function loadAssist(): Promise<AssistFn> {
-    if (assistCampingLazy) return Promise.resolve(assistCampingLazy);
-    if (!assistLoad) {
-      assistLoad = import('@/lib/camping-assist').then((m) => {
-        assistCampingLazy = m.assistCamping;
-        return m.assistCamping;
-      });
-    }
-    return assistLoad;
-  }
 
   function escapeHtml(s: string) {
     return s
@@ -885,9 +930,8 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
     return `<span class="chatw-msg-title">${escapeHtml(data.title)}</span><p>${escapeHtml(data.summary)}</p>${bullets}${disclaimer}${cta}`;
   }
 
-  function thinkingHtml(lang: string) {
-    const label = lang === 'en' ? THINK_EN : THINK_DE;
-    return `<span class="chatw-thinking" aria-live="polite"><span>${label}</span><span class="chatw-thinking-dots" aria-hidden="true"><span></span><span></span><span></span></span></span>`;
+  function thinkingHtml() {
+    return `<span class="chatw-thinking" aria-live="polite"><span>ccoverath KI denkt</span><span class="chatw-thinking-dots" aria-hidden="true"><span></span><span></span><span></span></span></span>`;
   }
 
   function wait(ms: number) {
@@ -896,6 +940,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
 
   document.querySelectorAll<HTMLElement>('[data-chat-widget]').forEach((root) => {
     const panel = root.querySelector<HTMLElement>('[data-chat-panel]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-chat-toggle]');
     const close = root.querySelector('[data-chat-close]');
     const form = root.querySelector<HTMLFormElement>('[data-chat-form]');
     const input = root.querySelector<HTMLTextAreaElement>('[data-chat-input]');
@@ -906,9 +951,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
     const tabs = root.querySelectorAll<HTMLButtonElement>('[data-chat-tab]');
     const panes = root.querySelectorAll<HTMLElement>('[data-chat-pane]');
     const sizeBtns = root.querySelectorAll<HTMLButtonElement>('[data-chat-size]');
-    if (!panel || !form || !input || !body) return;
-    const siteLang = () =>
-      root.dataset.lang === 'en' || document.documentElement.lang.startsWith('en') ? 'en' : 'de';
+    if (!panel || !toggle || !form || !input || !body) return;
 
     const scrollToLatest = () => {
       requestAnimationFrame(() => {
@@ -959,17 +1002,14 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
 
     const setOpen = (open: boolean) => {
       panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
       root.classList.toggle('is-open', open);
       document.body.classList.toggle('bar-hidden', open);
-      document.body.classList.toggle('scroll-locked', open);
       if (open) {
         track('chat_widget_open');
-        window.dispatchEvent(new CustomEvent('cco:chat-opened'));
         const chatPane = root.querySelector<HTMLElement>('[data-chat-pane="chat"]');
         if (!chatPane?.hidden) input.focus({ preventScroll: true });
         scrollToLatest();
-      } else {
-        window.dispatchEvent(new CustomEvent('cco:chat-closed'));
       }
     };
 
@@ -990,20 +1030,18 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
     };
 
     const ask = async (message: string): Promise<CampingAssistResult> => {
-      const assistCamping = await loadAssist();
-      const lang = siteLang();
-      let data = assistCamping(message, lang);
+      let data = assistCamping(message);
       try {
         if (API) {
           const res = await fetch(`${API}/api/camping-assistant`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, lang }),
+            body: JSON.stringify({ message }),
           });
           if (res.ok) data = (await res.json()) as CampingAssistResult;
         }
       } catch {
-        /* local rules / offline fallback */
+        /* local */
       }
       return data;
     };
@@ -1017,7 +1055,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
       const cleaned = message.trim();
       if (cleaned.length < 2) return;
       if (cleaned.length < 4) {
-        appendMsg(siteLang() === 'en' ? MSG_SHORT_EN : MSG_SHORT_DE, 'bot');
+        appendMsg('Schreib bitte etwas genauer – z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“.', 'bot');
         return;
       }
       setTab('chat');
@@ -1027,7 +1065,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
       autosize(input);
       track('camping_assistant_start', { source: 'chat_widget' });
 
-      const thinking = appendMsg(thinkingHtml(siteLang()), 'bot', true);
+      const thinking = appendMsg(thinkingHtml(), 'bot', true);
       thinking.classList.add('is-thinking');
       const started = Date.now();
       const data = await ask(cleaned);
@@ -1040,14 +1078,8 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
       track('camping_assistant_complete', { provider: data.provider, off_topic: data.offTopic ? 1 : 0 });
     };
 
+    toggle.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
     close?.addEventListener('click', () => setOpen(false));
-    window.addEventListener('cco:open-chat', () => {
-      void loadAssist();
-      setOpen(true);
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && root.classList.contains('is-open')) setOpen(false);
-    });
     tabs.forEach((t) => t.addEventListener('click', () => setTab(t.dataset.chatTab || 'chat')));
     sizeBtns.forEach((b) => b.addEventListener('click', () => setSize(b.dataset.chatSize || 'md')));
 

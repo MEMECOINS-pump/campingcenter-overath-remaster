@@ -1,53 +1,44 @@
 ---
 import Logo from '@/components/brand/Logo.astro';
 import Icon from '@/components/ui/Icon.astro';
-import { mainNavFor, moreNavFor } from '@/data/navigation';
+import { mainNav, moreNav } from '@/data/navigation';
 import { company, openingHours, formatHours } from '@/data/company';
-import { getLangFromPath, localizedPath, stripLocale, t, type Locale } from '@/i18n';
-import { url } from '@/lib/url';
+import { stripBase, url } from '@/lib/url';
 
-interface Props {
-  lang?: Locale;
-}
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
-const mainNav = mainNavFor(lang);
-const moreNav = moreNavFor(lang);
-const L = (path: string) => url(localizedPath(path, lang));
-const current = stripLocale(Astro.url.pathname);
+const current = stripBase(Astro.url.pathname);
 const primary = [
-  { label: t(lang, 'navSale'), href: '/wohnmobile/', hint: t(lang, 'navSaleHint'), icon: 'van' as const },
-  { label: t(lang, 'footerSell'), href: '/wohnmobil-ankauf/', hint: t(lang, 'navTradeInHint'), icon: 'tag' as const },
-  { label: t(lang, 'navRental'), href: '/vermietung-wohnmobile/', hint: t(lang, 'navRentalHint'), icon: 'key' as const },
-  { label: t(lang, 'navWorkshop'), href: '/werkstatt-kundendienst/', hint: t(lang, 'navWorkshopHint'), icon: 'wrench' as const },
+  { label: 'Verkauf', href: '/wohnmobile/', hint: 'Fahrzeuge entdecken', icon: 'van' as const },
+  { label: 'Fahrzeug verkaufen', href: '/wohnmobil-ankauf/', hint: 'Ankauf starten', icon: 'tag' as const },
+  { label: 'Vermietung', href: '/vermietung-wohnmobile/', hint: 'Wohnmobil mieten', icon: 'key' as const },
+  { label: 'Werkstatt', href: '/werkstatt-kundendienst/', hint: 'Service & Terminanfrage', icon: 'wrench' as const },
 ];
-const saleChildren = mainNav.find((i) => i.href === '/wohnmobile/')?.children ?? [];
 const secondary = [
   ...mainNav.filter((i) => i.href === '/ueber-uns/'),
-  ...saleChildren.filter((c) => c.href !== '/wohnmobile/'),
+  ...(mainNav.find((i) => i.label === 'Verkauf')?.children ?? []).filter((c) => c.href !== '/wohnmobile/'),
   ...moreNav,
 ];
 ---
 
-<dialog class="mobile-menu" id="mobile-menu" aria-label={t(lang, 'menu')} data-menu>
+<dialog class="mobile-menu" id="mobile-menu" aria-label="Menü" data-menu>
   <div class="mm-shell">
     <div class="mm-top">
-      <a href={L('/')} class="mm-logo" aria-label={`${company.name} – ${t(lang, 'homeAria')}`}>
+      <a href={url('/')} class="mm-logo" aria-label={`${company.name} – Startseite`}>
         <Logo withClaim={false} />
       </a>
       <button type="button" class="mm-close" data-menu-close autofocus>
         <Icon name="close" />
-        <span class="sr-only">{t(lang, 'menuClose')}</span>
+        <span class="sr-only">Menü schließen</span>
       </button>
     </div>
 
     <div class="mm-scroll">
-      <nav aria-label={t(lang, 'mobileNavAria')}>
-        <p class="mm-heading">{t(lang, 'menu')}</p>
+      <nav aria-label="Mobile Navigation">
+        <p class="mm-heading">Menü</p>
         <ul class="mm-primary">
           {
             primary.map((item) => (
               <li>
-                <a href={L(item.href)} aria-current={current.startsWith(item.href) ? 'page' : undefined}>
+                <a href={url(item.href)} aria-current={current.startsWith(item.href) ? 'page' : undefined}>
                   <span class="mm-icon">
                     <Icon name={item.icon} />
                   </span>
@@ -66,7 +57,7 @@ const secondary = [
           {
             secondary.map((item) => (
               <li>
-                <a href={L(item.href)} aria-current={current === item.href ? 'page' : undefined}>
+                <a href={url(item.href)} aria-current={current === item.href ? 'page' : undefined}>
                   {item.label}
                 </a>
               </li>
@@ -76,7 +67,7 @@ const secondary = [
       </nav>
 
       <section class="mm-contact" aria-labelledby="mm-contact-h">
-        <p class="mm-heading" id="mm-contact-h">{t(lang, 'contact')}</p>
+        <p class="mm-heading" id="mm-contact-h">Kontakt</p>
         <ul class="mm-contact-list">
           <li>
             <a href={company.phone.href} data-track="call_click" data-track-location="mobile-menu">
@@ -101,26 +92,22 @@ const secondary = [
           {
             openingHours.map((p) => (
               <div>
-                <dt>{lang === 'en' ? (p.schemaDays.includes('Saturday') ? 'Sat' : 'Mon–Fri') : p.shortDays}</dt>
-                <dd>
-                  {lang === 'en'
-                    ? p.hours.map((h) => `${h.opens}–${h.closes}`).join(' / ')
-                    : formatHours(p)}
-                </dd>
+                <dt>{p.shortDays}</dt>
+                <dd>{formatHours(p)}</dd>
               </div>
             ))
           }
           <div>
-            <dt>{t(lang, 'daysSundayHoliday')}</dt>
-            <dd>{t(lang, 'closed')}</dd>
+            <dt>So / Feiertag</dt>
+            <dd>geschlossen</dd>
           </div>
         </dl>
       </section>
     </div>
 
     <div class="mm-bottom">
-      <a class="btn btn-accent btn-block btn-lg" href={L('/kontakt/#beratung')} data-track="cta_click" data-track-location="mobile-menu">
-        {t(lang, 'bookAdvice')}
+      <a class="btn btn-accent btn-block btn-lg" href={url('/kontakt/#beratung')} data-track="cta_click" data-track-location="mobile-menu">
+        Beratung vereinbaren
       </a>
     </div>
   </div>

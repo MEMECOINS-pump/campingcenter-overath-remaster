@@ -2,38 +2,23 @@
 import Photo from '@/components/ui/Photo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { ankauf } from '@/data/content';
-import { ankaufEn } from '@/data/content-en';
-import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
-
-interface Props {
-  lang?: Locale;
-}
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
-const L = (path: string) => url(localizedPath(path, lang));
-const copy = lang === 'en' ? ankaufEn : ankauf;
-const types = copy.vehicleTypes.join(', ').replace(/, ([^,]*)$/, lang === 'en' ? ' and $1' : ' und $1');
 ---
 
 <section class="section section-dark ankauf" aria-labelledby="ankauf-title">
   <div class="container split split-reverse">
     <div class="ankauf-media reveal">
-      <Photo
-        src="ankauf-owner"
-        alt={lang === 'en' ? 'Motorhome owner handing over their vehicle' : 'Wohnmobilbesitzer übergibt sein Fahrzeug'}
-        sizes="(min-width: 60em) 40vw, 92vw"
-        widths={[480, 768, 1080]}
-      />
+      <Photo src="ankauf-owner" alt="Wohnmobilbesitzer übergibt sein Fahrzeug" sizes="(min-width: 60em) 40vw, 92vw" widths={[480, 768, 1080]} />
     </div>
     <div class="ankauf-copy">
-      <p class="eyebrow">{t(lang, 'ankaufEyebrow')}</p>
-      <h2 id="ankauf-title">{t(lang, 'ankaufTitle')}</h2>
+      <p class="eyebrow">Wohnmobil verkaufen</p>
+      <h2 id="ankauf-title">Dein Camper, fair bewertet.</h2>
       <p class="lead">
-        {lang === 'en' ? `We buy ${types}.` : `Wir kaufen ${types} an.`} {copy.promise}
+        Wir kaufen {ankauf.vehicleTypes.join(', ').replace(/, ([^,]*)$/, ' und $1')} an. {ankauf.promise}
       </p>
       <ol class="steps">
         {
-          copy.process.map((s, i) => (
+          ankauf.process.map((s, i) => (
             <li>
               <span class="step-no">{String(i + 1).padStart(2, '0')}</span>
               <div>
@@ -45,8 +30,8 @@ const types = copy.vehicleTypes.join(', ').replace(/, ([^,]*)$/, lang === 'en' ?
         }
       </ol>
       <div class="btn-row">
-        <a class="btn btn-accent btn-lg" href={L('/wohnmobil-ankauf/')} data-track="cta_click" data-track-location="ankauf-teaser">
-          {t(lang, 'ankaufCta')} <Icon name="arrow-right" class="arrow" />
+        <a class="btn btn-accent btn-lg" href={url('/wohnmobil-ankauf/')} data-track="cta_click" data-track-location="ankauf-teaser">
+          Fahrzeug bewerten <Icon name="arrow-right" class="arrow" />
         </a>
       </div>
     </div>

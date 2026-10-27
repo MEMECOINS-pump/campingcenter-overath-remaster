@@ -1,63 +1,57 @@
 ---
-import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
-
-interface Props {
-  lang?: Locale;
-}
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
 ---
 
 <section class="consent-banner" aria-labelledby="consent-title" data-consent-banner hidden>
   <div class="cb-inner">
     <div class="cb-text">
-      <h2 id="consent-title">{t(lang, 'cookieTitle')}</h2>
+      <h2 id="consent-title">Deine Privatsphäre</h2>
       <p>
-        {t(lang, 'cookieBody')}{' '}
-        <a href={url(localizedPath('/datenschutz/', lang))}>{t(lang, 'navPrivacy')}</a>
+        Kein Tracking. Google Maps und YouTube laden wir nur mit deiner Zustimmung.{" "}
+        <a href={url('/datenschutz/')}>Datenschutz</a>
       </p>
     </div>
     <div class="cb-actions">
-      <button type="button" class="btn btn-sm" data-consent-action="all">{t(lang, 'cookieAcceptAll')}</button>
-      <button type="button" class="btn btn-ghost btn-sm" data-consent-open>{t(lang, 'cookieSettingsBtn')}</button>
-      <button type="button" class="btn btn-ghost btn-sm" data-consent-action="necessary">{t(lang, 'cookieNecessaryOnly')}</button>
+      <button type="button" class="btn btn-sm" data-consent-action="all">Alle akzeptieren</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-open>Einstellungen</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-action="necessary">Nur notwendige</button>
     </div>
   </div>
 </section>
 
 <dialog class="consent-dialog" aria-labelledby="consent-dialog-title" data-consent-dialog>
   <form method="dialog" class="cd-form" data-consent-form>
-    <h2 id="consent-dialog-title">{t(lang, 'cookieDialogTitle')}</h2>
-    <p class="cd-intro">{t(lang, 'cookieDialogIntro')}</p>
+    <h2 id="consent-dialog-title">Cookie- und Medien-Einstellungen</h2>
+    <p class="cd-intro">Du entscheidest, was geladen wird. Deine Auswahl kannst du jederzeit im Footer unter „Cookie-Einstellungen“ ändern.</p>
 
     <div class="cd-option">
       <div>
-        <h3>{t(lang, 'cookieNecessary')}</h3>
-        <p>{t(lang, 'cookieNecessaryDesc')}</p>
+        <h3>Notwendig</h3>
+        <p>Speichert deine Merkliste, deinen Vergleich und diese Auswahl lokal in deinem Browser. Keine Übertragung an Dritte.</p>
       </div>
-      <span class="cd-always">{t(lang, 'cookieAlwaysOn')}</span>
+      <span class="cd-always">Immer aktiv</span>
     </div>
 
     <label class="cd-option">
       <div>
-        <h3>{t(lang, 'cookieMedia')}</h3>
-        <p>{t(lang, 'cookieMediaDesc')}</p>
+        <h3>Externe Medien</h3>
+        <p>Google Maps (Anfahrt) und YouTube-Videos (über youtube-nocookie.com). Beim Laden werden Daten an Google übertragen.</p>
       </div>
       <input type="checkbox" class="cd-switch" name="media" role="switch" />
     </label>
 
     <label class="cd-option">
       <div>
-        <h3>{t(lang, 'cookieStats')}</h3>
-        <p>{t(lang, 'cookieStatsDesc')}</p>
+        <h3>Statistik</h3>
+        <p>Anonyme Reichweitenmessung zur Verbesserung der Seite. In dieser Präsentation ist kein Statistik-Dienst eingebunden.</p>
       </div>
       <input type="checkbox" class="cd-switch" name="stats" role="switch" />
     </label>
 
     <div class="cd-actions">
-      <button type="submit" class="btn" value="all">{t(lang, 'cookieAcceptAll')}</button>
-      <button type="submit" class="btn btn-ghost" value="save">{t(lang, 'cookieSave')}</button>
-      <button type="submit" class="btn btn-ghost" value="necessary">{t(lang, 'cookieEssential')}</button>
+      <button type="submit" class="btn" value="all">Alle akzeptieren</button>
+      <button type="submit" class="btn btn-ghost" value="save">Speichern</button>
+      <button type="submit" class="btn btn-ghost" value="necessary">Nur essenzielle</button>
     </div>
   </form>
 </dialog>

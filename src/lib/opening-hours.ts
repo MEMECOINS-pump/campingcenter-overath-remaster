@@ -1,6 +1,5 @@
 import { openingHours, type OpeningPeriod } from '@/data/company';
 import { holidayOn, type PublicHoliday } from '@/data/holidays';
-import type { Locale } from '@/i18n';
 
 export type OpenStatus =
   | {
@@ -67,10 +66,9 @@ function periodForDay(day: string, schedule: OpeningPeriod[] = openingHours): Op
   return schedule.find((p) => p.schemaDays.includes(day));
 }
 
-function formatTodayHours(p: OpeningPeriod | undefined, lang: Locale): string {
-  if (!p) return lang === 'en' ? 'Normally closed today' : 'Heute planmäßig geschlossen';
-  const hours = p.hours.map((h) => `${h.opens}–${h.closes}`).join(' · ');
-  return lang === 'en' ? `Usual hours today: ${hours}` : `Regulär heute: ${hours} Uhr`;
+function formatTodayHours(p: OpeningPeriod | undefined): string {
+  if (!p) return 'Heute planmäßig geschlossen';
+  return `Regulär heute: ${p.hours.map((h) => `${h.opens}–${h.closes}`).join(' · ')} Uhr`;
 }
 
 function addCalendarDays(isoDate: string, days: number): string {
@@ -84,12 +82,7 @@ function weekdayIndexFromIso(isoDate: string): number {
   return new Date(y!, m! - 1, d!).getDay(); // 0=Sun … local, but we built from Y-M-D as civil date
 }
 
-function nextOpenLabel(
-  fromIso: string,
-  fromMinutes: number,
-  schedule: OpeningPeriod[] = openingHours,
-  lang: Locale = 'de',
-): string | null {
+function nextOpenLabel(fromIso: string, fromMinutes: number, schedule: OpeningPeriod[] = openingHours): string | null {
   for (let offset = 0; offset < 14; offset++) {
     const iso = addCalendarDays(fromIso, offset);
     const hol = holidayOn(iso);
@@ -102,35 +95,25 @@ function nextOpenLabel(
 
     if (offset === 0) {
       const later = period.hours.find((h) => toMin(h.opens) > fromMinutes);
-      if (later) {
-        return lang === 'en' ? `opens today at ${later.opens}` : `öffnet heute um ${later.opens} Uhr`;
-      }
+      if (later) return `öffnet heute um ${later.opens} Uhr`;
       continue;
     }
 
     const first = period.hours[0];
-    if (offset === 1) {
-      return lang === 'en' ? `opens tomorrow at ${first.opens}` : `öffnet morgen um ${first.opens} Uhr`;
-    }
-    const when = new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'de-DE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    }).format(new Date(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))));
-    return lang === 'en' ? `opens ${when} at ${first.opens}` : `öffnet am ${when} um ${first.opens} Uhr`;
+    if (offset === 1) return `öffnet morgen um ${first.opens} Uhr`;
+    const when = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }).format(
+      new Date(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))),
+    );
+    return `öffnet am ${when} um ${first.opens} Uhr`;
   }
   return null;
 }
 
-export function computeOpenStatus(
-  date = new Date(),
-  schedule: OpeningPeriod[] = openingHours,
-  lang: Locale = 'de',
-): OpenStatus {
+export function computeOpenStatus(date = new Date(), schedule: OpeningPeriod[] = openingHours): OpenStatus {
   const now = berlinParts(date);
   const holiday = holidayOn(now.isoDate, now.year);
   const today = periodForDay(now.day, schedule);
-  const opensNext = nextOpenLabel(now.isoDate, now.minutes, schedule, lang);
+  const opensNext = nextOpenLabel(now.isoDate, now.minutes, schedule);
 
   if (holiday) {
     return {
@@ -138,15 +121,9 @@ export function computeOpenStatus(
       reason: 'holiday',
       holiday,
       opensNext,
-      shortLabel: lang === 'en' ? 'HOLIDAY · Closed' : 'FEIERTAG · Geschlossen',
-      todayLabel:
-        lang === 'en'
-          ? `Public holiday today: ${holiday.name} – we are closed`
-          : `Heute Feiertag: ${holiday.name} – wir haben geschlossen`,
-      label:
-        lang === 'en'
-          ? `Closed for public holiday: ${holiday.name}`
-          : `Geschlossen wegen Feiertag: ${holiday.name}`,
+      shortLabel: `FEIERTAG · Geschlossen`,
+      todayLabel: `Heute Feiertag: ${holiday.name} – wir haben geschlossen`,
+      label: `Geschlossen wegen Feiertag: ${holiday.name}`,
     };
   }
 
@@ -157,12 +134,9 @@ export function computeOpenStatus(
       reason: 'hours',
       holiday: null,
       closesAt: openSlot.closes,
-      shortLabel: lang === 'en' ? 'Open' : 'Geöffnet',
-      todayLabel: formatTodayHours(today, lang),
-      label:
-        lang === 'en'
-          ? `Open today · until ${openSlot.closes}`
-          : `Heute geöffnet · bis ${openSlot.closes} Uhr`,
+      shortLabel: 'Geöffnet',
+      todayLabel: formatTodayHours(today),
+      label: `Heute geöffnet · bis ${openSlot.closes} Uhr`,
     };
   }
 
@@ -172,10 +146,10 @@ export function computeOpenStatus(
     reason,
     holiday: null,
     opensNext,
-    shortLabel: lang === 'en' ? 'Closed' : 'Geschlossen',
-    todayLabel: formatTodayHours(today, lang),
+    shortLabel: 'Geschlossen',
+    todayLabel: formatTodayHours(today),
     // opensNext belongs only in the secondary line (data-oh-sub) — never duplicate in label
-    label: lang === 'en' ? 'Currently closed' : 'Aktuell geschlossen',
+    label: 'Aktuell geschlossen',
   };
 }
 
@@ -192,13 +166,4 @@ export function schedulePayload(schedule: OpeningPeriod[] = openingHours) {
 
 function formatHoursLabel(p: OpeningPeriod): string {
   return `${p.shortDays}: ${p.hours.map((h) => `${h.opens}–${h.closes}`).join(' · ')} Uhr`;
-}
-
-/** Companion / badge strings for a given open status + locale. */
-export function companionOpenCopy(status: OpenStatus, lang: Locale): string {
-  if (status.reason === 'holiday') {
-    return lang === 'en' ? 'Public holiday · Closed' : 'Feiertag · Geschlossen';
-  }
-  if (status.state === 'open') return lang === 'en' ? 'Open now' : 'Jetzt geöffnet';
-  return lang === 'en' ? 'Currently closed' : 'Aktuell geschlossen';
 }

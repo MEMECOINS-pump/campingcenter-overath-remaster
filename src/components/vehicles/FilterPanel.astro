@@ -1,21 +1,11 @@
 ---
 import { facetCounts, vehicles } from '@/lib/vehicles';
-import { formatInt, formatLength } from '@/lib/format';
-import { getLangFromPath, type Locale } from '@/i18n';
-import { glossary, g, translateCategoryLabel } from '@/i18n/glossary';
-
-interface Props {
-  lang?: Locale;
-}
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+import { formatInt } from '@/lib/format';
 
 const makes = facetCounts(vehicles, 'make');
 const transmissions = facetCounts(vehicles, 'transmission');
 const categoryLabels = new Map(vehicles.map((v) => [v.category, v.categoryLabel]));
-const categories = facetCounts(vehicles, 'category').map((c) => ({
-  ...c,
-  label: translateCategoryLabel(categoryLabels.get(c.value as never) ?? c.value, lang),
-}));
+const categories = facetCounts(vehicles, 'category').map((c) => ({ ...c, label: categoryLabels.get(c.value as never) ?? c.value }));
 
 const maxPrice = Math.max(...vehicles.map((v) => v.price));
 const priceSteps = [50000, 60000, 70000, 80000, 90000, 100000, 125000].filter((p) => p < maxPrice);
@@ -24,54 +14,44 @@ const lengthSteps = [6000, 6500, 7000, 7500];
 const groups = [
   {
     key: 'zustand',
-    legend: g(lang, glossary.filter.condition),
+    legend: 'Zustand',
     options: [
-      { value: 'neu', label: g(lang, glossary.conditionFilter.neu) },
-      { value: 'gebraucht', label: g(lang, glossary.conditionFilter.gebraucht) },
+      { value: 'neu', label: 'Neufahrzeuge' },
+      { value: 'gebraucht', label: 'Gebrauchte' },
     ].map((o) => ({ ...o, count: vehicles.filter((v) => v.condition === o.value).length })),
   },
-  { key: 'art', legend: g(lang, glossary.filter.category), options: categories.map((c) => ({ value: c.value, label: c.label, count: c.count })) },
-  { key: 'marke', legend: g(lang, glossary.filter.make), options: makes.map((m) => ({ value: m.value, label: m.value, count: m.count })) },
+  { key: 'art', legend: 'Fahrzeugart', options: categories.map((c) => ({ value: c.value, label: c.label, count: c.count })) },
+  { key: 'marke', legend: 'Marke', options: makes.map((m) => ({ value: m.value, label: m.value, count: m.count })) },
   {
     key: 'gewicht',
-    legend: g(lang, glossary.filter.weight),
+    legend: 'Zulässiges Gesamtgewicht',
     options: [
-      { value: 'bis35', label: g(lang, glossary.filter.weightUnder35), hint: g(lang, glossary.filter.weightUnder35Hint) },
-      { value: 'ueber35', label: g(lang, glossary.filter.weightOver35), hint: g(lang, glossary.filter.weightOver35Hint) },
+      { value: 'bis35', label: 'bis 3,5 t', hint: 'Führerschein Klasse B' },
+      { value: 'ueber35', label: 'über 3,5 t', hint: 'Klasse C1 oder alte Klasse 3' },
     ].map((o) => ({
       ...o,
       count: vehicles.filter((v) => v.grossWeightKg !== null && (o.value === 'bis35' ? v.grossWeightKg <= 3500 : v.grossWeightKg > 3500)).length,
     })),
   },
-  {
-    key: 'getriebe',
-    legend: g(lang, glossary.filter.transmission),
-    options: transmissions.map((t) => ({
-      value: t.value,
-      label: t.value === 'Schaltgetriebe' || t.value === 'Automatik'
-        ? g(lang, glossary.transmission[t.value as 'Schaltgetriebe' | 'Automatik'])
-        : t.value,
-      count: t.count,
-    })),
-  },
+  { key: 'getriebe', legend: 'Getriebe', options: transmissions.map((t) => ({ value: t.value, label: t.value, count: t.count })) },
 ];
 ---
 
-<form class="fpanel" data-filter-form aria-label={g(lang, glossary.filter.aria)}>
+<form class="fpanel" data-filter-form aria-label="Fahrzeuge filtern">
   {
-    groups.map((group) => (
+    groups.map((g) => (
       <fieldset class="fgroup">
-        <legend>{group.legend}</legend>
+        <legend>{g.legend}</legend>
         <ul>
-          {group.options.map((o) => (
+          {g.options.map((o) => (
             <li>
               <label class="fcheck">
-                <input type="checkbox" name={group.key} value={o.value} />
+                <input type="checkbox" name={g.key} value={o.value} />
                 <span class="fcheck-label">
                   {o.label}
                   {'hint' in o && o.hint && <small>{o.hint}</small>}
                 </span>
-                <span class="fcheck-count" data-facet-count={`${group.key}:${o.value}`}>
+                <span class="fcheck-count" data-facet-count={`${g.key}:${o.value}`}>
                   {o.count}
                 </span>
               </label>
@@ -84,22 +64,22 @@ const groups = [
 
   <div class="fgroup fgroup-selects">
     <div class="field">
-      <label for="f-preis">{g(lang, glossary.filter.priceUpTo)}</label>
+      <label for="f-preis">Preis bis</label>
       <select id="f-preis" name="preis" class="select">
-        <option value="">{g(lang, glossary.filter.any)}</option>
-        {priceSteps.map((p) => <option value={p}>{formatInt(p, lang)} €</option>)}
+        <option value="">Beliebig</option>
+        {priceSteps.map((p) => <option value={p}>{formatInt(p)} €</option>)}
       </select>
     </div>
     <div class="field">
-      <label for="f-laenge">{g(lang, glossary.filter.lengthUpTo)}</label>
+      <label for="f-laenge">Länge bis</label>
       <select id="f-laenge" name="laenge" class="select">
-        <option value="">{g(lang, glossary.filter.any)}</option>
-        {lengthSteps.map((l) => <option value={l}>{formatLength(l, lang)}</option>)}
+        <option value="">Beliebig</option>
+        {lengthSteps.map((l) => <option value={l}>{(l / 1000).toLocaleString('de-DE', { minimumFractionDigits: 1 })} m</option>)}
       </select>
     </div>
   </div>
 
-  <button type="reset" class="btn btn-ghost btn-block fpanel-reset" data-filter-reset>{g(lang, glossary.filter.reset)}</button>
+  <button type="reset" class="btn btn-ghost btn-block fpanel-reset" data-filter-reset>Filter zurücksetzen</button>
 </form>
 
 <style>

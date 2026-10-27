@@ -1,27 +1,23 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
 import { company } from '@/data/company';
-import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
 
 interface Props {
   inquiryHref?: string | undefined;
   inquiryLabel?: string | undefined;
-  lang?: Locale;
 }
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
-const inquiryHref = Astro.props.inquiryHref ?? `${localizedPath('/kontakt/', lang)}#formular`;
-const inquiryLabel = Astro.props.inquiryLabel ?? t(lang, 'actionBarAdvice');
+const { inquiryHref = '/kontakt/#formular', inquiryLabel = 'Anfrage' } = Astro.props;
 ---
 
-<nav class="action-bar" aria-label={t(lang, 'companionQuickContact')} data-action-bar>
+<nav class="action-bar" aria-label="Schnellaktionen" data-action-bar>
   <a href={company.phone.href} data-track="call_click" data-track-location="action-bar">
     <Icon name="phone" />
-    <span>{t(lang, 'actionBarCall')}</span>
+    <span>Anrufen</span>
   </a>
-  <a href={url(localizedPath('/wohnmobile/', lang))} data-track="cta_click" data-track-location="action-bar">
+  <a href={url('/wohnmobile/')} data-track="cta_click" data-track-location="action-bar">
     <Icon name="van" />
-    <span>{t(lang, 'footerVehicles')}</span>
+    <span>Fahrzeuge</span>
   </a>
   <a class="ab-primary" href={url(inquiryHref)} data-track="cta_click" data-track-location="action-bar">
     <Icon name="mail" />

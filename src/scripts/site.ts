@@ -1,7 +1,6 @@
 import { bindTrackAttributes, track } from '@/lib/analytics';
 import { readConsent, writeConsent } from '@/lib/consent';
 import { COMPARE_MAX, clearCollection, hasItem, onCollectionChange, readCollection, toggleItem } from '@/lib/collections';
-import { computeOpenStatus, type OpenStatus } from '@/lib/opening-hours';
 
 const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel);
 const $$ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) =>
@@ -43,8 +42,7 @@ export function openModal(dialog: HTMLDialogElement, opener?: HTMLElement | null
 /* ---------- header ---------- */
 function initHeader(): void {
   const header = $('[data-header]');
-  if (!header || header.hasAttribute('data-bound')) return;
-  header.setAttribute('data-bound', '');
+  if (!header) return;
 
   if (header.dataset.overlay) {
     const update = () => header.classList.toggle('is-solid', window.scrollY > 24);
@@ -95,8 +93,7 @@ function initHeader(): void {
 function initMenu(): void {
   const dialog = $<HTMLDialogElement>('[data-menu]');
   const openers = $$<HTMLButtonElement>('[data-menu-open]');
-  if (!dialog || dialog.hasAttribute('data-bound')) return;
-  dialog.setAttribute('data-bound', '');
+  if (!dialog) return;
 
   const setExpanded = (v: boolean) => openers.forEach((b) => b.setAttribute('aria-expanded', String(v)));
 
@@ -120,10 +117,12 @@ function initMenu(): void {
     const link = (e.target as Element).closest('a');
     if (link) {
       const href = link.getAttribute('href') ?? '';
+      // same-page anchors: close so the target is visible
       if (href.includes('#') || href === location.pathname) dialog.close();
     }
   });
 
+  // Close when switching to desktop layout while open
   window.matchMedia('(min-width: 64em)').addEventListener('change', (mq) => {
     if (mq.matches && dialog.open) dialog.close();
   });
@@ -131,8 +130,6 @@ function initMenu(): void {
 
 /* ---------- on-screen keyboard: hide sticky bars while typing ---------- */
 function initKeyboardAwareness(): void {
-  if (document.documentElement.hasAttribute('data-kb-bound')) return;
-  document.documentElement.setAttribute('data-kb-bound', '');
   const coarse = window.matchMedia('(pointer: coarse)');
   const isField = (el: EventTarget | null) =>
     el instanceof HTMLElement &&
@@ -154,26 +151,16 @@ function initConsent(): void {
   const banner = $('[data-consent-banner]');
   const dialog = $<HTMLDialogElement>('[data-consent-dialog]');
   const form = $<HTMLFormElement>('[data-consent-form]');
-  const html = document.documentElement;
 
-  if (banner && !readConsent()) {
-    banner.hidden = false;
-    html.classList.add('needs-consent');
-    html.classList.remove('consent-known');
-  } else {
-    html.classList.add('consent-known');
-    html.classList.remove('needs-consent');
-    if (banner) banner.hidden = true;
-  }
-
-  if (document.body.hasAttribute('data-consent-bound')) return;
-  document.body.setAttribute('data-consent-bound', '');
+  // Boot script may already unhide the banner; keep that, or show if still needed.
+  if (banner && !readConsent()) banner.hidden = false;
+  else if (banner && readConsent()) banner.hidden = true;
 
   const decide = (media: boolean, stats: boolean) => {
     writeConsent(media, stats);
     if (banner) banner.hidden = true;
-    html.classList.add('consent-known');
-    html.classList.remove('needs-consent');
+    document.documentElement.classList.add('consent-known');
+    document.documentElement.classList.remove('needs-consent');
   };
 
   $$('[data-consent-action]').forEach((btn) =>
@@ -220,196 +207,49 @@ function syncCollections(): void {
   $$('[data-compare-tray]').forEach((el) => {
     el.hidden = cmp.length === 0;
   });
-  const lang = siteLang();
   $$<HTMLButtonElement>('[data-fav-toggle]').forEach((btn) => {
     const on = hasItem('favorites', btn.dataset.favToggle ?? '');
     btn.setAttribute('aria-pressed', String(on));
     const label = btn.querySelector('[data-label]');
-    if (label) label.textContent = on ? (lang === 'en' ? 'Saved' : 'Gemerkt') : lang === 'en' ? 'Save' : 'Merken';
+    if (label) label.textContent = on ? 'Gemerkt' : 'Merken';
   });
   $$<HTMLButtonElement>('[data-compare-toggle]').forEach((btn) => {
     const on = hasItem('compare', btn.dataset.compareToggle ?? '');
     btn.setAttribute('aria-pressed', String(on));
     const label = btn.querySelector('[data-label]');
-    if (label)
-      label.textContent = on ? (lang === 'en' ? 'In compare' : 'Im Vergleich') : lang === 'en' ? 'Compare' : 'Vergleichen';
+    if (label) label.textContent = on ? 'Im Vergleich' : 'Vergleichen';
   });
 }
 
 function initCollections(): void {
-  if (!document.body.hasAttribute('data-collections-bound')) {
-    document.body.setAttribute('data-collections-bound', '');
-    document.addEventListener('click', (e) => {
-      const target = e.target as Element;
-      const fav = target.closest<HTMLElement>('[data-fav-toggle]');
-      if (fav) {
-        e.preventDefault();
-        const id = fav.dataset.favToggle ?? '';
-        const on = toggleItem('favorites', id);
-        const lang = siteLang();
-        toast(
-          on
-            ? lang === 'en'
-              ? 'Added to wishlist'
-              : 'Zur Merkliste hinzugefügt'
-            : lang === 'en'
-              ? 'Removed from wishlist'
-              : 'Von der Merkliste entfernt',
-        );
-        track('vehicle_favorite', { vehicle_id: id, state: on ? 'add' : 'remove' });
-        return;
-      }
-      const cmp = target.closest<HTMLElement>('[data-compare-toggle]');
-      if (cmp) {
-        e.preventDefault();
-        const id = cmp.dataset.compareToggle ?? '';
-        const on = toggleItem('compare', id);
-        const lang = siteLang();
-        if (on === null)
-          toast(
-            lang === 'en'
-              ? `Maximum ${COMPARE_MAX} vehicles in compare — remove one first.`
-              : `Maximal ${COMPARE_MAX} Fahrzeuge im Vergleich – entferne zuerst eines.`,
-          );
-        else
-          toast(
-            on
-              ? lang === 'en'
-                ? 'Added to compare'
-                : 'Zum Vergleich hinzugefügt'
-              : lang === 'en'
-                ? 'Removed from compare'
-                : 'Aus dem Vergleich entfernt',
-          );
-        if (on !== null) track('vehicle_compare', { vehicle_id: id, state: on ? 'add' : 'remove' });
-        return;
-      }
-      if (target.closest('[data-compare-clear]')) {
-        clearCollection('compare');
-        toast(siteLang() === 'en' ? 'Compare cleared' : 'Vergleich geleert');
-      }
-    });
-    onCollectionChange(syncCollections);
-  }
-  syncCollections();
-}
-
-/* ---------- opening status (re-bind after view transitions) ---------- */
-function siteLang(): 'de' | 'en' {
-  const htmlLang = document.documentElement.lang || '';
-  const body = document.body?.dataset.lang;
-  const pref = document.documentElement.dataset.ccoLang;
-  if (body === 'en' || pref === 'en' || htmlLang.startsWith('en')) return 'en';
-  return 'de';
-}
-
-function applyOpening(root: HTMLElement, status: OpenStatus): void {
-  const isHoliday = status.reason === 'holiday';
-  const next = status.state === 'closed' ? status.opensNext : null;
-  const holidaySub = root.dataset.i18nHolidaySub || 'Gesetzlicher Feiertag (NRW)';
-  root.dataset.state = status.state;
-  root.dataset.reason = status.reason;
-
-  root.querySelectorAll<HTMLElement>('[data-oh-line]').forEach((el) => {
-    el.textContent = status.label;
-  });
-  root.querySelectorAll<HTMLElement>('[data-oh-sub]').forEach((el) => {
-    if (isHoliday) {
-      el.hidden = false;
-      el.textContent = `${holidaySub}${next ? ` · ${next}` : ''}`;
-    } else if (next) {
-      el.hidden = false;
-      el.textContent = next;
-    } else {
-      el.hidden = true;
-      el.textContent = '';
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element;
+    const fav = target.closest<HTMLElement>('[data-fav-toggle]');
+    if (fav) {
+      e.preventDefault();
+      const id = fav.dataset.favToggle ?? '';
+      const on = toggleItem('favorites', id);
+      toast(on ? 'Zur Merkliste hinzugefügt' : 'Von der Merkliste entfernt');
+      track('vehicle_favorite', { vehicle_id: id, state: on ? 'add' : 'remove' });
+      return;
+    }
+    const cmp = target.closest<HTMLElement>('[data-compare-toggle]');
+    if (cmp) {
+      e.preventDefault();
+      const id = cmp.dataset.compareToggle ?? '';
+      const on = toggleItem('compare', id);
+      if (on === null) toast(`Maximal ${COMPARE_MAX} Fahrzeuge im Vergleich – entferne zuerst eines.`);
+      else toast(on ? 'Zum Vergleich hinzugefügt' : 'Aus dem Vergleich entfernt');
+      if (on !== null) track('vehicle_compare', { vehicle_id: id, state: on ? 'add' : 'remove' });
+      return;
+    }
+    if (target.closest('[data-compare-clear]')) {
+      clearCollection('compare');
+      toast('Vergleich geleert');
     }
   });
-  root.querySelectorAll<HTMLElement>('[data-oh-today]').forEach((el) => {
-    el.textContent = status.todayLabel;
-  });
-  root.querySelectorAll<HTMLButtonElement>('[data-oh-open]').forEach((btn) => {
-    btn.dataset.state = status.state;
-    btn.dataset.reason = status.reason;
-  });
-  root.querySelectorAll<HTMLElement>('[data-oh-banner]').forEach((el) => {
-    el.dataset.state = status.state;
-    el.dataset.reason = status.reason;
-  });
-  root.querySelectorAll<HTMLElement>('[data-oh-banner-title]').forEach((el) => {
-    el.textContent = isHoliday
-      ? root.dataset.i18nBannerHoliday || 'Heute Feiertag – geschlossen'
-      : status.state === 'open'
-        ? root.dataset.i18nBannerOpen || 'Jetzt geöffnet'
-        : root.dataset.i18nBannerClosed || 'Jetzt geschlossen';
-  });
-  root.querySelectorAll<HTMLElement>('[data-oh-alert]').forEach((el) => {
-    el.hidden = !isHoliday;
-  });
-  root.querySelectorAll<HTMLElement>('[data-oh-alert-name]').forEach((el) => {
-    el.textContent = status.holiday?.name ?? '';
-  });
-  const alertEl = root.querySelector<HTMLElement>('[data-oh-alert]');
-  const alertH = isHoliday && alertEl && !alertEl.hidden ? Math.ceil(alertEl.getBoundingClientRect().height) : 0;
-  document.documentElement.style.setProperty('--header-alert-h', `${alertH}px`);
-  root.querySelectorAll<HTMLElement>('[data-oh-next]').forEach((el) => {
-    el.hidden = !next;
-    el.textContent = next ?? '';
-  });
-}
-
-function tickOpening(): void {
-  const lang = siteLang();
-  $$<HTMLElement>('[data-opening-status]').forEach((root) => {
-    const rootLang = root.dataset.lang === 'en' ? 'en' : lang;
-    applyOpening(root, computeOpenStatus(new Date(), undefined, rootLang));
-  });
-  $$<HTMLElement>('[data-open-state]').forEach((el) => {
-    const status = computeOpenStatus(new Date(), undefined, lang);
-    el.dataset.state = status.state;
-    el.dataset.reason = status.reason;
-    const host = el.closest<HTMLElement>('[data-i18n-companion-open], [data-companion]') || document.body;
-    const holiday =
-      (host as HTMLElement).dataset?.i18nCompanionHoliday ||
-      document.querySelector<HTMLElement>('[data-i18n-companion-holiday]')?.dataset.i18nCompanionHoliday ||
-      (lang === 'en' ? 'Public holiday · Closed' : 'Feiertag · Geschlossen');
-    const open =
-      document.querySelector<HTMLElement>('[data-i18n-companion-open]')?.dataset.i18nCompanionOpen ||
-      (lang === 'en' ? 'Open now' : 'Jetzt geöffnet');
-    const closed =
-      document.querySelector<HTMLElement>('[data-i18n-companion-closed]')?.dataset.i18nCompanionClosed ||
-      (lang === 'en' ? 'Currently closed' : 'Aktuell geschlossen');
-    el.textContent = status.reason === 'holiday' ? holiday : status.state === 'open' ? open : closed;
-  });
-}
-
-function initOpening(): void {
-  $$<HTMLElement>('[data-opening-status]').forEach((root) => {
-    if (root.hasAttribute('data-bound')) return;
-    root.setAttribute('data-bound', '');
-    const rootLang = root.dataset.lang === 'en' ? 'en' : siteLang();
-    applyOpening(root, computeOpenStatus(new Date(), undefined, rootLang));
-    const sheet = root.querySelector<HTMLDialogElement>('[data-oh-sheet]');
-    const setSheet = (open: boolean) => {
-      document.body.classList.toggle('scroll-locked', open);
-      if (open) sheet?.showModal();
-      else sheet?.close();
-    };
-    root.querySelector('[data-oh-open]')?.addEventListener('click', () => setSheet(true));
-    root.querySelector('[data-oh-close]')?.addEventListener('click', () => setSheet(false));
-    sheet?.addEventListener('click', (e) => {
-      if (e.target === sheet) setSheet(false);
-    });
-    sheet?.addEventListener('close', () => document.body.classList.remove('scroll-locked'));
-  });
-  tickOpening();
-  if (!document.documentElement.hasAttribute('data-oh-interval')) {
-    document.documentElement.setAttribute('data-oh-interval', '');
-    window.setInterval(tickOpening, 30_000);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') tickOpening();
-    });
-  }
+  onCollectionChange(syncCollections);
+  syncCollections();
 }
 
 /* ---------- reveal on scroll ---------- */
@@ -434,89 +274,10 @@ function initReveal(): void {
   items.forEach((el) => io.observe(el));
 }
 
-/** Rewrite internal DE hrefs to /en/... when preference is English (keeps clicks sticky). */
-const EN_EXACT = new Set([
-  '/',
-  '/kontakt/',
-  '/wohnmobile/',
-  '/vermietung-wohnmobile/',
-  '/wohnmobil-ankauf/',
-  '/werkstatt-kundendienst/',
-  '/ueber-uns/',
-  '/camper-finder/',
-  '/marken/',
-  '/merkliste/',
-]);
-
-function hasEnBare(bare: string): boolean {
-  if (EN_EXACT.has(bare)) return true;
-  return /^\/wohnmobile\/[^/]+\/$/.test(bare);
-}
-
-function toEnHref(href: string): string | null {
-  if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('#'))
-    return null;
-  try {
-    const u = new URL(href, location.origin);
-    let path = u.pathname;
-    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
-    if (base && base !== '/' && path.startsWith(base)) path = path.slice(base.length) || '/';
-    if (path === '/en' || path.startsWith('/en/')) return null;
-    const bare = path.endsWith('/') || /\.[a-z0-9]+$/i.test(path) ? path : `${path}/`;
-    if (!hasEnBare(bare)) return null;
-    const enPath = bare === '/' ? '/en/' : `/en${bare}`;
-    return `${base}${enPath}${u.search}${u.hash}`;
-  } catch {
-    return null;
-  }
-}
-
-function initLocaleLinks(): void {
-  if (siteLang() !== 'en') return;
-  $$<HTMLAnchorElement>('a[href]').forEach((a) => {
-    const href = a.getAttribute('href');
-    if (!href) return;
-    const next = toEnHref(href);
-    if (next && next !== href) a.setAttribute('href', next);
-  });
-}
-
-function bootUi(): void {
-  initHeader();
-  initMenu();
-  initKeyboardAwareness();
-  initConsent();
-  initCollections();
-  initOpening();
-  initReveal();
-  initLocaleLinks();
-  bindTrackAttributes();
-}
-
-bootUi();
-document.addEventListener('astro:page-load', bootUi);
-document.addEventListener('astro:after-swap', () => {
-  const html = document.documentElement;
-  const label = html.dataset.ccoOpenLabel;
-  const state = html.dataset.ccoOpen;
-  const reason = html.dataset.ccoOpenReason;
-  if (label) {
-    $$('[data-oh-line]').forEach((el) => {
-      el.textContent = label;
-    });
-  }
-  if (state) {
-    $$('[data-opening-status], [data-oh-open]').forEach((el) => {
-      el.dataset.state = state;
-      if (reason) el.dataset.reason = reason;
-    });
-  }
-  const n = html.dataset.ccoFavCount;
-  if (n) {
-    $$('[data-fav-count]').forEach((el) => {
-      if (el === html || el === document.documentElement) return;
-      el.textContent = n;
-      (el as HTMLElement).hidden = false;
-    });
-  }
-});
+initHeader();
+initMenu();
+initKeyboardAwareness();
+initConsent();
+initCollections();
+initReveal();
+bindTrackAttributes();

@@ -3,19 +3,13 @@ import { Image } from 'astro:assets';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { brands } from '@/data/brands';
-import { brandsEn } from '@/data/content-en';
 import { vehicles } from '@/lib/vehicles';
-import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
 
 interface Props {
   showHeader?: boolean;
-  lang?: Locale;
 }
-const { showHeader = true, lang: langProp } = Astro.props;
-const lang = langProp ?? getLangFromPath(Astro.url.pathname);
-const L = (path: string) => url(localizedPath(path, lang));
-const list = lang === 'en' ? brandsEn : brands;
+const { showHeader = true } = Astro.props;
 const count = (make?: string) => (make ? vehicles.filter((v) => v.make === make).length : 0);
 ---
 
@@ -26,28 +20,23 @@ const count = (make?: string) => (make ? vehicles.filter((v) => v.make === make)
         <div class="section-head-row">
           <SectionHeader
             id="brands-title"
-            eyebrow={t(lang, 'brandsEyebrow')}
-            title={t(lang, 'brandsTitle')}
-            lead={t(lang, 'brandsLead')}
+            eyebrow="Vertragshändler"
+            title="Starke Marken. Persönliche Beratung."
+            lead="Als Vertragspartner von CHALLENGER, LA STRADA und EURA MOBIL beraten wir dich persönlich – und zeigen dir, welches Modell wirklich zu dir passt."
           />
-          <a class="btn btn-ghost" href={L('/marken/')}>
-            {t(lang, 'brandsAll')} <Icon name="arrow-right" class="arrow" />
+          <a class="btn btn-ghost" href={url('/marken/')}>
+            Alle Marken <Icon name="arrow-right" class="arrow" />
           </a>
         </div>
       )
     }
     <ul class="brand-grid" role="list">
       {
-        list.map((b) => {
+        brands.map((b) => {
           const n = count(b.inventoryMake);
-          const meta = b.internalHref
-            ? t(lang, 'brandsOwnPage')
-            : n > 0
-              ? t(lang, 'brandsInStock').replace('{n}', String(n))
-              : t(lang, 'brandsMore');
           return (
             <li class="brand">
-              <a href={L(`/marken/#${b.id}`)} class="brand-link">
+              <a href={url(`/marken/#${b.id}`)} class="brand-link">
                 <Image
                   src={b.logo}
                   alt={b.name}
@@ -56,7 +45,7 @@ const count = (make?: string) => (make ? vehicles.filter((v) => v.make === make)
                   class:list={['brand-logo', { 'brand-logo-square': b.logo.width / b.logo.height < 1.6 }]}
                   loading="lazy"
                 />
-                <span class="brand-meta">{meta}</span>
+                <span class="brand-meta">{b.internalHref ? 'Eigene Themenseite' : n > 0 ? `${n} im Bestand` : 'Mehr zur Marke'}</span>
               </a>
             </li>
           );

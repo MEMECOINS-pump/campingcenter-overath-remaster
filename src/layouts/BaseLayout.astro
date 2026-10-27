@@ -1,6 +1,5 @@
 ---
 import '@/styles/global.css';
-import { ClientRouter } from 'astro:transitions';
 import SeoHead, { type SeoProps } from '@/components/layout/SeoHead.astro';
 import Header from '@/components/layout/Header.astro';
 import MobileMenu from '@/components/layout/MobileMenu.astro';
@@ -9,10 +8,9 @@ import Footer from '@/components/layout/Footer.astro';
 import CookieConsent from '@/components/layout/CookieConsent.astro';
 import CompareTray from '@/components/vehicles/CompareTray.astro';
 import ChatWidget from '@/components/layout/ChatWidget.astro';
-import CampingCompanion from '@/components/layout/CampingCompanion.astro';
+import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
 import { organizationSchema } from '@/lib/schema';
 import { buildBootScript } from '@/lib/boot-script';
-import { getLangFromPath, htmlLang, t, type Locale } from '@/i18n';
 
 interface Props extends SeoProps {
   /** Transparent header over a full-bleed hero. */
@@ -24,8 +22,6 @@ interface Props extends SeoProps {
   bodyClass?: string;
   /** Floating "X von 3 im Vergleich" pill – only where vehicles are listed. */
   compareTray?: boolean;
-  /** Override locale (otherwise derived from URL: `/en/...` → en). */
-  lang?: Locale;
 }
 
 const {
@@ -36,37 +32,34 @@ const {
   bodyClass,
   compareTray = false,
   jsonLd = [],
-  lang: langProp,
   ...seo
 } = Astro.props;
 
-const lang = langProp ?? getLangFromPath(Astro.url.pathname);
 const boot = buildBootScript();
 ---
 
 <!doctype html>
-<html lang={htmlLang(lang)}>
+<html lang="de-DE">
   <head>
     <script is:inline set:html={boot} />
-    <SeoHead {...seo} lang={lang} jsonLd={[organizationSchema(Astro.site), ...jsonLd]} />
-    <ClientRouter fallback="swap" />
+    <SeoHead {...seo} jsonLd={[organizationSchema(Astro.site), ...jsonLd]} />
     <slot name="head" />
   </head>
-  <body class={bodyClass} data-actionbar={actionBar || Astro.slots.has('sticky') ? '' : undefined} data-lang={lang}>
-    <a class="skip-link" href="#main">{t(lang, 'skipToContent')}</a>
-    <Header overlay={overlayHeader} lang={lang} />
-    <MobileMenu lang={lang} />
-    <main id="main" tabindex="-1" transition:animate="fade">
+  <body class={bodyClass} data-actionbar={actionBar || Astro.slots.has('sticky') ? '' : undefined}>
+    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+    <Header overlay={overlayHeader} />
+    <MobileMenu />
+    <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer lang={lang} />
-    {actionBar && <MobileActionBar inquiryHref={inquiryHref} inquiryLabel={inquiryLabel} lang={lang} />}
+    <Footer />
+    {actionBar && <MobileActionBar inquiryHref={inquiryHref} inquiryLabel={inquiryLabel} />}
     <slot name="sticky" />
     {compareTray && <CompareTray />}
-    <CampingCompanion lang={lang} transition:persist="cco-companion" />
-    <ChatWidget lang={lang} transition:persist="cco-chat" />
-    <CookieConsent lang={lang} />
-    <div class="toast" role="status" aria-live="polite" data-toast transition:persist="cco-toast"></div>
+    <ChatWidget />
+    <AccessibilityPrefs />
+    <CookieConsent />
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
     <script>
       import '@/scripts/site';
     </script>

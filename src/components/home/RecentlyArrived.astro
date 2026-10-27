@@ -3,15 +3,9 @@ import VehicleCard from '@/components/vehicles/VehicleCard.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { recentlyArrivedVehicles, snapshotDate } from '@/lib/vehicles';
-import { formatDateLocalized } from '@/lib/format';
-import { getLangFromPath, localizedPath, t, type Locale } from '@/i18n';
+import { formatDateDE } from '@/lib/format';
 import { url } from '@/lib/url';
 
-interface Props {
-  lang?: Locale;
-}
-const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
-const L = (path: string) => url(localizedPath(path, lang));
 const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
 ---
 
@@ -22,12 +16,16 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
         <div class="section-head-row">
           <SectionHeader
             id="arrived-title"
-            eyebrow={t(lang, 'arrivedEyebrow')}
-            title={t(lang, 'arrivedTitle')}
-            lead={showNewBadge ? t(lang, 'arrivedLeadBadge') : t(lang, 'arrivedLead')}
+            eyebrow="Frisch eingetroffen"
+            title="Entdecke unsere neuesten Fahrzeuge und finde deinen nächsten Reisebegleiter."
+            lead={
+              showNewBadge
+                ? 'Frisch in unserem Bestand – mit Badge „NEU IM BESTAND“, wenn das Einstelldatum bestätigt ist.'
+                : 'Eine aktuelle Auswahl aus unserem Bestand. Das genaue Einstelldatum folgt mit der Live-Synchronisation.'
+            }
           />
-          <a class="btn btn-ghost" href={L('/wohnmobile/')}>
-            {t(lang, 'arrivedCta')} <Icon name="arrow-right" class="arrow" />
+          <a class="btn btn-ghost" href={url('/wohnmobile/')}>
+            Zum Bestand <Icon name="arrow-right" class="arrow" />
           </a>
         </div>
 
@@ -35,14 +33,12 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
           <ul class="rail-track" role="list">
             {arrived.map((v, i) => (
               <li class="rail-item">
-                <VehicleCard vehicle={v} index={i} priority={i === 0} showNewInventoryBadge={showNewBadge} lang={lang} />
+                <VehicleCard vehicle={v} index={i} priority={i === 0} showNewInventoryBadge={showNewBadge} />
               </li>
             ))}
           </ul>
         </div>
-        <p class="arrived-note">
-          {t(lang, 'asOf')} {formatDateLocalized(snapshotDate, lang)} · {t(lang, 'featuredNote')}
-        </p>
+        <p class="arrived-note">Stand {formatDateDE(snapshotDate)} · Angaben laut Fahrzeuginserat.</p>
       </div>
     </section>
   )
@@ -60,7 +56,7 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
   .rail-track {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: min(82%, 21rem);
+    grid-auto-columns: min(85%, 22.5rem);
     gap: 1rem;
     padding: 0.25rem var(--gutter) 1rem;
     overflow-x: auto;
@@ -94,9 +90,9 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
     .rail-track {
       grid-auto-flow: row;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 1.25rem;
-      padding: 0;
+      grid-auto-columns: unset;
       overflow: visible;
+      padding-inline: 0;
     }
   }
 </style>
