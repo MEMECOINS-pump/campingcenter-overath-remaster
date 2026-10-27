@@ -220,17 +220,19 @@ function syncCollections(): void {
   $$('[data-compare-tray]').forEach((el) => {
     el.hidden = cmp.length === 0;
   });
+  const lang = siteLang();
   $$<HTMLButtonElement>('[data-fav-toggle]').forEach((btn) => {
     const on = hasItem('favorites', btn.dataset.favToggle ?? '');
     btn.setAttribute('aria-pressed', String(on));
     const label = btn.querySelector('[data-label]');
-    if (label) label.textContent = on ? 'Gemerkt' : 'Merken';
+    if (label) label.textContent = on ? (lang === 'en' ? 'Saved' : 'Gemerkt') : lang === 'en' ? 'Save' : 'Merken';
   });
   $$<HTMLButtonElement>('[data-compare-toggle]').forEach((btn) => {
     const on = hasItem('compare', btn.dataset.compareToggle ?? '');
     btn.setAttribute('aria-pressed', String(on));
     const label = btn.querySelector('[data-label]');
-    if (label) label.textContent = on ? 'Im Vergleich' : 'Vergleichen';
+    if (label)
+      label.textContent = on ? (lang === 'en' ? 'In compare' : 'Im Vergleich') : lang === 'en' ? 'Compare' : 'Vergleichen';
   });
 }
 
@@ -244,7 +246,16 @@ function initCollections(): void {
         e.preventDefault();
         const id = fav.dataset.favToggle ?? '';
         const on = toggleItem('favorites', id);
-        toast(on ? 'Zur Merkliste hinzugefügt' : 'Von der Merkliste entfernt');
+        const lang = siteLang();
+        toast(
+          on
+            ? lang === 'en'
+              ? 'Added to wishlist'
+              : 'Zur Merkliste hinzugefügt'
+            : lang === 'en'
+              ? 'Removed from wishlist'
+              : 'Von der Merkliste entfernt',
+        );
         track('vehicle_favorite', { vehicle_id: id, state: on ? 'add' : 'remove' });
         return;
       }
@@ -253,14 +264,29 @@ function initCollections(): void {
         e.preventDefault();
         const id = cmp.dataset.compareToggle ?? '';
         const on = toggleItem('compare', id);
-        if (on === null) toast(`Maximal ${COMPARE_MAX} Fahrzeuge im Vergleich – entferne zuerst eines.`);
-        else toast(on ? 'Zum Vergleich hinzugefügt' : 'Aus dem Vergleich entfernt');
+        const lang = siteLang();
+        if (on === null)
+          toast(
+            lang === 'en'
+              ? `Maximum ${COMPARE_MAX} vehicles in compare — remove one first.`
+              : `Maximal ${COMPARE_MAX} Fahrzeuge im Vergleich – entferne zuerst eines.`,
+          );
+        else
+          toast(
+            on
+              ? lang === 'en'
+                ? 'Added to compare'
+                : 'Zum Vergleich hinzugefügt'
+              : lang === 'en'
+                ? 'Removed from compare'
+                : 'Aus dem Vergleich entfernt',
+          );
         if (on !== null) track('vehicle_compare', { vehicle_id: id, state: on ? 'add' : 'remove' });
         return;
       }
       if (target.closest('[data-compare-clear]')) {
         clearCollection('compare');
-        toast('Vergleich geleert');
+        toast(siteLang() === 'en' ? 'Compare cleared' : 'Vergleich geleert');
       }
     });
     onCollectionChange(syncCollections);
@@ -408,6 +434,55 @@ function initReveal(): void {
   items.forEach((el) => io.observe(el));
 }
 
+/** Rewrite internal DE hrefs to /en/... when preference is English (keeps clicks sticky). */
+const EN_EXACT = new Set([
+  '/',
+  '/kontakt/',
+  '/wohnmobile/',
+  '/vermietung-wohnmobile/',
+  '/wohnmobil-ankauf/',
+  '/werkstatt-kundendienst/',
+  '/ueber-uns/',
+  '/camper-finder/',
+  '/marken/',
+  '/404/',
+  '/merkliste/',
+  '/vergleich/',
+]);
+
+function hasEnBare(bare: string): boolean {
+  if (EN_EXACT.has(bare)) return true;
+  return /^\/wohnmobile\/[^/]+\/$/.test(bare);
+}
+
+function toEnHref(href: string): string | null {
+  if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('#'))
+    return null;
+  try {
+    const u = new URL(href, location.origin);
+    let path = u.pathname;
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+    if (base && base !== '/' && path.startsWith(base)) path = path.slice(base.length) || '/';
+    if (path === '/en' || path.startsWith('/en/')) return null;
+    let bare = path.endsWith('/') || /\.[a-z0-9]+$/i.test(path) ? path : `${path}/`;
+    if (!hasEnBare(bare)) return null;
+    const enPath = bare === '/' ? '/en/' : `/en${bare}`;
+    return `${base}${enPath}${u.search}${u.hash}`;
+  } catch {
+    return null;
+  }
+}
+
+function initLocaleLinks(): void {
+  if (siteLang() !== 'en') return;
+  $$<HTMLAnchorElement>('a[href]').forEach((a) => {
+    const href = a.getAttribute('href');
+    if (!href) return;
+    const next = toEnHref(href);
+    if (next && next !== href) a.setAttribute('href', next);
+  });
+}
+
 function bootUi(): void {
   initHeader();
   initMenu();
@@ -416,6 +491,7 @@ function bootUi(): void {
   initCollections();
   initOpening();
   initReveal();
+  initLocaleLinks();
   bindTrackAttributes();
 }
 
@@ -437,9 +513,10 @@ document.addEventListener('astro:after-swap', () => {
       if (reason) el.dataset.reason = reason;
     });
   }
-  const n = html.dataset.favCount;
+  const n = html.dataset.ccoFavCount;
   if (n) {
     $$('[data-fav-count]').forEach((el) => {
+      if (el === html || el === document.documentElement) return;
       el.textContent = n;
       (el as HTMLElement).hidden = false;
     });
