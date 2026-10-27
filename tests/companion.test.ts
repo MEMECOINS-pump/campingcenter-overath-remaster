@@ -29,6 +29,8 @@ describe('CampingCompanion hub', () => {
     expect(layout).toContain('ChatWidget');
     expect(companion).toContain('AccessibilityPrefs');
     expect(layout).toMatch(/lang="de"/);
+    expect(companion).toMatch(/margin-inline:\s*auto\s+0/);
+    expect(companion).toContain('right-side sheet');
   });
 
   it('keeps boot-before-paint a11y key without locale redirects', () => {
@@ -45,6 +47,17 @@ describe('CampingCompanion hub', () => {
     expect(boot).toContain('Heute geöffnet');
     expect(boot).toContain('Feiertag');
     expect(boot).not.toContain('Currently closed');
+  });
+
+  it('boot refreshes opening status live (not one-shot SSR text)', () => {
+    const boot = readFileSync(join(root, 'src/lib/boot-script.ts'), 'utf8');
+    const site = readFileSync(join(root, 'src/scripts/site.ts'), 'utf8');
+    expect(boot).toContain('__ccoRefreshOpen');
+    expect(boot).toContain('cco:refresh-open');
+    expect(boot).toContain('data-oh-banner-title');
+    expect(boot).toContain('visibilitychange');
+    expect(site).toContain('refreshOpenStatus');
+    expect(site).toContain('astro:after-swap');
   });
 
   it('chat lazy-loads assist rules', () => {

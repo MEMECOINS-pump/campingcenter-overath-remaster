@@ -185,6 +185,7 @@ import { url } from '@/lib/url';
       }
     };
     paintStatus();
+    window.addEventListener('cco:open-status', paintStatus);
 
     const setView = (name: string) => {
       root.querySelectorAll<HTMLElement>('[data-companion-view]').forEach((el) => {
@@ -346,14 +347,16 @@ import { url } from '@/lib/url';
     display: block;
   }
 
+  /* Desktop/tablet: right-side sheet (not centered modal). Mobile: bottom sheet. */
   .companion-panel {
     width: min(calc(100vw - 1rem), 26rem);
-    max-height: min(92dvh, 40rem);
-    margin: auto;
-    margin-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    margin-inline: auto 0;
     padding: 0;
     border: 0;
-    border-radius: 1.25rem;
+    border-radius: 1.25rem 0 0 1.25rem;
     background: transparent;
     color: var(--text);
     box-shadow: none;
@@ -378,6 +381,14 @@ import { url } from '@/lib/url';
       height: 100%;
       max-height: 100dvh;
       border-radius: 1.1rem 1.1rem 0 0;
+    }
+  }
+
+  @media (min-width: 40em) {
+    .companion-sheet {
+      height: 100%;
+      max-height: inherit;
+      border-radius: 1.25rem 0 0 1.25rem;
     }
   }
 

@@ -40,33 +40,51 @@ export function openModal(dialog: HTMLDialogElement, opener?: HTMLElement | null
 }
 
 /* ---------- header ---------- */
+let headerChromeBound = false;
+
+function closeHeaderDropdowns(except?: Element): void {
+  const header = $('[data-header]');
+  if (!header) return;
+  for (const dd of $$('[data-dropdown]', header)) {
+    if (dd === except) continue;
+    $('button', dd)?.setAttribute('aria-expanded', 'false');
+    const panel = $('.dropdown', dd);
+    if (panel) panel.hidden = true;
+  }
+}
+
 function initHeader(): void {
   const header = $('[data-header]');
   if (!header) return;
 
-  if (header.dataset.overlay) {
-    const update = () => header.classList.toggle('is-solid', window.scrollY > 24);
-    update();
-    window.addEventListener('scroll', update, { passive: true });
+  if (!headerChromeBound) {
+    headerChromeBound = true;
+    window.addEventListener(
+      'scroll',
+      () => {
+        const h = $('[data-header][data-overlay]');
+        if (h) h.classList.toggle('is-solid', window.scrollY > 24);
+      },
+      { passive: true },
+    );
+    document.addEventListener('click', (e) => {
+      if (!(e.target as Element).closest('[data-dropdown]')) closeHeaderDropdowns();
+    });
   }
 
-  const dropdowns = $$('[data-dropdown]', header);
-  const closeAll = (except?: Element) => {
-    for (const dd of dropdowns) {
-      if (dd === except) continue;
-      $('button', dd)?.setAttribute('aria-expanded', 'false');
-      const panel = $('.dropdown', dd);
-      if (panel) panel.hidden = true;
-    }
-  };
+  const overlay = $('[data-header][data-overlay]');
+  if (overlay) overlay.classList.toggle('is-solid', window.scrollY > 24);
 
-  for (const dd of dropdowns) {
+  if (header.hasAttribute('data-bound')) return;
+  header.setAttribute('data-bound', '');
+
+  for (const dd of $$('[data-dropdown]', header)) {
     const btn = $<HTMLButtonElement>('button', dd);
     const panel = $('.dropdown', dd);
     if (!btn || !panel) continue;
     btn.addEventListener('click', () => {
       const open = btn.getAttribute('aria-expanded') !== 'true';
-      closeAll(dd);
+      closeHeaderDropdowns(dd);
       btn.setAttribute('aria-expanded', String(open));
       panel.hidden = !open;
     });
@@ -78,37 +96,48 @@ function initHeader(): void {
     });
     dd.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !panel.hidden) {
-        closeAll();
+        closeHeaderDropdowns();
         btn.focus();
       }
     });
   }
-
-  document.addEventListener('click', (e) => {
-    if (!(e.target as Element).closest('[data-dropdown]')) closeAll();
-  });
 }
 
 /* ---------- mobile menu ---------- */
+let menuMediaBound = false;
+
 function initMenu(): void {
   const dialog = $<HTMLDialogElement>('[data-menu]');
-  const openers = $$<HTMLButtonElement>('[data-menu-open]');
   if (!dialog) return;
 
-  const setExpanded = (v: boolean) => openers.forEach((b) => b.setAttribute('aria-expanded', String(v)));
+  const wireOpeners = () => {
+    const openers = $$<HTMLButtonElement>('[data-menu-open]');
+    const setExpanded = (v: boolean) => openers.forEach((b) => b.setAttribute('aria-expanded', String(v)));
+    openers.forEach((btn) => {
+      if (btn.hasAttribute('data-bound')) return;
+      btn.setAttribute('data-bound', '');
+      btn.addEventListener('click', () => {
+        const d = $<HTMLDialogElement>('[data-menu]');
+        if (!d) return;
+        d.showModal();
+        lockScroll(true);
+        setExpanded(true);
+      });
+    });
+  };
 
-  openers.forEach((btn) =>
-    btn.addEventListener('click', () => {
-      dialog.showModal();
-      lockScroll(true);
-      setExpanded(true);
-    }),
-  );
+  wireOpeners();
+
+  if (dialog.hasAttribute('data-bound')) return;
+  dialog.setAttribute('data-bound', '');
+
+  const setExpanded = (v: boolean) =>
+    $$<HTMLButtonElement>('[data-menu-open]').forEach((b) => b.setAttribute('aria-expanded', String(v)));
 
   dialog.addEventListener('close', () => {
     lockScroll(false);
     setExpanded(false);
-    openers[0]?.focus({ preventScroll: true });
+    $$<HTMLButtonElement>('[data-menu-open]')[0]?.focus({ preventScroll: true });
   });
 
   $$('[data-menu-close]', dialog).forEach((b) => b.addEventListener('click', () => dialog.close()));
@@ -122,10 +151,13 @@ function initMenu(): void {
     }
   });
 
-  // Close when switching to desktop layout while open
-  window.matchMedia('(min-width: 64em)').addEventListener('change', (mq) => {
-    if (mq.matches && dialog.open) dialog.close();
-  });
+  if (!menuMediaBound) {
+    menuMediaBound = true;
+    window.matchMedia('(min-width: 64em)').addEventListener('change', (mq) => {
+      const d = $<HTMLDialogElement>('[data-menu]');
+      if (mq.matches && d?.open) d.close();
+    });
+  }
 }
 
 /* ---------- on-screen keyboard: hide sticky bars while typing ---------- */
@@ -274,6 +306,13 @@ function initReveal(): void {
   items.forEach((el) => io.observe(el));
 }
 
+/** Recompute open/closed from Europe/Berlin (boot script); never reuse stale SSR/VT text. */
+function refreshOpenStatus(): void {
+  const refresh = (window as Window & { __ccoRefreshOpen?: () => void }).__ccoRefreshOpen;
+  if (typeof refresh === 'function') refresh();
+  else window.dispatchEvent(new Event('cco:refresh-open'));
+}
+
 /** Hours pill opens the sheet. Status text is painted by the boot script. */
 function initOpeningSheet(): void {
   $$<HTMLElement>('[data-opening-status]').forEach((root) => {
@@ -284,6 +323,7 @@ function initOpeningSheet(): void {
     if (!sheet || !opener) return;
     const setExpanded = (open: boolean) => opener.setAttribute('aria-expanded', String(open));
     opener.addEventListener('click', () => {
+      refreshOpenStatus();
       openModal(sheet, opener);
       setExpanded(true);
     });
@@ -295,32 +335,13 @@ function initOpeningSheet(): void {
   });
 }
 
-initHeader();
-initMenu();
-initKeyboardAwareness();
-initConsent();
-initCollections();
-initReveal();
-initOpeningSheet();
-bindTrackAttributes();
-document.addEventListener('astro:page-load', initOpeningSheet);
-
-document.addEventListener('astro:after-swap', () => {
+function bootPageUi(): void {
+  initHeader();
+  initMenu();
+  initReveal();
+  initOpeningSheet();
+  refreshOpenStatus();
   const html = document.documentElement;
-  const label = html.dataset.ccoOpenLabel;
-  const state = html.dataset.ccoOpen;
-  const reason = html.dataset.ccoOpenReason;
-  if (label) {
-    $$('[data-oh-line]').forEach((el) => {
-      el.textContent = label;
-    });
-  }
-  if (state) {
-    $$('[data-opening-status], [data-oh-open]').forEach((el) => {
-      el.dataset.state = state;
-      if (reason) el.dataset.reason = reason;
-    });
-  }
   const n = html.dataset.ccoFavCount;
   if (n) {
     $$('[data-fav-count]').forEach((el) => {
@@ -329,4 +350,12 @@ document.addEventListener('astro:after-swap', () => {
       (el as HTMLElement).hidden = false;
     });
   }
-});
+}
+
+initKeyboardAwareness();
+initConsent();
+initCollections();
+bindTrackAttributes();
+bootPageUi();
+document.addEventListener('astro:page-load', bootPageUi);
+document.addEventListener('astro:after-swap', refreshOpenStatus);

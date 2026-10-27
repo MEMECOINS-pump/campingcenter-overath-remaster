@@ -1,6 +1,13 @@
 /**
  * Blocking first-paint boot: opening status, consent, a11y prefs, fav count, scroll solid.
  * Runs as is:inline so there is no flash of pending/wrong chrome.
+ *
+ * Opening status is recomputed from Europe/Berlin wall time (not SSR text):
+ * - first paint
+ * - every minute boundary
+ * - tab visibility restore
+ * - View Transitions (cco:refresh-open / window.__ccoRefreshOpen)
+ * Pill, hours sheet banner, companion dataset, and open-state badges stay in sync.
  */
 import { schedulePayload } from '@/lib/opening-hours';
 import { holidaysAround } from '@/data/holidays';
@@ -62,14 +69,17 @@ function addDays(iso,n){
   return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 }
 var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function dayHoursFor(day){
+  for(var i=0;i<D.schedule.length;i++){if(D.schedule[i].d===day)return D.schedule[i].h;}
+  return null;
+}
 function nextOpen(fromIso,fromMin){
   for(var offset=0;offset<14;offset++){
     var iso=addDays(fromIso,offset);
     if(D.holidays.some(function(h){return h.date===iso;}))continue;
     var di=new Date(Number(iso.slice(0,4)),Number(iso.slice(5,7))-1,Number(iso.slice(8,10))).getDay();
     var day=days[di];
-    var hours=null;
-    for(var i=0;i<D.schedule.length;i++){if(D.schedule[i].d===day){hours=D.schedule[i].h;break;}}
+    var hours=dayHoursFor(day);
     if(!hours||!hours[0])continue;
     if(offset===0){
       for(var j=0;j<hours.length;j++){if(toMin(hours[j][0])>fromMin)return 'öffnet heute um '+hours[j][0]+' Uhr';}
@@ -82,36 +92,54 @@ function nextOpen(fromIso,fromMin){
   }
   return '';
 }
-var now=berlin();
-var hol=D.holidays.find(function(h){return h.date===now.iso;})||null;
-var slot=null;
-var dayHours=null;
-for(var i=0;i<D.schedule.length;i++){
-  if(D.schedule[i].d===now.day){dayHours=D.schedule[i].h;break;}
+function todayHoursLabel(hours){
+  if(!hours||!hours.length)return 'Heute planmäßig geschlossen';
+  return 'Regulär heute: '+hours.map(function(h){return h[0]+'\u2013'+h[1];}).join(' \u00b7 ')+' Uhr';
 }
-if(!hol&&dayHours){
-  for(var j=0;j<dayHours.length;j++){
-    var a=toMin(dayHours[j][0]),b=toMin(dayHours[j][1]);
-    if(now.minutes>=a&&now.minutes<b){slot=dayHours[j];break;}
+function compute(){
+  var now=berlin();
+  var hol=D.holidays.find(function(h){return h.date===now.iso;})||null;
+  var dayHours=dayHoursFor(now.day);
+  var slot=null;
+  if(!hol&&dayHours){
+    for(var j=0;j<dayHours.length;j++){
+      var a=toMin(dayHours[j][0]),b=toMin(dayHours[j][1]);
+      if(now.minutes>=a&&now.minutes<b){slot=dayHours[j];break;}
+    }
   }
+  var opensNext=nextOpen(now.iso,now.minutes);
+  var todayLabel=hol
+    ?('Heute Feiertag: '+hol.name+' \u2013 wir haben geschlossen')
+    :todayHoursLabel(dayHours);
+  var state,reason,label,sub='',alertName='',bannerTitle,nextLine='';
+  if(hol){
+    state='closed';reason='holiday';
+    label='Geschlossen wegen Feiertag: '+hol.name;
+    alertName=hol.name;
+    sub='Gesetzlicher Feiertag (NRW)'+(opensNext?' \u00b7 '+opensNext:'');
+    bannerTitle=label;
+    nextLine=opensNext||'';
+  }else if(slot){
+    state='open';reason='hours';
+    label='Heute geöffnet \u00b7 bis '+slot[1]+' Uhr';
+    bannerTitle=label;
+    nextLine='';
+  }else{
+    state='closed';
+    reason=(now.day==='Sunday'||!dayHours)?'sunday':'outside';
+    label='Aktuell geschlossen';
+    sub=opensNext||'';
+    bannerTitle=label;
+    nextLine=opensNext||'';
+  }
+  return{state:state,reason:reason,label:label,sub:sub,alertName:alertName,todayLabel:todayLabel,bannerTitle:bannerTitle,nextLine:nextLine};
 }
-var state,reason,label,sub='',alertName='';
-var opensNext=nextOpen(now.iso,now.minutes);
-if(hol){state='closed';reason='holiday';label='Geschlossen wegen Feiertag: '+hol.name;alertName=hol.name;sub='Gesetzlicher Feiertag (NRW)'+(opensNext?' · '+opensNext:'');}
-else if(slot){state='open';reason='hours';label='Heute geöffnet · bis '+slot[1]+' Uhr';}
-else{state='closed';reason=(now.day==='Sunday'||!dayHours)?'sunday':'outside';label='Aktuell geschlossen';sub=opensNext||'';}
-/* Use cco* keys — never data-open-state on <html> (would match badges and wipe the document via textContent). */
-html.dataset.ccoOpen=state;
-html.dataset.ccoOpenReason=reason;
-html.dataset.ccoOpenLabel=label;
-html.dataset.ccoOpenAlert=alertName;
-if(window.scrollY>24)html.classList.add('boot-scrolled');
-function paint(){
-  if(html.dataset.favCount){
-    if(!html.dataset.ccoFavCount)html.dataset.ccoFavCount=html.dataset.favCount;
-    delete html.dataset.favCount;
-  }
-
+function paintOpen(status){
+  var state=status.state,reason=status.reason,label=status.label,sub=status.sub,alertName=status.alertName;
+  html.dataset.ccoOpen=state;
+  html.dataset.ccoOpenReason=reason;
+  html.dataset.ccoOpenLabel=label;
+  html.dataset.ccoOpenAlert=alertName;
   document.querySelectorAll('[data-opening-status]').forEach(function(root){
     root.dataset.state=state;root.dataset.reason=reason;
     root.querySelectorAll('[data-oh-line]').forEach(function(el){el.textContent=label;});
@@ -119,6 +147,15 @@ function paint(){
       if(sub){el.hidden=false;el.textContent=sub;}else{el.hidden=true;el.textContent='';}
     });
     root.querySelectorAll('[data-oh-open]').forEach(function(btn){btn.dataset.state=state;btn.dataset.reason=reason;});
+    root.querySelectorAll('[data-oh-banner]').forEach(function(banner){
+      banner.dataset.state=state;banner.dataset.reason=reason;
+    });
+    root.querySelectorAll('[data-oh-banner-title]').forEach(function(el){el.textContent=status.bannerTitle;});
+    root.querySelectorAll('[data-oh-today]').forEach(function(el){el.textContent=status.todayLabel;});
+    root.querySelectorAll('[data-oh-next]').forEach(function(el){
+      if(status.nextLine){el.hidden=false;el.textContent=status.nextLine;}
+      else{el.hidden=true;el.textContent='';}
+    });
     var alert=root.querySelector('[data-oh-alert]');
     if(alert){
       alert.hidden=reason!=='holiday';
@@ -130,8 +167,32 @@ function paint(){
   });
   document.querySelectorAll('span[data-open-state], .open-state[data-open-state]').forEach(function(el){
     el.dataset.state=state;el.dataset.reason=reason;
-    el.textContent=reason==='holiday'?'Feiertag · Geschlossen':(state==='open'?'Jetzt geöffnet':'Aktuell geschlossen');
+    el.textContent=reason==='holiday'?'Feiertag \u00b7 Geschlossen':(state==='open'?'Jetzt geöffnet':'Aktuell geschlossen');
   });
+  try{window.dispatchEvent(new CustomEvent('cco:open-status',{detail:status}));}catch(e){}
+}
+function refreshOpen(){
+  paintOpen(compute());
+}
+function msToNextMinute(){
+  var now=new Date();
+  var ms=60000-((now.getSeconds()*1000)+now.getMilliseconds());
+  return ms<250?ms+60000:ms;
+}
+var openTimer=0;
+function armOpenTimer(){
+  if(openTimer)clearTimeout(openTimer);
+  openTimer=setTimeout(function(){
+    refreshOpen();
+    armOpenTimer();
+  },msToNextMinute());
+}
+function paintChrome(){
+  if(html.dataset.favCount){
+    if(!html.dataset.ccoFavCount)html.dataset.ccoFavCount=html.dataset.favCount;
+    delete html.dataset.favCount;
+  }
+  refreshOpen();
   if(html.classList.contains('needs-consent')){
     var banner=document.querySelector('[data-consent-banner]');
     if(banner)banner.hidden=false;
@@ -146,7 +207,14 @@ function paint(){
     });
   }
 }
-if(document.body)paint();
-else document.addEventListener('DOMContentLoaded',paint);
+if(window.scrollY>24)html.classList.add('boot-scrolled');
+window.__ccoRefreshOpen=refreshOpen;
+window.addEventListener('cco:refresh-open',refreshOpen);
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible')refreshOpen();
+});
+armOpenTimer();
+if(document.body)paintChrome();
+else document.addEventListener('DOMContentLoaded',paintChrome);
 })();`;
 }
