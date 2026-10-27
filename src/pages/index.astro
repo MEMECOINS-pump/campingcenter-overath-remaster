@@ -15,8 +15,10 @@ import FaqAccordion from '@/components/ui/FaqAccordion.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import ContactSection from '@/components/sections/ContactSection.astro';
 import CtaSection from '@/components/sections/CtaSection.astro';
-import { faqs } from '@/data/faqs';
+import { faqsFor } from '@/data/faqs';
 import { faqSchema } from '@/lib/schema';
+
+const faqs = faqsFor('de');
 ---
 
 <BaseLayout

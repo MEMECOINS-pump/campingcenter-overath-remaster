@@ -1,6 +1,7 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
 import { company, openingHours, formatHours } from '@/data/company';
+import { getLangFromPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
 
 /**
@@ -8,14 +9,40 @@ import { url } from '@/lib/url';
  * (z. B. „Tag der Deutschen Einheit“) bei jedem Reload kurz mit aus.
  * Status kommt ausschließlich clientseitig (Europe/Berlin).
  */
+interface Props {
+  lang?: Locale;
+}
+const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
+const dayLabels =
+  lang === 'en'
+    ? openingHours.map((p) => ({
+        ...p,
+        days: p.schemaDays.includes('Saturday') ? 'Saturday' : 'Monday to Friday',
+      }))
+    : openingHours;
 ---
 
-<div class="oh" data-opening-status data-state="pending" data-reason="hours">
+<div
+  class="oh"
+  data-opening-status
+  data-state="pending"
+  data-reason="hours"
+  data-lang={lang}
+  data-i18n-holiday-sub={lang === 'en' ? 'Public holiday (NRW)' : 'Gesetzlicher Feiertag (NRW)'}
+  data-i18n-banner-holiday={lang === 'en' ? 'Public holiday today – closed' : 'Heute Feiertag – geschlossen'}
+  data-i18n-banner-open={t(lang, 'companionOpenNow')}
+  data-i18n-banner-closed={lang === 'en' ? 'Closed now' : 'Jetzt geschlossen'}
+  data-i18n-alert-kicker={lang === 'en' ? 'Public holiday today' : 'Heute Feiertag'}
+  data-i18n-alert-closed={lang === 'en' ? '— we are closed' : '— wir haben geschlossen'}
+  data-i18n-companion-holiday={t(lang, 'companionHolidayClosed')}
+  data-i18n-companion-open={t(lang, 'companionOpenNow')}
+  data-i18n-companion-closed={t(lang, 'companionClosedNow')}
+>
   <!-- Immer hidden im HTML – JS zeigt nur an echten Feiertagen -->
   <div class="oh-alert" data-oh-alert hidden role="status">
-    <span class="oh-alert-kicker">Heute Feiertag</span>
+    <span class="oh-alert-kicker" data-oh-alert-kicker>{lang === 'en' ? 'Public holiday today' : 'Heute Feiertag'}</span>
     <strong class="oh-alert-name" data-oh-alert-name></strong>
-    <span class="oh-alert-closed">— wir haben geschlossen</span>
+    <span class="oh-alert-closed" data-oh-alert-closed>{lang === 'en' ? '— we are closed' : '— wir haben geschlossen'}</span>
   </div>
 
   <div class="container oh-row">
@@ -30,7 +57,7 @@ import { url } from '@/lib/url';
     >
       <span class="oh-dot" aria-hidden="true"></span>
       <span class="oh-copy">
-        <span class="oh-line" data-oh-line>Öffnungszeiten</span>
+        <span class="oh-line" data-oh-line>{t(lang, 'openingHours')}</span>
         <span class="oh-sub" data-oh-sub hidden></span>
       </span>
     </button>
@@ -39,37 +66,41 @@ import { url } from '@/lib/url';
   <dialog class="oh-sheet" id="oh-sheet" data-oh-sheet>
     <div class="oh-sheet-inner">
       <header class="oh-sheet-head">
-        <p class="eyebrow">Öffnungszeiten</p>
-        <button type="button" class="oh-close" data-oh-close aria-label="Schließen"><Icon name="close" /></button>
+        <p class="eyebrow">{t(lang, 'openingHours')}</p>
+        <button type="button" class="oh-close" data-oh-close aria-label={t(lang, 'companionClose')}><Icon name="close" /></button>
       </header>
 
       <div class="oh-banner" data-oh-banner data-state="pending" data-reason="hours">
-        <p class="oh-banner-title" data-oh-banner-title>Öffnungszeiten</p>
+        <p class="oh-banner-title" data-oh-banner-title>{t(lang, 'openingHours')}</p>
         <p class="oh-banner-detail" data-oh-today></p>
         <p class="oh-banner-next" data-oh-next hidden></p>
       </div>
 
       <ul class="oh-week">
         {
-          openingHours.map((p) => (
+          dayLabels.map((p) => (
             <li>
               <strong>{p.days}</strong>
-              <span>{formatHours(p)}</span>
+              <span>
+                {lang === 'en'
+                  ? p.hours.map((h) => `${h.opens}–${h.closes}`).join(' and ')
+                  : formatHours(p)}
+              </span>
             </li>
           ))
         }
         <li>
-          <strong>Sonntag & Feiertage</strong>
-          <span>geschlossen</span>
+          <strong>{lang === 'en' ? 'Sunday & public holidays' : 'Sonntag & Feiertage'}</strong>
+          <span>{lang === 'en' ? 'closed' : 'geschlossen'}</span>
         </li>
       </ul>
-      <p class="oh-sun">An gesetzlichen Feiertagen in NRW haben wir geschlossen – genau wie sonntags.</p>
+      <p class="oh-sun">{t(lang, 'closedSundayHoliday')}</p>
       <div class="btn-row">
-        <a class="btn btn-accent btn-sm" href={company.phone.href}>Anrufen</a>
+        <a class="btn btn-accent btn-sm" href={company.phone.href}>{t(lang, 'companionCallNow')}</a>
         <a class="btn btn-ghost btn-sm" href={company.directions} target="_blank" rel="noopener">
-          Route <span class="sr-only">(öffnet in neuem Tab)</span>
+          {lang === 'en' ? 'Directions' : 'Route'} <span class="sr-only">({lang === 'en' ? 'opens in new tab' : 'öffnet in neuem Tab'})</span>
         </a>
-        <a class="btn btn-ghost btn-sm" href={url('/kontakt/')}>Kontakt</a>
+        <a class="btn btn-ghost btn-sm" href={url(lang === 'en' ? '/en/kontakt/' : '/kontakt/')}>{t(lang, 'contact')}</a>
       </div>
     </div>
   </dialog>

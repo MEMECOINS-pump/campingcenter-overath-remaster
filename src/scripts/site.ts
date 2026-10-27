@@ -196,6 +196,7 @@ function initConsent(): void {
     lockScroll(false);
     if (!form) return;
     if (dialog.returnValue === 'all') decide(true, true);
+    else if (dialog.returnValue === 'necessary') decide(false, false);
     else if (dialog.returnValue === 'save')
       decide(
         (form.elements.namedItem('media') as HTMLInputElement).checked,
@@ -268,9 +269,18 @@ function initCollections(): void {
 }
 
 /* ---------- opening status (re-bind after view transitions) ---------- */
+function siteLang(): 'de' | 'en' {
+  const htmlLang = document.documentElement.lang || '';
+  const body = document.body?.dataset.lang;
+  const pref = document.documentElement.dataset.ccoLang;
+  if (body === 'en' || pref === 'en' || htmlLang.startsWith('en')) return 'en';
+  return 'de';
+}
+
 function applyOpening(root: HTMLElement, status: OpenStatus): void {
   const isHoliday = status.reason === 'holiday';
   const next = status.state === 'closed' ? status.opensNext : null;
+  const holidaySub = root.dataset.i18nHolidaySub || 'Gesetzlicher Feiertag (NRW)';
   root.dataset.state = status.state;
   root.dataset.reason = status.reason;
 
@@ -280,7 +290,7 @@ function applyOpening(root: HTMLElement, status: OpenStatus): void {
   root.querySelectorAll<HTMLElement>('[data-oh-sub]').forEach((el) => {
     if (isHoliday) {
       el.hidden = false;
-      el.textContent = `Gesetzlicher Feiertag (NRW)${next ? ` · ${next}` : ''}`;
+      el.textContent = `${holidaySub}${next ? ` · ${next}` : ''}`;
     } else if (next) {
       el.hidden = false;
       el.textContent = next;
@@ -302,10 +312,10 @@ function applyOpening(root: HTMLElement, status: OpenStatus): void {
   });
   root.querySelectorAll<HTMLElement>('[data-oh-banner-title]').forEach((el) => {
     el.textContent = isHoliday
-      ? 'Heute Feiertag – geschlossen'
+      ? root.dataset.i18nBannerHoliday || 'Heute Feiertag – geschlossen'
       : status.state === 'open'
-        ? 'Jetzt geöffnet'
-        : 'Jetzt geschlossen';
+        ? root.dataset.i18nBannerOpen || 'Jetzt geöffnet'
+        : root.dataset.i18nBannerClosed || 'Jetzt geschlossen';
   });
   root.querySelectorAll<HTMLElement>('[data-oh-alert]').forEach((el) => {
     el.hidden = !isHoliday;
@@ -323,17 +333,27 @@ function applyOpening(root: HTMLElement, status: OpenStatus): void {
 }
 
 function tickOpening(): void {
-  const status = computeOpenStatus();
-  $$<HTMLElement>('[data-opening-status]').forEach((root) => applyOpening(root, status));
+  const lang = siteLang();
+  $$<HTMLElement>('[data-opening-status]').forEach((root) => {
+    const rootLang = root.dataset.lang === 'en' ? 'en' : lang;
+    applyOpening(root, computeOpenStatus(new Date(), undefined, rootLang));
+  });
   $$<HTMLElement>('[data-open-state]').forEach((el) => {
+    const status = computeOpenStatus(new Date(), undefined, lang);
     el.dataset.state = status.state;
     el.dataset.reason = status.reason;
-    el.textContent =
-      status.reason === 'holiday'
-        ? 'Feiertag · Geschlossen'
-        : status.state === 'open'
-          ? 'Jetzt geöffnet'
-          : 'Aktuell geschlossen';
+    const host = el.closest<HTMLElement>('[data-i18n-companion-open], [data-companion]') || document.body;
+    const holiday =
+      (host as HTMLElement).dataset?.i18nCompanionHoliday ||
+      document.querySelector<HTMLElement>('[data-i18n-companion-holiday]')?.dataset.i18nCompanionHoliday ||
+      (lang === 'en' ? 'Public holiday · Closed' : 'Feiertag · Geschlossen');
+    const open =
+      document.querySelector<HTMLElement>('[data-i18n-companion-open]')?.dataset.i18nCompanionOpen ||
+      (lang === 'en' ? 'Open now' : 'Jetzt geöffnet');
+    const closed =
+      document.querySelector<HTMLElement>('[data-i18n-companion-closed]')?.dataset.i18nCompanionClosed ||
+      (lang === 'en' ? 'Currently closed' : 'Aktuell geschlossen');
+    el.textContent = status.reason === 'holiday' ? holiday : status.state === 'open' ? open : closed;
   });
 }
 
@@ -341,7 +361,8 @@ function initOpening(): void {
   $$<HTMLElement>('[data-opening-status]').forEach((root) => {
     if (root.hasAttribute('data-bound')) return;
     root.setAttribute('data-bound', '');
-    applyOpening(root, computeOpenStatus());
+    const rootLang = root.dataset.lang === 'en' ? 'en' : siteLang();
+    applyOpening(root, computeOpenStatus(new Date(), undefined, rootLang));
     const sheet = root.querySelector<HTMLDialogElement>('[data-oh-sheet]');
     const setSheet = (open: boolean) => {
       document.body.classList.toggle('scroll-locked', open);
@@ -401,12 +422,19 @@ function bootUi(): void {
 bootUi();
 document.addEventListener('astro:page-load', bootUi);
 document.addEventListener('astro:after-swap', () => {
-  // Re-apply boot paint after soft navigations (no full reload)
   const html = document.documentElement;
-  const label = html.dataset.openLabel;
+  const label = html.dataset.ccoOpenLabel;
+  const state = html.dataset.ccoOpen;
+  const reason = html.dataset.ccoOpenReason;
   if (label) {
     $$('[data-oh-line]').forEach((el) => {
       el.textContent = label;
+    });
+  }
+  if (state) {
+    $$('[data-opening-status], [data-oh-open]').forEach((el) => {
+      el.dataset.state = state;
+      if (reason) el.dataset.reason = reason;
     });
   }
   const n = html.dataset.favCount;

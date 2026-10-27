@@ -1,0 +1,346 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import { agbDocuments } from '@/data/content';
+import { rentalEn } from '@/data/content-en';
+import { partners } from '@/data/brands';
+import { company } from '@/data/company';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
+import { localizedPath } from '@/i18n';
+
+const lang = 'en' as const;
+const rental = rentalEn;
+const crumbs = [{ label: 'Rental', href: '/vermietung-wohnmobile/' }];
+const rentalTerms = agbDocuments.find((d) => d.area === 'Vermietung');
+const benefitIcons = ['sparkle', 'bike', 'tag'] as const;
+const steps = [
+  { title: 'Choose a vehicle', text: 'Online around the clock via ADAC motorhome hire — or in person with us on site.' },
+  { title: 'Get advice', text: 'Questions about the vehicle, equipment or route? Our team is happy to help.' },
+  { title: 'Hit the road', text: 'Collect your rental vehicle with us in Overath — and your adventure begins.' },
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/vermietung-wohnmobile/"
+  title="Rent a motorhome in Overath – ADAC station Cologne-East"
+  description="Rent a motorhome at Campingcenter Overath, ADAC rental station Cologne-East: new vehicles, bike racks and 3% discount for ADAC members."
+  overlayHeader
+  inquiryHref={rental.adacBookingUrl}
+  inquiryLabel="Book"
+  jsonLd={[
+    breadcrumbSchema(crumbs, Astro.site),
+    serviceSchema('Motorhome rental', rental.intro, '/vermietung-wohnmobile/', Astro.site),
+  ]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Rent a motorhome"
+    title="Freedom for a while."
+    lead="We are a rental station of ADAC motorhome hire in Cologne-East. Book online around the clock — or get advice with us on site."
+    image="rental-header"
+    imageAlt="Rental motorhome on a country road"
+  >
+    <a class="btn btn-accent btn-lg" href={rental.adacBookingUrl} target="_blank" rel="noopener" data-track="rental_booking_click" data-track-location="rental_hero">
+      Book via ADAC <Icon name="external" /><span class="sr-only"> (opens in new tab)</span>
+    </a>
+    <a class="btn btn-glass btn-lg" href={company.phone.href} data-track="call_click" data-track-location="rental_hero">
+      <Icon name="phone" /> Phone advice
+    </a>
+  </PageHero>
+
+  <section class="section" aria-labelledby="rt-partner">
+    <div class="container split">
+      <div class="rt-photo reveal">
+        <Photo src="rental-fleet" alt="Rental motorhomes at Campingcenter Overath" sizes="(min-width: 60em) 45vw, 92vw" widths={[480, 768, 1080]} />
+      </div>
+      <div>
+        <p class="eyebrow">{rental.station}</p>
+        <h2 id="rt-partner">Double benefits for your trip</h2>
+        <p class="lead">{rental.partnership}</p>
+        <p>{rental.intro}</p>
+        <p class="rt-hygiene">
+          <Icon name="shield" />
+          <span>{rental.hygiene}</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-sand" aria-labelledby="rt-benefits">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Your benefits</p>
+        <h2 id="rt-benefits">Rent with confidence</h2>
+      </div>
+      <ul class="grid grid-3" role="list">
+        {
+          rental.benefits.map((b, i) => (
+            <li class="card card-pad rt-benefit reveal" data-delay={i}>
+              <span class="rt-icon">
+                <Icon name={benefitIcons[i] ?? 'check'} />
+              </span>
+              <h3>{b.title}</h3>
+              <p class="muted">{b.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="rt-steps">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2 id="rt-steps">On the road in three steps</h2>
+      </div>
+      <ol class="rt-steps">
+        {
+          steps.map((s, i) => (
+            <li class="reveal" data-delay={i}>
+              <span class="rt-no">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{s.title}</h3>
+              <p class="muted">{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="btn-row rt-actions">
+        <a class="btn btn-accent btn-lg" href={rental.adacBookingUrl} target="_blank" rel="noopener" data-track="rental_booking_click" data-track-location="rental_steps">
+          Check availability <Icon name="external" /><span class="sr-only"> (opens in new tab)</span>
+        </a>
+        {
+          rentalTerms && (
+            <a class="btn btn-ghost btn-lg" href={rentalTerms.href} target="_blank" rel="noopener">
+              <Icon name="document" /> Rental terms (PDF)<span class="sr-only"> (opens in new tab)</span>
+            </a>
+          )
+        }
+      </div>
+      <p class="small muted rt-note">
+        Booking, prices and availability run via ADAC motorhome hire. You leave this website for that.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="anfrage" aria-labelledby="rt-inquiry">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Non-binding enquiry</p>
+        <h2 id="rt-inquiry">Send us a rental enquiry</h2>
+        <p class="lead">Besides ADAC online booking you can also write to us directly — e.g. if you are an ADAC member and have questions.</p>
+      </div>
+      <div class="card card-pad">
+        <form data-form="rental_inquiry" data-api-path="/api/rental-inquiry" data-subject="New rental enquiry – Campingcenter Overath">
+          <div class="form-stack">
+            <fieldset class="field">
+              <legend>Are you an ADAC member?</legend>
+              <div class="seg" role="radiogroup">
+                <label class="seg-opt"><input type="radio" name="adacMember" value="ja" required data-track-change="adac_member_selected" /><span>Yes</span></label>
+                <label class="seg-opt"><input type="radio" name="adacMember" value="nein" required /><span>No</span></label>
+              </div>
+              <p class="field-error" aria-live="polite"></p>
+            </fieldset>
+            <div data-show-if="adacMember:ja">
+              <Field name="adacNumber" label="ADAC membership number (optional)" hint="Optional — helps with processing." autocomplete="off" />
+            </div>
+            <Field name="name" label="Name" required autocomplete="name" />
+            <Field name="email" label="Email" type="email" required autocomplete="email" />
+            <Field name="telefon" label="Phone" type="tel" required autocomplete="tel" />
+            <Field name="period" label="Preferred rental period" placeholder="e.g. 12–19 July" />
+            <Field name="travelers" label="Number of travellers" />
+            <Field name="message" label="Message" type="textarea" rows={4} />
+            <FormEnd submitLabel="Send rental enquiry" />
+          </div>
+          <FormSuccess title="Enquiry prepared" text="Your rental enquiry goes to vermietung@ccoverath.de." />
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="rt-freedom" aria-labelledby="rt-freedom">
+    <div class="rt-freedom-media">
+      <Photo src="lake-motorhomes" alt="" sizes="100vw" widths={[640, 1024, 1600]} />
+    </div>
+    <div class="container rt-freedom-inner">
+      <h2 id="rt-freedom">Your holiday, your route.</h2>
+      <p>{rental.freedom}</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="rt-partners">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Our partners</p>
+        <h2 id="rt-partners">Strong partners by our side</h2>
+      </div>
+      <ul class="partner-grid" role="list">
+        {
+          partners.map((p) => (
+            <li>
+              <a href={p.website} target="_blank" rel="noopener" class="partner">
+                <Image src={p.logo} alt={p.name} widths={[160, 320]} sizes="10rem" loading="lazy" class="partner-logo" />
+                <span class="sr-only"> (opens in new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaSection
+    primary={{ label: 'Buy a motorhome', href: localizedPath('/wohnmobile/', lang) }}
+    secondary={{ label: 'Book consultation', href: localizedPath('/kontakt/', lang) + '#beratung' }}
+  />
+</BaseLayout>
+
+<style>
+  .rt-photo {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  .rt-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  h2 {
+    margin: 0.5rem 0 1rem;
+  }
+
+  .rt-hygiene {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius);
+    background: var(--forest-soft);
+    color: var(--forest);
+    font-weight: 600;
+  }
+
+  .rt-hygiene :global(.icon) {
+    flex: none;
+    width: 1.3rem;
+    height: 1.3rem;
+    margin-top: 0.1rem;
+  }
+
+  .rt-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 12px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .rt-benefit h3 {
+    margin: 1rem 0 0.4rem;
+    font-size: 1.2rem;
+  }
+
+  .rt-steps {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+  }
+
+  @media (min-width: 48em) {
+    .rt-steps {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  .rt-steps li {
+    padding: 1.5rem;
+    border-top: 3px solid var(--brand);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .rt-no {
+    display: block;
+    margin-bottom: 0.65rem;
+    font-weight: 800;
+    color: var(--brand-ink);
+  }
+
+  .rt-actions {
+    margin-top: 1.75rem;
+  }
+
+  .rt-note {
+    margin-top: 1rem;
+  }
+
+  .rt-freedom {
+    position: relative;
+    isolation: isolate;
+    color: #fff;
+    background: #2a2622;
+  }
+
+  .rt-freedom-media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .rt-freedom-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(14 12 10 / 0.88), rgb(14 12 10 / 0.45));
+  }
+
+  .rt-freedom-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .rt-freedom-inner {
+    padding-block: clamp(3rem, 2rem + 5vw, 5.5rem);
+    max-width: 40rem;
+  }
+
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 1rem;
+    list-style: none;
+  }
+
+  .partner {
+    display: grid;
+    place-items: center;
+    min-height: 5.5rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    background: var(--white);
+    border: 1px solid var(--line);
+  }
+
+  .partner-logo {
+    width: auto;
+    max-width: 9rem;
+    height: 2.5rem;
+    object-fit: contain;
+  }
+</style>

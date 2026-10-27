@@ -1,0 +1,244 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Photo from '@/components/ui/Photo.astro';
+import Field from '@/components/forms/Field.astro';
+import FormEnd from '@/components/forms/FormEnd.astro';
+import FormSuccess from '@/components/forms/FormSuccess.astro';
+import YouTubeLite from '@/components/embeds/YouTubeLite.astro';
+import CtaSection from '@/components/sections/CtaSection.astro';
+import { workshopRequestTopics } from '@/data/services';
+import { serviceGroupsEn, workshopHighlightsEn } from '@/data/content-en';
+import { agbDocuments, videos } from '@/data/content';
+import { company } from '@/data/company';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
+import { localizedPath } from '@/i18n';
+
+const lang = 'en' as const;
+const crumbs = [{ label: 'Workshop & aftersales', href: '/werkstatt-kundendienst/' }];
+const repairTerms = agbDocuments.find((d) => d.area === 'Werkstatt');
+const highlightIcons = ['shield', 'drop', 'bolt'] as const;
+const today = new Date().toISOString().slice(0, 10);
+const groups = serviceGroupsEn;
+const highlights = workshopHighlightsEn;
+const topicsEn = [
+  'TÜV approval',
+  'Gas check',
+  'Watertightness test',
+  'Service',
+  'Accident / GRP damage',
+  'Moisture damage',
+  'Retrofit / special fitting',
+  'Solar / electrics',
+  'Vehicle wash',
+  'Other',
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path="/werkstatt-kundendienst/"
+  title="Workshop & aftersales for motorhomes and caravans"
+  description="Specialist workshop in Overath: TÜV, gas check, watertightness, GRP and moisture damage, solar, electrics, awnings, movers and more. Request a workshop appointment."
+  overlayHeader
+  inquiryHref="#termin"
+  inquiryLabel="Appointment"
+  jsonLd={[
+    breadcrumbSchema(crumbs, Astro.site),
+    serviceSchema(
+      'Workshop & aftersales for motorhomes and caravans',
+      'Inspection, repair, technology, comfort and chassis — specialist workshop in Overath.',
+      '/werkstatt-kundendienst/',
+      Astro.site,
+    ),
+  ]}
+>
+  <PageHero
+    crumbs={crumbs}
+    eyebrow="Workshop & aftersales"
+    title="Your camper deserves the best service."
+    lead="Specialist workshop for motorhomes and caravans in Overath — from sealed safety checks to GRP repair."
+    image="workshop-interior"
+    imageAlt="Campingcenter Overath workshop with motorhome on the lift"
+  >
+    <a class="btn btn-accent btn-lg" href="#termin" data-track="cta_click" data-track-location="workshop_hero">
+      Request workshop appointment <Icon name="arrow-right" class="arrow" />
+    </a>
+    <a class="btn btn-glass btn-lg" href={company.phone.href} data-track="call_click" data-track-location="workshop_hero">
+      <Icon name="phone" /> {company.phone.display}
+    </a>
+  </PageHero>
+
+  <section class="section-tight ws-highlights" aria-label="Highlights">
+    <div class="container">
+      <ul class="grid grid-3" role="list">
+        {
+          highlights.map((h, i) => (
+            <li class="card card-pad ws-hl reveal">
+              <span class="ws-icon">
+                <Icon name={highlightIcons[i] ?? 'check'} />
+              </span>
+              <h2>{h.title}</h2>
+              <p class="muted">{h.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ws-services">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Services</p>
+        <h2 id="ws-services">Everything for your motorhome and caravan</h2>
+        <p class="lead">Whether maintenance, repair or retrofit: our workshop team knows leisure vehicles from experience.</p>
+      </div>
+
+      <nav class="ws-jump" aria-label="Service areas">
+        <ul>
+          {
+            groups.map((g) => (
+              <li>
+                <a href={`#${g.id}`}>
+                  <Icon name={g.icon} /> {g.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="ws-groups">
+        {
+          groups.map((g) => (
+            <article id={g.id} class="ws-group card card-pad reveal" aria-labelledby={`${g.id}-t`}>
+              <header>
+                <span class="ws-icon">
+                  <Icon name={g.icon} />
+                </span>
+                <div>
+                  <h3 id={`${g.id}-t`}>{g.title}</h3>
+                  <p class="muted">{g.lead}</p>
+                </div>
+              </header>
+              <ul class="check-list">
+                {g.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-sand" aria-labelledby="ws-video">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Insight</p>
+        <h2 id="ws-video">Your specialist for motorhomes and caravans</h2>
+        <p class="lead">A short look into our workshop — and why campers trust us with their vehicles.</p>
+        {
+          repairTerms && (
+            <a class="btn btn-ghost" href={repairTerms.href} target="_blank" rel="noopener">
+              <Icon name="document" /> Repair terms (PDF)<span class="sr-only"> (opens in new tab)</span>
+            </a>
+          )
+        }
+      </div>
+      <YouTubeLite id={videos.workshop.id} title={videos.workshop.title} />
+    </div>
+  </section>
+
+  <section id="termin" class="section" aria-labelledby="ws-form">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Appointment request</p>
+        <h2 id="ws-form">Request a workshop appointment</h2>
+        <p class="lead">Tell us your preferred window and topic. We confirm appointments personally — faster by phone on {company.phone.display}.</p>
+      </div>
+      <div class="card card-pad">
+        <form class="form-stack" data-form="workshop" data-subject="Workshop appointment request (EN)">
+          <Field
+            name="thema"
+            type="select"
+            label="Topic"
+            required
+            options={topicsEn.map((t, i) => ({ value: workshopRequestTopics[i] ?? t, label: t }))}
+          />
+          <Field name="fahrzeug" label="Vehicle / model" placeholder="e.g. Challenger 240" />
+          <Field name="wunschtermin" type="date" label="Preferred date" min={today} />
+          <Field name="name" label="Name" required autocomplete="name" />
+          <Field name="email" label="Email" type="email" required autocomplete="email" />
+          <Field name="telefon" label="Phone" type="tel" required autocomplete="tel" />
+          <Field name="nachricht" label="Description" type="textarea" rows={4} />
+          <FormEnd submitLabel="Send request" />
+          <FormSuccess title="Request prepared" text="We will confirm your appointment personally." />
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-label="Workshop photo">
+    <div class="container">
+      <Photo src="workshop-interior" alt="Workshop interior at Campingcenter Overath" sizes="92vw" widths={[768, 1200]} />
+    </div>
+  </section>
+
+  <CtaSection
+    primary={{ label: 'Browse vehicles', href: localizedPath('/wohnmobile/', lang) }}
+    secondary={{ label: 'Contact', href: localizedPath('/kontakt/', lang) }}
+  />
+</BaseLayout>
+
+<style>
+  .ws-icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 12px;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+  }
+
+  .ws-hl h2 {
+    margin: 0.85rem 0 0.4rem;
+    font-size: 1.2rem;
+  }
+
+  .ws-jump ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0 0 1.75rem;
+    list-style: none;
+  }
+
+  .ws-jump a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    font-weight: 650;
+  }
+
+  .ws-groups {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .ws-group header {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    margin-bottom: 0.85rem;
+  }
+
+  .ws-group h3 {
+    margin: 0 0 0.35rem;
+  }
+</style>

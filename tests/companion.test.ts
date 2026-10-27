@@ -35,4 +35,18 @@ describe('CampingCompanion hub', () => {
     expect(boot).toContain("cco:a11y");
     expect(boot).toContain('cco:lang');
   });
+
+  it('boot opening labels support English', () => {
+    const boot = readFileSync(join(root, 'src/lib/boot-script.ts'), 'utf8');
+    expect(boot).toContain('Currently closed');
+    expect(boot).toContain('Open today');
+    expect(boot).toContain('Public holiday');
+  });
+
+  it('chat lazy-loads assist rules', () => {
+    const chat = readFileSync(join(root, 'src/components/layout/ChatWidget.astro'), 'utf8');
+    expect(chat).toContain("import('@/lib/camping-assist')");
+    expect(chat).toContain('loadAssist');
+    expect(chat).toContain('campingQuickPrompts(lang)');
+  });
 });

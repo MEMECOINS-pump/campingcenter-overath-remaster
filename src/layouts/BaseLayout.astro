@@ -1,5 +1,6 @@
 ---
 import '@/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import SeoHead, { type SeoProps } from '@/components/layout/SeoHead.astro';
 import Header from '@/components/layout/Header.astro';
 import MobileMenu from '@/components/layout/MobileMenu.astro';
@@ -48,23 +49,24 @@ const boot = buildBootScript();
   <head>
     <script is:inline set:html={boot} />
     <SeoHead {...seo} lang={lang} jsonLd={[organizationSchema(Astro.site), ...jsonLd]} />
+    <ClientRouter fallback="swap" />
     <slot name="head" />
   </head>
   <body class={bodyClass} data-actionbar={actionBar || Astro.slots.has('sticky') ? '' : undefined} data-lang={lang}>
     <a class="skip-link" href="#main">{t(lang, 'skipToContent')}</a>
     <Header overlay={overlayHeader} lang={lang} />
     <MobileMenu lang={lang} />
-    <main id="main" tabindex="-1">
+    <main id="main" tabindex="-1" transition:animate="fade">
       <slot />
     </main>
     <Footer lang={lang} />
     {actionBar && <MobileActionBar inquiryHref={inquiryHref} inquiryLabel={inquiryLabel} lang={lang} />}
     <slot name="sticky" />
     {compareTray && <CompareTray />}
-    <CampingCompanion lang={lang} />
-    <ChatWidget lang={lang} />
-    <CookieConsent lang={lang} />
-    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <CampingCompanion lang={lang} transition:persist="cco-companion" />
+    <ChatWidget lang={lang} transition:persist="cco-chat" />
+    <CookieConsent lang={lang} transition:persist="cco-consent" />
+    <div class="toast" role="status" aria-live="polite" data-toast transition:persist="cco-toast"></div>
     <script>
       import '@/scripts/site';
     </script>

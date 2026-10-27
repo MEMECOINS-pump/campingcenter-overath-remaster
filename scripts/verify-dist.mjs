@@ -12,6 +12,9 @@ const requiredRoutes = [
   'marken/', 'la-strada-konfigurator/', 'ueber-uns/', 'kontakt/', 'jobs/', 'rechnungswesen/', 'reinigungskraft/', 'bewerbung/',
   '360-rundgang/', 'fahrzeugwaesche-herbst/', 'camper-finder/', 'merkliste/', 'vergleich/', 'impressum/',
   'datenschutz/', 'agb/', 'barrierefreiheitserklaerung/', 'download/', 'danke/',
+  // EN counterparts (chrome + page bodies)
+  'en/', 'en/kontakt/', 'en/wohnmobile/', 'en/vermietung-wohnmobile/', 'en/wohnmobil-ankauf/',
+  'en/werkstatt-kundendienst/', 'en/ueber-uns/', 'en/camper-finder/', 'en/marken/',
 ];
 const requiredFiles = ['404.html', 'robots.txt', 'sitemap-index.xml', '.nojekyll', 'site.webmanifest'];
 

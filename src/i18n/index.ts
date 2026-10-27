@@ -27,7 +27,21 @@ export function stripLocale(pathname: string): string {
  * EN pages shipped so far (expand as translations land).
  * Missing EN routes fall back to German URLs so nav never 404s.
  */
-export const enRoutes = new Set<string>(['/', '/kontakt/', '/wohnmobile/']);
+export const enRoutes = new Set<string>([
+  '/',
+  '/kontakt/',
+  '/wohnmobile/',
+  '/vermietung-wohnmobile/',
+  '/wohnmobil-ankauf/',
+  '/werkstatt-kundendienst/',
+  '/ueber-uns/',
+  '/camper-finder/',
+  '/marken/',
+  '/404/',
+]);
+
+export { glossary, g, translateCategoryLabel, translateTransmission, translateCondition } from './glossary';
+export { translateVehicleCopy, tmRemember } from './tm';
 
 /** Build a localized internal path (no base); use with `url()`. */
 export function localizedPath(path: string, lang: Locale): string {

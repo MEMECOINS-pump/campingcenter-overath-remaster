@@ -41,7 +41,7 @@ const crumbs = [{ label: t(lang, 'footerAllMh'), href: '/wohnmobile/' }];
       <aside class="sr-aside" aria-labelledby="sr-filter-title">
         <h2 id="sr-filter-title" class="sr-aside-title">{t(lang, 'vehFilter')}</h2>
         <div data-filter-home>
-          <FilterPanel />
+          <FilterPanel lang={lang} />
         </div>
       </aside>
 
@@ -71,7 +71,7 @@ const crumbs = [{ label: t(lang, 'footerAllMh'), href: '/wohnmobile/' }];
           {
             vehicles.map((v, i) => (
               <li data-grid-item={v.id}>
-                <VehicleCard vehicle={v} index={i} priority={i < 2} headingLevel={2} />
+                <VehicleCard vehicle={v} index={i} priority={i < 2} headingLevel={2} lang={lang} />
               </li>
             ))
           }

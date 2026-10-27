@@ -1,10 +1,10 @@
 ---
 /**
  * Camping KI chat — opened only via CampingCompanion (`cco:open-chat`).
- * No separate FAB; heavy assist logic stays here and loads with the page bundle.
+ * No separate FAB; assist rules are lazy-loaded on first open/ask.
  */
 import Icon from '@/components/ui/Icon.astro';
-import { CAMPING_QUICK_PROMPTS } from '@/lib/camping-assist';
+import { campingQuickPrompts } from '@/lib/camping-assist';
 import { challengerManualHighlights, challengerManuals } from '@/data/challenger-manuals';
 import { getLangFromPath, t, type Locale } from '@/i18n';
 import { url } from '@/lib/url';
@@ -55,7 +55,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
         </div>
         <div class="chatw-chips" data-chat-chips>
           {
-            CAMPING_QUICK_PROMPTS.map((q) => (
+            campingQuickPrompts(lang).map((q) => (
               <button type="button" class="chatw-chip" data-chat-chip data-text={q.text}>
                 {q.label}
               </button>
@@ -834,7 +834,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
 
 <script>
   import { track } from '@/lib/analytics';
-  import { assistCamping, type CampingAssistResult } from '@/lib/camping-assist';
+  import type { CampingAssistResult } from '@/lib/camping-assist';
   import { url } from '@/lib/url';
 
   const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
@@ -846,6 +846,21 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
     'Please be a bit more specific — e.g. “Challenger 240”, “rent” or “opening hours”.';
   const THINK_DE = 'ccoverath KI denkt';
   const THINK_EN = 'ccoverath AI is thinking';
+
+  type AssistFn = (message: string, lang?: 'de' | 'en') => CampingAssistResult;
+  let assistCampingLazy: AssistFn | null = null;
+  let assistLoad: Promise<AssistFn> | null = null;
+
+  function loadAssist(): Promise<AssistFn> {
+    if (assistCampingLazy) return Promise.resolve(assistCampingLazy);
+    if (!assistLoad) {
+      assistLoad = import('@/lib/camping-assist').then((m) => {
+        assistCampingLazy = m.assistCamping;
+        return m.assistCamping;
+      });
+    }
+    return assistLoad;
+  }
 
   function escapeHtml(s: string) {
     return s
@@ -975,18 +990,20 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
     };
 
     const ask = async (message: string): Promise<CampingAssistResult> => {
-      let data = assistCamping(message);
+      const assistCamping = await loadAssist();
+      const lang = siteLang();
+      let data = assistCamping(message, lang);
       try {
         if (API) {
           const res = await fetch(`${API}/api/camping-assistant`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message }),
+            body: JSON.stringify({ message, lang }),
           });
           if (res.ok) data = (await res.json()) as CampingAssistResult;
         }
       } catch {
-        /* local */
+        /* local rules / offline fallback */
       }
       return data;
     };
@@ -1025,6 +1042,7 @@ const lang = Astro.props.lang ?? getLangFromPath(Astro.url.pathname);
 
     close?.addEventListener('click', () => setOpen(false));
     window.addEventListener('cco:open-chat', () => {
+      void loadAssist();
       setOpen(true);
     });
     document.addEventListener('keydown', (e) => {

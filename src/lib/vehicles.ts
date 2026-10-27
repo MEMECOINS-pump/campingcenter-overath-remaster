@@ -1,5 +1,7 @@
 import inventory from '@/data/inventory.json';
 import { formatKm, formatLength, formatPrice, formatWeight } from './format';
+import type { Locale } from '@/i18n/locales';
+import { glossary, g, translateTransmission } from '@/i18n/glossary';
 import type { BedSpec, Category, Condition, FilterableVehicle } from './filter';
 
 export * from './filter';
@@ -142,17 +144,25 @@ export function specRows(v: Vehicle): SpecRow[] {
   return rows.filter((r): r is SpecRow => r !== null);
 }
 
-export function cardFacts(v: Vehicle): string[] {
+export function cardFacts(v: Vehicle, lang: Locale = 'de'): string[] {
+  const cond =
+    v.condition === 'neu'
+      ? v.modelYear
+        ? `${g(lang, glossary.condition.neu)} · ${g(lang, glossary.card.modelYear)} ${v.modelYear}`
+        : g(lang, glossary.card.newVehicle)
+      : v.firstRegistration
+        ? `${g(lang, glossary.card.firstReg)} ${v.firstRegistration}`
+        : g(lang, glossary.card.used);
   return [
-    v.condition === 'neu' ? (v.modelYear ? `Neu · MJ ${v.modelYear}` : 'Neufahrzeug') : v.firstRegistration ? `EZ ${v.firstRegistration}` : 'Gebraucht',
-    v.mileageKm && v.mileageKm > 0 ? formatKm(v.mileageKm) : null,
-    v.lengthMm ? formatLength(v.lengthMm) : null,
-    v.transmission ?? null,
+    cond,
+    v.mileageKm && v.mileageKm > 0 ? formatKm(v.mileageKm, lang) : null,
+    v.lengthMm ? formatLength(v.lengthMm, lang) : null,
+    translateTransmission(v.transmission, lang),
     v.powerPs ? `${v.powerPs} PS` : null,
   ].filter((x): x is string => Boolean(x));
 }
 
-export const priceLabel = (v: Vehicle): string => formatPrice(v.price);
+export const priceLabel = (v: Vehicle, lang: Locale = 'de'): string => formatPrice(v.price, lang);
 
 export function facetCounts<K extends keyof Vehicle>(list: Vehicle[], key: K): { value: string; count: number }[] {
   const map = new Map<string, number>();
@@ -177,7 +187,7 @@ export interface VehicleLite extends FilterableVehicle {
   specs: SpecRow[];
 }
 
-export const toLite = (v: Vehicle): VehicleLite => ({
+export const toLite = (v: Vehicle, lang: Locale = 'de'): VehicleLite => ({
   id: v.id,
   slug: v.slug,
   title: v.title,
@@ -195,7 +205,7 @@ export const toLite = (v: Vehicle): VehicleLite => ({
   sleepingPlaces: v.sleepingPlaces,
   beds: v.beds,
   image: v.images[0] ? vehicleImage(v.images[0], 640) : null,
-  priceLabel: priceLabel(v),
-  facts: cardFacts(v),
+  priceLabel: priceLabel(v, lang),
+  facts: cardFacts(v, lang),
   specs: specRows(v),
 });

@@ -23,7 +23,7 @@ const isActive = (href: string, children?: { href: string }[]) =>
 
 <header class="site-header" data-header data-overlay={overlay ? 'true' : undefined}>
   <div class="header-utility">
-    <OpeningStatus />
+    <OpeningStatus lang={lang} />
   </div>
   <div class="container header-inner">
     <a class="header-logo" href={L('/')} aria-label={`${company.name} – ${t(lang, 'homeAria')}`}>

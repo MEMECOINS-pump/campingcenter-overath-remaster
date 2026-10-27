@@ -24,3 +24,7 @@ Thumbs.db
 .vscode/
 .idea/
 __pycache__/
+
+test-results/
+playwright-report/
+

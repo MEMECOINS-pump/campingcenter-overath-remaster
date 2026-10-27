@@ -22,15 +22,15 @@ describe('i18n routing', () => {
     expect(localizedPath('/wohnmobile/', 'de')).toBe('/wohnmobile/');
     expect(localizedPath('/wohnmobile/', 'en')).toBe('/en/wohnmobile/');
     expect(localizedPath('/', 'en')).toBe('/en/');
-    // Not yet translated → DE fallback
-    expect(localizedPath('/werkstatt-kundendienst/', 'en')).toBe('/werkstatt-kundendienst/');
+    expect(localizedPath('/werkstatt-kundendienst/', 'en')).toBe('/en/werkstatt-kundendienst/');
+    expect(localizedPath('/wohnmobil-ankauf/', 'en')).toBe('/en/wohnmobil-ankauf/');
   });
 
   it('switches locale while preserving path', () => {
     expect(switchLocalePath('/en/kontakt/', 'de')).toBe('/kontakt/');
     expect(switchLocalePath('/kontakt/', 'en')).toBe('/en/kontakt/');
     expect(stripLocale('/en/wohnmobile/')).toBe('/wohnmobile/');
-    expect(switchLocalePath('/werkstatt-kundendienst/', 'en')).toBe('/werkstatt-kundendienst/');
+    expect(switchLocalePath('/werkstatt-kundendienst/', 'en')).toBe('/en/werkstatt-kundendienst/');
   });
 
   it('translates companion and nav keys', () => {
