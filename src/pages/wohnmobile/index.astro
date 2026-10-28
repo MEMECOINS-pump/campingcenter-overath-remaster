@@ -170,11 +170,15 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem 1rem;
-    margin-inline: calc(var(--gutter) * -1);
-    padding: 0.75rem var(--gutter);
-    background: rgb(from var(--ivory) r g b / 0.94);
+    /* Keep inside the content column — negative full-bleed margins looked like a white slab over the hero. */
+    margin-inline: 0;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--sand) 55%, var(--ivory));
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: none;
   }
 
   @media (min-width: 64em) {

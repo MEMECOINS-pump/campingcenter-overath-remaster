@@ -8,19 +8,30 @@ import { vehicles } from '@/lib/vehicles';
 import { breadcrumbSchema } from '@/lib/schema';
 import { url } from '@/lib/url';
 
-const crumbs = [{ label: 'Camper-Finder', href: '/camper-finder/' }];
+const crumbs = [{ label: 'Mein perfekter Camper', href: '/camper-finder/' }];
 
 const questions = [
   {
     name: 'persons',
-    title: 'Wie viele Personen reisen mit?',
-    hint: 'Damit wir Sitz- und Wohnraum richtig einschätzen.',
+    title: 'Mit wem reist du?',
+    hint: 'Schlafplätze und Sitzplätze sind unterschiedlich – wir trennen das bewusst.',
     options: [
-      { value: '1', label: '1', text: 'Solo' },
-      { value: '2', label: '2', text: 'Zu zweit' },
-      { value: '3', label: '3', text: 'Kleine Gruppe' },
-      { value: '4', label: '4', text: 'Familie' },
-      { value: '5plus', label: '5+', text: 'Große Gruppe' },
+      { value: '1', label: 'Alleine', text: 'Solo' },
+      { value: '2', label: 'Zu zweit', text: 'Paar' },
+      { value: '3', label: 'Kleine Gruppe', text: '3 Personen' },
+      { value: '4', label: 'Mit der Familie', text: '4 Personen' },
+      { value: '5plus', label: 'Mit Freunden', text: '5+ Personen' },
+    ],
+  },
+  {
+    name: 'style',
+    title: 'Wie oft möchtest du verreisen?',
+    hint: 'Hilft bei Komfort- und Größenempfehlungen – ohne erfundene Ausstattung.',
+    options: [
+      { value: 'kompakt', label: 'Am Wochenende', text: 'kurze Trips' },
+      { value: 'offen', label: 'Mehrmals im Jahr', text: 'flexibel' },
+      { value: 'komfort', label: 'Auf längeren Reisen', text: 'Komfort' },
+      { value: 'raum', label: 'So oft wie möglich', text: 'viel Raum' },
     ],
   },
   {
@@ -99,16 +110,19 @@ const questions = [
 
 <BaseLayout
   compareTray
-  title="Camper-Finder – Welcher Camper passt zu dir?"
-  description="Beantworte ein paar kurze Fragen zu Personen, Schlafplätzen, Bettlänge und Fahrzeuglänge – der Camping Finder zeigt passende Wohnmobile aus dem Bestand des Campingcenter Overath."
+  title="Mein perfekter Camper – intelligenter Camper-Finder"
+  description="Erzähl uns, wie du reisen möchtest – Mein perfekter Camper zeigt passende Wohnmobile aus dem aktuellen Bestand des Campingcenter Overath. Ohne erfundene Fahrzeugdaten."
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <section class="page-hero section-paper finder-hero">
+  <section class="page-hero section-paper finder-hero" data-header-theme="light">
     <div class="container">
       <Breadcrumbs items={crumbs} />
-      <p class="eyebrow">Camping Finder</p>
+      <p class="eyebrow">Mein perfekter Camper</p>
       <h1>Welcher Camper passt zu dir?</h1>
-      <p class="lead">Beantworte ein paar kurze Fragen und finde heraus, welche Fahrzeuge zu deinen Reiseplänen passen.</p>
+      <p class="lead">
+        Erzähl uns, wie du reisen möchtest – wir finden passende Fahrzeuge aus unserem aktuellen Bestand. Empfehlungen
+        nutzen nur verifizierte Angaben; fehlende Specs werden nicht erraten.
+      </p>
     </div>
   </section>
 
@@ -165,7 +179,7 @@ const questions = [
       </header>
 
       <div class="finder-empty card card-pad" data-finder-empty hidden>
-        <h3>Wir finden gemeinsam eine Lösung.</h3>
+        <h3>Aktuell haben wir kein Fahrzeug, das alle deine Wünsche erfüllt.</h3>
         <p>Hinterlasse unten deine Kontaktdaten – wir melden uns mit konkreten Vorschlägen inkl. deiner Finder-Antworten.</p>
         <a class="btn btn-accent" href={url('/kontakt/#beratung')}>Persönliche Beratung anfragen</a>
       </div>
@@ -337,6 +351,16 @@ const questions = [
     margin: 0.35rem 0 0;
     padding-left: 0;
     list-style: none;
+  }
+
+  .finder-match-score {
+    margin: 0 0 0.35rem;
+    font-size: var(--fs-sm);
+    color: var(--brand-ink);
+  }
+
+  .finder-match-score strong {
+    font-size: 1.05rem;
   }
 
   .finder-why-label {

@@ -53,6 +53,62 @@ function closeHeaderDropdowns(except?: Element): void {
   }
 }
 
+let headerThemeIo: IntersectionObserver | null = null;
+
+function tagHeaderThemeSections(): void {
+  const main = $('#main') ?? document.body;
+  $$('.section-sand, .section-paper, .section-forest, .page-hero, .hero, [data-header-theme]', main).forEach((el) => {
+    if (el.hasAttribute('data-header-theme')) return;
+    if (el.classList.contains('hero')) el.setAttribute('data-header-theme', 'dark');
+    else if (el.classList.contains('section-forest')) el.setAttribute('data-header-theme', 'forest');
+    else if (el.classList.contains('section-sand')) el.setAttribute('data-header-theme', 'sand');
+    else el.setAttribute('data-header-theme', 'light');
+  });
+}
+
+function initHeaderTheme(): void {
+  const header = $('[data-header]');
+  if (!header || !('IntersectionObserver' in window)) return;
+  tagHeaderThemeSections();
+  headerThemeIo?.disconnect();
+  const sections = $$('[data-header-theme]');
+  if (!sections.length) {
+    header.removeAttribute('data-theme');
+    return;
+  }
+  const visible = new Map<Element, number>();
+  headerThemeIo = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.set(entry.target, entry.intersectionRatio);
+        else visible.delete(entry.target);
+      }
+      let best: Element | null = null;
+      let bestRatio = 0;
+      for (const [el, ratio] of visible) {
+        if (ratio >= bestRatio) {
+          best = el;
+          bestRatio = ratio;
+        }
+      }
+      const theme = best?.getAttribute('data-header-theme');
+      if (theme) header.setAttribute('data-theme', theme);
+      else if (!header.hasAttribute('data-overlay') || header.classList.contains('is-solid')) {
+        header.setAttribute('data-theme', 'light');
+      } else {
+        header.removeAttribute('data-theme');
+      }
+    },
+    {
+      /* Probe band just under the sticky header */
+      root: null,
+      rootMargin: '-12% 0px -70% 0px',
+      threshold: [0, 0.15, 0.35, 0.6],
+    },
+  );
+  sections.forEach((el) => headerThemeIo?.observe(el));
+}
+
 function initHeader(): void {
   const header = $('[data-header]');
   if (!header) return;
@@ -74,6 +130,7 @@ function initHeader(): void {
 
   const overlay = $('[data-header][data-overlay]');
   if (overlay) overlay.classList.toggle('is-solid', window.scrollY > 24);
+  initHeaderTheme();
 
   if (header.hasAttribute('data-bound')) return;
   header.setAttribute('data-bound', '');
@@ -340,6 +397,7 @@ function bootPageUi(): void {
   initMenu();
   initReveal();
   initOpeningSheet();
+  initHeaderTheme();
   refreshOpenStatus();
   const html = document.documentElement;
   const n = html.dataset.ccoFavCount;

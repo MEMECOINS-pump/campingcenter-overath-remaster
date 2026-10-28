@@ -130,15 +130,15 @@ import { url } from '@/lib/url';
           data-companion-tab="a11y"
         >
           <span class="companion-tab-a11y-mark" aria-hidden="true">
-            <!-- Universal accessibility pictogram (figure with outstretched arms/legs in circle) -->
+            <!-- Recognizable a11y pictogram: blue disc + white figure (decorative; label beside) -->
             <svg class="companion-tab-a11y-svg" viewBox="0 0 48 48" focusable="false">
-              <circle cx="24" cy="24" r="18.5" fill="none" stroke="currentColor" stroke-width="2.5"></circle>
-              <circle cx="24" cy="13.6" r="3.2" fill="currentColor"></circle>
+              <circle cx="24" cy="24" r="24" fill="#1a73e8"></circle>
+              <circle cx="24" cy="12.8" r="3.35" fill="#fff"></circle>
               <path
-                fill="currentColor"
-                d="M10.8 21.4h26.4v2.7H27.2l5.9 11.2-2.4 1.25-6.15-11.65h-1.1l-6.15 11.65-2.4-1.25 5.9-11.2H10.8z"
+                fill="#fff"
+                d="M9.6 20.6h28.8v3.05H28.1l6.35 12.05-2.55 1.35L25.3 24.9h-2.6l-6.6 12.15-2.55-1.35 6.35-12.05H9.6z"
               ></path>
-              <path fill="currentColor" d="M22.55 24.1h2.9v12.8h-2.9z"></path>
+              <path fill="#fff" d="M22.35 23.65h3.3v13.7h-3.3z"></path>
             </svg>
           </span>
           <span>{'Barrierefreiheit'}</span>
@@ -351,6 +351,10 @@ import { url } from '@/lib/url';
   }
 
   document.querySelectorAll<HTMLElement>('[data-companion]').forEach((root) => {
+    /* transition:persist re-runs this module — guard against double listeners (open+close in one tap). */
+    if (root.dataset.bound === '1') return;
+    root.dataset.bound = '1';
+
     const panel = root.querySelector<HTMLDialogElement>('[data-companion-panel]');
     const openBtn = root.querySelector<HTMLButtonElement>('[data-companion-open]');
     const closeBtn = root.querySelector('[data-companion-close]');
@@ -596,7 +600,8 @@ import { url } from '@/lib/url';
     position: fixed;
     right: max(0.85rem, env(safe-area-inset-right, 0px));
     bottom: var(--companion-bottom);
-    z-index: var(--z-companion, 68);
+    /* Above legacy chat shell (70) so the FAB is never blocked when chat is closed. */
+    z-index: var(--z-companion, 72);
     display: grid;
     justify-items: end;
     align-content: end;
@@ -801,6 +806,7 @@ import { url } from '@/lib/url';
     position: fixed;
     inset: auto;
     right: max(0.85rem, env(safe-area-inset-right, 0px));
+    left: auto;
     bottom: calc(var(--companion-bottom) + var(--companion-fab) + 0.65rem);
     width: var(--cw);
     height: var(--ch);
@@ -814,6 +820,34 @@ import { url } from '@/lib/url';
     color: var(--text);
     box-shadow: none;
     overflow: visible;
+    translate: 0 0;
+  }
+
+  /* Phones: horizontally centered, stable first paint (no post-open jump) */
+  @media (max-width: 39.99em) {
+    .companion {
+      --cw: min(380px, calc(100vw - 24px));
+      --ch: min(500px, calc(100dvh - 100px));
+      justify-items: center;
+      right: 0;
+      left: 0;
+      width: 100%;
+      padding-inline: 12px;
+      box-sizing: border-box;
+    }
+
+    .companion-fab {
+      justify-self: end;
+    }
+
+    .companion-panel {
+      left: 50%;
+      right: auto;
+      translate: -50% 0;
+      width: var(--cw);
+      max-width: calc(100vw - 24px);
+      max-height: calc(100dvh - 100px);
+    }
   }
 
   .companion-panel::backdrop {
@@ -964,9 +998,11 @@ import { url } from '@/lib/url';
     display: grid;
     place-items: center;
     flex: 0 0 auto;
-    width: 0.95rem;
-    height: 0.95rem;
-    color: currentColor;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgb(26 115 232 / 0.25);
   }
 
   .companion-tab-a11y-svg {

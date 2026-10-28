@@ -22,8 +22,10 @@ describe('CampingCompanion support center', () => {
     expect(companion).toContain('data-companion-tab="a11y"');
     expect(companion).toContain('data-companion-tab="chat"');
     expect(companion).toContain('data-companion-tab="contact"');
-    expect(companion).toContain('Universal accessibility pictogram');
+    expect(companion).toContain('Recognizable a11y pictogram');
+    expect(companion).toContain('#1a73e8');
     expect(companion).toContain('companion-tab-a11y-svg');
+    expect(companion).toContain("dataset.bound === '1'");
     expect(companion).not.toContain('Premium Kompass');
     expect(companion).not.toContain('Minimalist motorhome');
     expect(companion).not.toMatch(/<rect x="4" y="18" width="28"/);
@@ -37,6 +39,7 @@ describe('CampingCompanion support center', () => {
     expect(companion).toContain('GROSS');
     expect(companion).toContain('min(360px, calc(100vw - 24px))');
     expect(companion).toContain('min(480px, calc(100dvh - 100px))');
+    expect(companion).toContain('left: 50%');
     expect(companion).toContain('Jetzt anrufen');
     expect(companion).toContain('Nachricht schreiben');
     expect(companion).toContain('Route planen');
@@ -46,6 +49,7 @@ describe('CampingCompanion support center', () => {
 
     expect(chat).not.toContain('chatw-fab');
     expect(chat).toContain('cco:open-companion');
+    expect(chat).toMatch(/\.chatw:not\(\.is-open\)[\s\S]*pointer-events:\s*none/);
     expect(a11y).not.toContain('a11y-fab');
     expect(a11y).toContain('data-a11y');
     expect(a11y).toContain('Sehr groß');

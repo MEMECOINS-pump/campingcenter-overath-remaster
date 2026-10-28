@@ -83,4 +83,26 @@ test.describe('CampingCompanion smoke', () => {
     await expect(page).not.toHaveURL(/\/en\//);
     await expect(page.locator('html')).toHaveAttribute('lang', /de/);
   });
+
+  test('FAB opens on hard load and after soft-nav', async ({ page }) => {
+    await page.goto(path('/'));
+    await page.locator('[data-consent-action="necessary"]').click({ timeout: 3000 }).catch(() => undefined);
+
+    const routes = ['/wohnmobile/', '/kontakt/', '/camper-finder/', '/barrierefreiheit/'];
+    for (const route of routes) {
+      await page.goto(path(route));
+      const fab = page.locator('[data-companion-open]');
+      await expect(fab).toBeVisible();
+      await fab.click();
+      await expect(page.locator('[data-companion-panel]')).toHaveAttribute('open', '');
+      await page.locator('[data-companion-close]').click();
+      await expect(page.locator('[data-companion-panel]')).not.toHaveAttribute('open');
+    }
+
+    await page.goto(path('/'));
+    await page.locator(`a[href="${path('/wohnmobile/')}"]`).first().click();
+    await page.waitForURL(/wohnmobile/);
+    await page.locator('[data-companion-open]').click();
+    await expect(page.locator('[data-companion-panel]')).toHaveAttribute('open', '');
+  });
 });

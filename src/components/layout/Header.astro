@@ -79,12 +79,75 @@ const isActive = (href: string, children?: { href: string }[]) =>
     box-shadow: var(--shadow-sm);
   }
 
+  /* Adaptive glass themes (IntersectionObserver sets data-theme on the header). */
+  .site-header[data-theme='sand'],
+  .site-header[data-overlay].is-solid[data-theme='sand'] {
+    background: rgb(238 232 222 / 0.88);
+    border-color: rgb(225 218 208 / 0.9);
+    color: var(--graphite);
+  }
+
+  .site-header[data-theme='forest'],
+  .site-header[data-overlay].is-solid[data-theme='forest'] {
+    background: rgb(48 75 60 / 0.82);
+    border-color: rgb(255 255 255 / 0.12);
+    color: #f7f4ee;
+    box-shadow: 0 10px 28px -18px rgb(20 32 26 / 0.55);
+  }
+
+  .site-header[data-theme='dark'],
+  .site-header[data-overlay].is-solid[data-theme='dark'] {
+    background: rgb(24 28 30 / 0.72);
+    border-color: rgb(255 255 255 / 0.1);
+    color: #f7f4ee;
+  }
+
+  .site-header[data-theme='light'],
+  .site-header[data-overlay].is-solid[data-theme='light'] {
+    background: rgb(250 248 244 / 0.9);
+    border-color: var(--line);
+    color: var(--graphite);
+  }
+
+  .site-header[data-theme='forest'] :global(.logo-name),
+  .site-header[data-theme='dark'] :global(.logo-name),
+  .site-header[data-theme='forest'] :global(.logo-light .logo-name),
+  .site-header[data-theme='dark'] :global(.logo-light .logo-name) {
+    color: #f7f4ee;
+  }
+
+  .site-header[data-theme='forest'] :global(.logo-claim),
+  .site-header[data-theme='dark'] :global(.logo-claim),
+  .site-header[data-theme='forest'] :global(.logo-light .logo-claim),
+  .site-header[data-theme='dark'] :global(.logo-light .logo-claim) {
+    color: rgb(247 244 238 / 0.72);
+  }
+
+  .site-header[data-theme='forest'] :global(.nav-link),
+  .site-header[data-theme='dark'] :global(.nav-link),
+  .site-header[data-theme='forest'] :global(.header-phone),
+  .site-header[data-theme='dark'] :global(.header-phone),
+  .site-header[data-theme='forest'] :global(.icon-btn),
+  .site-header[data-theme='dark'] :global(.icon-btn) {
+    color: inherit;
+  }
+
   .site-header[data-overlay].is-solid :global(.logo-light .logo-name) {
     color: var(--graphite);
   }
 
   .site-header[data-overlay].is-solid :global(.logo-light .logo-claim) {
     color: #676c6d;
+  }
+
+  .site-header[data-overlay].is-solid[data-theme='forest'] :global(.logo-light .logo-name),
+  .site-header[data-overlay].is-solid[data-theme='dark'] :global(.logo-light .logo-name) {
+    color: #f7f4ee;
+  }
+
+  .site-header[data-overlay].is-solid[data-theme='forest'] :global(.logo-light .logo-claim),
+  .site-header[data-overlay].is-solid[data-theme='dark'] :global(.logo-light .logo-claim) {
+    color: rgb(247 244 238 / 0.72);
   }
 
   .header-logo {

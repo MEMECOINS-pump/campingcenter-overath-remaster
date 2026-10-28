@@ -105,16 +105,19 @@ if (form && results) {
 
     if (r.hasExact) {
       if (empty) empty.hidden = true;
-      if (title) title.textContent = 'Deine Empfehlungen';
+      if (title) title.textContent = 'Diese Camper passen zu dir.';
       if (summary) {
         summary.textContent = `${r.exact.length} passende Fahrzeuge aus dem aktuellen Bestand – mit nachvollziehbaren Gründen.`;
       }
+      const maxSoft = Math.max(...r.exact.map((m) => m.score), 0.01);
       r.exact.forEach((m) => {
         m.vehicle.el.hidden = false;
         grid?.append(m.vehicle.el);
         const host = reasonsHost(m.vehicle.id);
         if (host) {
-          host.innerHTML = `<p class="finder-why-label">Warum passt dieses Fahrzeug zu dir?</p><ul>${m.reasons
+          /* Transparent relative score vs best hard+soft match in this result set (not invented absolute %). */
+          const pct = Math.max(62, Math.min(99, Math.round((m.score / maxSoft) * 100)));
+          host.innerHTML = `<p class="finder-match-score" aria-label="Passung ${pct} Prozent"><strong>${pct}&nbsp;%</strong> Passung in diesem Ergebnis</p><p class="finder-why-label">Warum passt dieses Fahrzeug zu dir?</p><ul>${m.reasons
             .map((x) => `<li>${x.ok ? '✓' : '•'} ${x.label}</li>`)
             .join('')}${m.needsConfirmation ? '<li>• Technische Angabe bitte bestätigen lassen.</li>' : ''}</ul>`;
         }
@@ -122,11 +125,11 @@ if (form && results) {
       track('camping_finder_results', { count: r.exact.length, exact: 1 });
     } else {
       if (empty) empty.hidden = false;
-      if (title) title.textContent = 'Wir finden gemeinsam eine Lösung.';
+      if (title) title.textContent = 'Aktuell haben wir kein Fahrzeug, das alle deine Wünsche erfüllt.';
       if (summary) {
         summary.textContent = r.blockedBy.length
-          ? `Mit den aktuellen Angaben gab es keinen exakten Treffer (u. a. ${r.blockedBy.join(', ')}). Wir beraten dich gern persönlich.`
-          : 'Mit den aktuellen Angaben gab es keinen exakten Treffer. Wir beraten dich gern persönlich.';
+          ? `Mit den aktuellen Angaben gab es keinen exakten Treffer (u. a. ${r.blockedBy.join(', ')}). Passe die Anforderungen an oder frag uns nach einer persönlichen Beratung.`
+          : 'Mit den aktuellen Angaben gab es keinen exakten Treffer. Passe die Anforderungen an oder frag uns nach einer persönlichen Beratung.';
       }
       track('camping_finder_results', { count: 0, exact: 0 });
     }

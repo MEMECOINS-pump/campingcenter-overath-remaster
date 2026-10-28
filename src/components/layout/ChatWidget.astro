@@ -194,10 +194,20 @@ import { url } from '@/lib/url';
     --cw-max-h: calc(100dvh - var(--cw-gap-bottom) - 0.5rem);
   }
 
+  /* Closed: collapse fully — leftover resize hit-target sat over the Companion FAB (z-chat > z-companion). */
   .chatw:not(.is-open) {
     width: 0;
     height: 0;
-    overflow: visible;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .chatw:not(.is-open) > * {
+    pointer-events: none;
+  }
+
+  .chatw:not(.is-open) .chatw-resize {
+    display: none;
   }
 
   @media (max-width: 40em) {

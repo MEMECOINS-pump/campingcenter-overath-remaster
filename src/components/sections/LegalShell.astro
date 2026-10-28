@@ -6,12 +6,14 @@ import { company } from '@/data/company';
 interface Props {
   title: string;
   path: string;
-  /** Path of the legally binding original on ccoverath.de. */
-  original: string;
+  /** Optional path of a reference document on ccoverath.de (omit for first-party statements). */
+  original?: string;
   updated?: string;
+  /** When true, skip the “presentation → old site” note (e.g. native accessibility statement). */
+  nativeStatement?: boolean;
 }
-const { title, path, original, updated } = Astro.props;
-const originalUrl = new URL(original, company.officialWebsite).href;
+const { title, path, original, updated, nativeStatement = false } = Astro.props;
+const originalUrl = original ? new URL(original, company.officialWebsite).href : null;
 ---
 
 <header class="page-hero">
@@ -23,13 +25,32 @@ const originalUrl = new URL(original, company.officialWebsite).href;
 </header>
 
 <div class="container-narrow legal">
-  <aside class="legal-note" aria-label="Hinweis zur Präsentationsfassung">
-    <Icon name="info" />
-    <p>
-      Diese Website ist eine Redesign-Präsentation. Rechtlich maßgeblich ist die Fassung auf{' '}
-      <a href={originalUrl} target="_blank" rel="noopener">{originalUrl.replace('https://', '')}<span class="sr-only"> (öffnet in neuem Tab)</span></a>.
-    </p>
-  </aside>
+  {
+    !nativeStatement && originalUrl && (
+      <aside class="legal-note" aria-label="Hinweis zur Präsentationsfassung">
+        <Icon name="info" />
+        <p>
+          Diese Website ist eine Redesign-Präsentation. Rechtlich maßgeblich ist die Fassung auf{' '}
+          <a href={originalUrl} target="_blank" rel="noopener">
+            {originalUrl.replace('https://', '')}
+            <span class="sr-only"> (öffnet in neuem Tab)</span>
+          </a>
+          .
+        </p>
+      </aside>
+    )
+  }
+  {
+    nativeStatement && (
+      <aside class="legal-note" aria-label="Hinweis zur Barrierefreiheitserklärung">
+        <Icon name="info" />
+        <p>
+          Diese Erklärung gilt für die vorliegende Website des Campingcenter Overath. Sie ist keine Zertifizierung und
+          ersetzt keine Rechtsberatung. Feedback zur Barrierefreiheit nehmen wir gern entgegen.
+        </p>
+      </aside>
+    )
+  }
   <div class="prose legal-body">
     <slot />
   </div>
