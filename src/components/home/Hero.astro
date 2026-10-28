@@ -36,7 +36,7 @@ const facts = [
         <a class="btn btn-accent btn-lg" href={url('/wohnmobile/')} data-track="cta_click" data-track-location="hero">
           Fahrzeuge entdecken <Icon name="arrow-right" class="arrow" />
         </a>
-        <a class="btn btn-glass btn-lg" href={url('/kontakt/#beratung')} data-track="cta_click" data-track-location="hero">
+        <a class="btn btn-light btn-lg" href={url('/kontakt/#beratung')} data-track="cta_click" data-track-location="hero">
           Beratung vereinbaren
         </a>
       </div>
@@ -188,6 +188,23 @@ const facts = [
     width: 1rem;
     height: 1rem;
     color: #ffc778;
+  }
+
+  @media (max-width: 63.99em) {
+    /* A full-viewport hero pins the facts under the fixed action bar. Let the hero size to its content. */
+    .hero {
+      min-height: auto;
+    }
+
+    .hero-inner {
+      align-content: start;
+      padding-top: calc(var(--sticky-top) + 1.35rem);
+      padding-bottom: calc(var(--actionbar-h) + 1.15rem);
+    }
+
+    .hero-facts {
+      padding-right: calc(var(--companion-fab-h) + 1.15rem);
+    }
   }
 
   @media (max-width: 35.99em) {

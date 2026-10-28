@@ -13,12 +13,12 @@ const { title = 'Danke! Wir melden uns bei dir.', text = 'Wir antworten in der R
   <span class="fs-icon"><Icon name="check" /></span>
 
   <div class="fs-sent">
-    <h3>{title}</h3>
+    <p class="fs-title">{title}</p>
     <p>{text}</p>
   </div>
 
   <div class="fs-prepared">
-    <h3>Deine Anfrage ist vorbereitet.</h3>
+    <p class="fs-title">Deine Anfrage ist vorbereitet.</p>
     <p>
       Diese Website ist eine Redesign-Präsentation und überträgt keine Formulardaten. Öffne die vorbereitete E-Mail mit allen Angaben – oder ruf uns direkt an.
     </p>
@@ -50,8 +50,12 @@ const { title = 'Danke! Wir melden uns bei dir.', text = 'Wir antworten in der R
     outline: none;
   }
 
-  .form-success h3 {
+  .form-success .fs-title {
+    margin: 0;
+    font-family: var(--font-head);
     font-size: 1.4rem;
+    font-weight: 560;
+    line-height: 1.2;
   }
 
   .form-success p {

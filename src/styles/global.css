@@ -308,6 +308,12 @@ html {
   hanging-punctuation: first last;
 }
 
+@media (max-width: 63.99em) {
+  html:has(body[data-actionbar]) {
+    scroll-padding-bottom: calc(4.2rem + var(--companion-fab-h) + 1rem + var(--safe-bottom));
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -546,6 +552,10 @@ ol.grid {
   align-items: center;
 }
 
+.split > * {
+  min-width: 0;
+}
+
 @media (min-width: 60em) {
   .split {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -653,7 +663,9 @@ ol.grid {
   letter-spacing: 0.005em;
   line-height: 1.2;
   text-decoration: none;
-  white-space: nowrap;
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
   transition:
     background-color var(--dur) var(--ease),
     color var(--dur) var(--ease),
@@ -662,14 +674,6 @@ ol.grid {
     box-shadow var(--dur) var(--ease);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-}
-
-@media (max-width: 24em) {
-  .btn {
-    max-width: 100%;
-    white-space: normal;
-    text-align: center;
-  }
 }
 
 .btn:hover {
@@ -1027,6 +1031,8 @@ ol.grid {
 .select,
 .textarea {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 3.25rem;
   padding: 0.8rem 1rem;
   border: 1px solid var(--line-strong);
@@ -1396,6 +1402,8 @@ body.scroll-locked {
 @media (max-width: 63.99em) {
   body[data-actionbar] {
     --actionbar-h: 4.2rem;
+    /* Action bar plus the compass, so the last content can scroll clear of both. */
+    padding-bottom: calc(var(--actionbar-h) + var(--companion-fab-h) + 0.85rem + var(--safe-bottom));
   }
 
   /* Chat/Keyboard: Actionbar ist weg – Layout-Offset mitziehen */
@@ -1407,6 +1415,7 @@ body.scroll-locked {
   /* Ankauf-Wizard: sticky Bottom-Nav → Chat/Cookie höher */
   body.page-ankauf {
     --actionbar-h: 4.5rem;
+    padding-bottom: calc(var(--actionbar-h) + var(--companion-fab-h) + 0.85rem + var(--safe-bottom));
   }
 
   body.page-ankauf.bar-hidden,
