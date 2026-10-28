@@ -1,0 +1,16 @@
+---
+import Photo from '@/components/ui/Photo.astro';
+
+interface Props {
+  /** File name without extension in src/assets/images. */
+  src: string;
+  focus?: 'center' | 'left' | 'right' | 'top' | 'bottom';
+}
+
+const { src, focus = 'center' } = Astro.props;
+---
+
+<div class:list={['atmo-media', `focus-${focus}`]} aria-hidden="true">
+  <Photo src={src} alt="" sizes="100vw" widths={[640, 960, 1280]} quality={62} />
+</div>
+<div class="atmo-shade" aria-hidden="true"></div>

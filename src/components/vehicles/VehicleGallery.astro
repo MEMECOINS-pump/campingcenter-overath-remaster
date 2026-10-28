@@ -102,6 +102,11 @@ const alt = (i: number) => `${v.title} – Foto ${i + 1} von ${n}`;
 }
 
 <style>
+  .gal {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .gal-empty {
     display: grid;
     place-items: center;
@@ -250,6 +255,8 @@ const alt = (i: number) => `${v.title} – Foto ${i + 1} von ${n}`;
     .gal-thumbs {
       display: flex;
       gap: 0.5rem;
+      min-width: 0;
+      max-width: 100%;
       margin-top: 0.75rem;
       overflow-x: auto;
       padding: 3px 3px 6px;

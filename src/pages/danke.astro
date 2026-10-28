@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { company } from '@/data/company';
@@ -6,7 +7,8 @@ import { url } from '@/lib/url';
 ---
 
 <BaseLayout title="Danke für deine Anfrage" description="Deine Anfrage ist beim Campingcenter Overath angekommen. Wir melden uns so schnell wie möglich bei dir." noindex>
-  <section class="section dk" aria-labelledby="dk-title">
+  <section class="section atmo dk" data-header-theme="dark" aria-labelledby="dk-title">
+    <Atmosphere src="atmo-lake" focus="center" />
     <div class="container-narrow dk-inner">
       <span class="dk-icon"><Icon name="check" /></span>
       <h1 id="dk-title">Danke! Deine Anfrage ist da.</h1>
@@ -23,6 +25,9 @@ import { url } from '@/lib/url';
 <style>
   .dk {
     padding-top: calc(var(--sticky-top) + 3rem);
+    min-height: calc(100svh - var(--sticky-top));
+    display: grid;
+    align-items: center;
   }
 
   .dk-inner {

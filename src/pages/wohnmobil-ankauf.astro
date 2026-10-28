@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -322,7 +323,8 @@ const faqs = [
     </div>
   </section>
 
-  <section class="section section-paper" aria-labelledby="ak-why">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ak-why">
+    <Atmosphere src="atmo-meadow" focus="left" />
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Warum an uns verkaufen?</p>
@@ -341,7 +343,8 @@ const faqs = [
     </div>
   </section>
 
-  <section class="section" aria-labelledby="ak-faq">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ak-faq">
+    <Atmosphere src="atmo-lake" focus="center" />
     <div class="container container-narrow">
       <div class="section-head">
         <p class="eyebrow">Häufige Fragen</p>

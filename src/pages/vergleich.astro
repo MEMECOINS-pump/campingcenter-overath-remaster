@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -34,7 +35,8 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
   noindex
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <section class="page-hero section-paper cmp-hero">
+  <section class="page-hero atmo cmp-hero" data-header-theme="dark">
+    <Atmosphere src="atmo-lake" focus="left" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Vergleich</p>

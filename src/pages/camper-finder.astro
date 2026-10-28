@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import VehicleCard from '@/components/vehicles/VehicleCard.astro';
@@ -114,7 +115,8 @@ const questions = [
   description="Erzähl uns, wie du reisen möchtest – Mein perfekter Camper zeigt passende Wohnmobile aus dem aktuellen Bestand des Campingcenter Overath. Ohne erfundene Fahrzeugdaten."
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <section class="page-hero section-paper finder-hero" data-header-theme="light">
+  <section class="page-hero atmo finder-hero" data-header-theme="dark">
+    <Atmosphere src="atmo-meadow" focus="center" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Mein perfekter Camper</p>
@@ -173,7 +175,8 @@ const questions = [
     </div>
   </section>
 
-  <section class="section" data-finder-results hidden aria-live="polite">
+  <section class="section atmo" data-header-theme="dark" data-finder-results hidden aria-live="polite">
+    <Atmosphere src="atmo-lake" focus="center" />
     <div class="container">
       <header class="finder-result-head">
         <p class="eyebrow">Ergebnis</p>

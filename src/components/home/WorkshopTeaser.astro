@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import Photo from '@/components/ui/Photo.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
@@ -6,7 +7,8 @@ import { serviceGroups, workshopHighlights } from '@/data/services';
 import { url } from '@/lib/url';
 ---
 
-<section class="section workshop" aria-labelledby="workshop-title">
+<section class="section atmo workshop" data-header-theme="dark" aria-labelledby="workshop-title">
+  <Atmosphere src="atmo-meadow" focus="right" />
   <div class="container">
     <div class="ws-grid">
       <div class="ws-copy">
@@ -97,7 +99,7 @@ import { url } from '@/lib/url';
 
   .ws-highlights p {
     font-size: var(--fs-sm);
-    color: var(--text-muted);
+    color: rgb(255 255 255 / 0.9);
   }
 
   .ws-media {
@@ -129,6 +131,7 @@ import { url } from '@/lib/url';
     border-radius: var(--radius-pill);
     border: 1px solid var(--line-strong);
     background: var(--surface);
+    color: var(--text);
     font-size: var(--fs-sm);
     font-weight: 600;
     text-decoration: none;

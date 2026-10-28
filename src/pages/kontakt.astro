@@ -1,4 +1,5 @@
 ﻿---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -106,7 +107,8 @@ const today = new Date().toISOString().slice(0, 10);
     </div>
   </section>
 
-  <section class="section section-paper" aria-labelledby="ct-route">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ct-route">
+    <Atmosphere src="atmo-lake" focus="right" />
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Anfahrt</p>

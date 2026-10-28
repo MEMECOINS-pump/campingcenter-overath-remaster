@@ -1,5 +1,6 @@
 ---
 import 'pannellum/build/pannellum.css';
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -18,7 +19,8 @@ const scenes = tourScenes.map((s) => ({ id: s.id, title: s.title, src: url(`/${s
   description="Schau dich virtuell bei uns um: 13 Stationen im 360° Rundgang durch Ausstellung und Gelände des Campingcenter Overath."
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <header class="page-hero">
+  <header class="page-hero atmo" data-header-theme="dark">
+    <Atmosphere src="atmo-lake" focus="center" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Virtueller Rundgang</p>

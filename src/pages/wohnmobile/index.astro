@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -22,7 +23,8 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
   description={`${vehicles.length} Wohnmobile im Bestand: ${newCount} Neufahrzeuge und ${usedCount} gebrauchte Reisemobile von Challenger, La Strada, Eura Mobil und mehr. Filtern, merken, vergleichen – persönlich beraten in Overath.`}
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <section class="page-hero section-paper sr-hero">
+  <section class="page-hero atmo sr-hero" data-header-theme="dark">
+    <Atmosphere src="atmo-meadow" focus="center" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Fahrzeuge im Bestand</p>
