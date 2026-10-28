@@ -64,6 +64,14 @@ for (const file of htmlFiles) {
   const desc = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
   if (desc.length < 50) fail(name, `meta description zu kurz (${desc.length})`);
   if (!/<link rel="canonical" href="https?:\/\//.test(html)) fail(name, 'canonical fehlt');
+  if (!/property="og:title"/.test(html)) fail(name, 'og:title fehlt');
+  if (!/property="og:description"/.test(html)) fail(name, 'og:description fehlt');
+  if (!/property="og:image"/.test(html)) fail(name, 'og:image fehlt');
+  if (!/property="og:locale" content="de_DE"/.test(html)) fail(name, 'og:locale de_DE fehlt');
+  if (!/name="twitter:card" content="summary_large_image"/.test(html)) fail(name, 'twitter:card fehlt');
+  if (!/name="twitter:title"/.test(html)) fail(name, 'twitter:title fehlt');
+  if (!/name="twitter:description"/.test(html)) fail(name, 'twitter:description fehlt');
+  if (!/name="twitter:image"/.test(html)) fail(name, 'twitter:image fehlt');
   if (site && !html.includes(`<link rel="canonical" href="${site}`)) fail(name, 'canonical zeigt nicht auf SITE_URL');
   const h1 = (html.match(/<h1[\s>]/g) ?? []).length;
   if (h1 !== 1) fail(name, `${h1} × <h1>`);

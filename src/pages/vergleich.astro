@@ -176,6 +176,8 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
 
   .cmp {
     --cols: 2;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .cmp[data-cols='2'] {
@@ -245,6 +247,26 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     gap: 0.75rem;
+  }
+
+  /* Four columns stay readable on a phone: swipe sideways instead of squeezing names. */
+  @media (max-width: 47.99em) {
+    .cmp {
+      overflow-x: auto;
+      padding-bottom: 0.35rem;
+      scroll-padding-inline: 0.25rem;
+    }
+
+    .cmp-head,
+    .cmp-values,
+    .cmp-actions {
+      width: max(100%, calc(var(--cols) * 9.25rem));
+      grid-template-columns: repeat(var(--cols), minmax(9.25rem, 1fr));
+    }
+
+    .cmp-spec {
+      min-width: max(100%, calc(var(--cols) * 9.25rem));
+    }
   }
 
   .cmp-head > [hidden],

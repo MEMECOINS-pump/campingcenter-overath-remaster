@@ -1,4 +1,5 @@
 import { runCampingFinder, type BedType, type Category, type Condition, type FilterableVehicle, type FinderAnswers } from '@/lib/filter';
+import { formatFinderLead } from '@/lib/finder-lead';
 import { track } from '@/lib/analytics';
 
 const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
@@ -117,8 +118,10 @@ if (form && results) {
         if (host) {
           /* Transparent relative score vs best hard+soft match in this result set (not invented absolute %). */
           const pct = Math.max(62, Math.min(99, Math.round((m.score / maxSoft) * 100)));
+          const esc = (s: string) =>
+            s.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] ?? ch);
           host.innerHTML = `<p class="finder-match-score" aria-label="Passung ${pct} Prozent"><strong>${pct}&nbsp;%</strong> Passung in diesem Ergebnis</p><p class="finder-why-label">Warum passt dieses Fahrzeug zu dir?</p><ul>${m.reasons
-            .map((x) => `<li>${x.ok ? '✓' : '•'} ${x.label}</li>`)
+            .map((x) => `<li>${x.ok ? '✓' : '•'} ${esc(x.label)}</li>`)
             .join('')}${m.needsConfirmation ? '<li>• Technische Angabe bitte bestätigen lassen.</li>' : ''}</ul>`;
         }
       });
@@ -185,18 +188,8 @@ if (form && results) {
         if (!res.ok) throw new Error('fail');
         if (status) status.textContent = 'Danke – deine Anfrage ist gespeichert. Wir melden uns.';
       } else {
-        const subject = encodeURIComponent('[AUSWERTUNG] Camping Finder – Neue Kundenanfrage');
-        const body = encodeURIComponent(
-          [
-            'Camping Finder Anfrage',
-            `Name: ${payload.name}`,
-            `E-Mail: ${payload.email}`,
-            `Telefon: ${payload.phone}`,
-            `Antworten: ${JSON.stringify(payload.answers)}`,
-            `Empfehlungen: ${payload.recommendedVehicleIds.join(', ') || '–'}`,
-          ].join('\n'),
-        );
-        window.location.href = `mailto:martin_meinke@ccoverath.de?subject=${subject}&body=${body}`;
+        const mail = formatFinderLead(payload);
+        window.location.href = `mailto:${mail.to}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
         if (status) status.textContent = 'Dein E-Mail-Programm öffnet sich mit der vorbereiteten Anfrage.';
       }
       track('camping_finder_lead_submit');

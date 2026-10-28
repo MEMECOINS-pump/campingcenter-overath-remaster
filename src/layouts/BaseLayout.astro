@@ -41,6 +41,8 @@ const boot = buildBootScript();
 <!doctype html>
 <html lang="de">
   <head>
+    <!-- Charset must be in the first 1024 bytes; the boot script is larger than that. -->
+    <meta charset="utf-8" />
     <script is:inline set:html={boot} />
     <SeoHead {...seo} jsonLd={[organizationSchema(Astro.site), ...jsonLd]} />
     <ClientRouter fallback="swap" />

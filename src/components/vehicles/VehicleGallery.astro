@@ -49,7 +49,7 @@ const alt = (i: number) => `${v.title} – Foto ${i + 1} von ${n}`;
           </>
         )}
 
-        <p class="gal-counter">
+        <p class="gal-counter" aria-live="polite">
           <span class="sr-only">Foto </span>
           <span data-gal-current>1</span> / {n}
         </p>
