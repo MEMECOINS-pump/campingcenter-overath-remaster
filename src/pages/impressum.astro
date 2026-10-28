@@ -4,7 +4,10 @@ import LegalShell from '@/components/sections/LegalShell.astro';
 import { company } from '@/data/company';
 ---
 
-<BaseLayout title="Impressum" description="Impressum der Campingcenter Overath GmbH & Co KG, Weberstraße 12, 51491 Overath.">
+<BaseLayout
+  title="Impressum"
+  description={`Impressum der ${company.legalName}, ${company.address.street}, ${company.address.postalCode} ${company.address.city}.`}
+>
   <LegalShell title="Impressum" path="/impressum/" original="/impressum/">
     <h2>Angaben gemäß § 5 DDG</h2>
     <address>
@@ -31,16 +34,16 @@ import { company } from '@/data/company';
     <h2>Umsatzsteuer-ID</h2>
     <p>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz: {company.vatId}</p>
 
-    <h2>Angaben zur Berufshaftpflichtversicherung</h2>
+    <h2>Zuständige Berufsgenossenschaft</h2>
     <p>
-      <strong>Name und Sitz des Versicherers:</strong><br />
+      <strong>Gesetzliche Unfallversicherung</strong><br />
       BGHM – Berufsgenossenschaft Holz und Metall<br />
       Arcadiastraße 8<br />
       40472 Düsseldorf<br />
       Tel.: 0800 9990080-0<br />
-      Web: <a href="https://www.bghm.de/" target="_blank" rel="noopener">www.bghm.de</a>
+      Web: <a href="https://www.bghm.de/" target="_blank" rel="noopener">www.bghm.de<span class="sr-only"> (öffnet in neuem Tab)</span></a>
     </p>
-    <p><strong>Geltungsraum der Versicherung:</strong> Deutschland</p>
+    <p><strong>Geltungsbereich:</strong> Deutschland</p>
 
     <h2>Redaktionell verantwortlich</h2>
     <address>
