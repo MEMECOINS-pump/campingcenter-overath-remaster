@@ -13,7 +13,9 @@ describe('CampingCompanion support center', () => {
 
     expect(companion).toContain('data-companion');
     expect(companion).toContain('companion-fab');
-    expect(companion).toContain('Barrierefreiheit & Hilfe öffnen');
+    expect(companion).toContain('companion-fab-compass');
+    expect(companion).toContain('companion-fab-needle');
+    expect(companion).toContain('Hilfe, Camping-KI und Barrierefreiheit öffnen');
     expect(companion).toContain('Hilfe & Barrierefreiheit');
     expect(companion).toContain('Wir helfen dir gerne weiter.');
     expect(companion).toContain('Camping-KI');
@@ -21,6 +23,7 @@ describe('CampingCompanion support center', () => {
     expect(companion).toContain('data-companion-tab="chat"');
     expect(companion).toContain('data-companion-tab="contact"');
     expect(companion).toContain('Universal accessibility pictogram');
+    expect(companion).toContain('companion-tab-a11y-svg');
     expect(companion).not.toContain('Premium Kompass');
     expect(companion).not.toContain('Minimalist motorhome');
     expect(companion).not.toMatch(/<rect x="4" y="18" width="28"/);

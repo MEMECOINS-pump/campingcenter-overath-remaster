@@ -15,8 +15,10 @@ test.describe('CampingCompanion smoke', () => {
     await expect(page.locator('.chatw-fab, .a11y-fab')).toHaveCount(0);
     await expect(page.locator('[data-companion-open]')).toHaveAttribute(
       'aria-label',
-      'Barrierefreiheit & Hilfe öffnen',
+      'Hilfe, Camping-KI und Barrierefreiheit öffnen',
     );
+    await expect(page.locator('.companion-fab-compass')).toHaveCount(1);
+    await expect(page.locator('.companion-tab-a11y-svg')).toHaveCount(1);
 
     await page.locator('[data-companion-open]').click();
     await expect(page.locator('[data-companion-panel]')).toHaveAttribute('open', '');

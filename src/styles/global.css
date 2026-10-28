@@ -85,7 +85,7 @@
 
   /* chrome lifts (consent / companion FAB) — keep launcher clear of cookie & action bar */
   --consent-lift: 0px;
-  --companion-fab-h: 3.25rem;
+  --companion-fab-h: 3.5rem;
   --chat-fab-h: var(--companion-fab-h); /* legacy alias */
 
   /* stacking: actionbar < compare < sticky-cta < toast < companion < chat < cookie < skip */
