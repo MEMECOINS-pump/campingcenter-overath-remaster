@@ -2,6 +2,7 @@
 import Icon from '@/components/ui/Icon.astro';
 import AccessibilityPrefs from '@/components/layout/AccessibilityPrefs.astro';
 import { company } from '@/data/company';
+import { CAMPING_QUICK_PROMPTS } from '@/lib/camping-assist';
 import { url } from '@/lib/url';
 
 ---
@@ -9,13 +10,9 @@ import { url } from '@/lib/url';
 <div
   class="companion"
   data-companion
-  data-i18n-open={'Jetzt geöffnet'}
-  data-i18n-closed={'Aktuell geschlossen'}
-  data-i18n-holiday={'Feiertag · Geschlossen'}
-  data-i18n-title={'Hilfe & Service'}
-  data-i18n-a11y={'Barrierefreiheit'}
-  data-i18n-contact={'Kontakt & Service'}
-  data-i18n-offline={'Beratung gerade nicht erreichbar'}
+  data-size="md"
+  data-i18n-title={'Hilfe & Barrierefreiheit'}
+  data-i18n-sub={'Wir helfen dir gerne weiter.'}
 >
   <button
     type="button"
@@ -24,18 +21,18 @@ import { url } from '@/lib/url';
     aria-haspopup="dialog"
     aria-expanded="false"
     aria-controls="companion-panel"
-    aria-label={'Hilfe öffnen: Camping-KI, Barrierefreiheit, Kontakt & Service'}
+    aria-label={'Barrierefreiheit & Hilfe öffnen'}
   >
     <span class="companion-fab-mark" aria-hidden="true">
-      <!-- Premium Kompass / Hilfe-Launcher (kein Wohnmobil-Icon) -->
+      <!-- Universal accessibility pictogram (figure with outstretched arms/legs in circle) -->
       <svg class="companion-fab-svg" viewBox="0 0 48 48" focusable="false">
-        <circle cx="24" cy="24" r="17.5" fill="none" stroke="currentColor" stroke-width="2.2" opacity="0.95" />
-        <circle cx="24" cy="24" r="12.25" fill="none" stroke="currentColor" stroke-width="1.35" opacity="0.35" />
-        <path d="M24 9.5v3.2M24 35.3v3.2M9.5 24h3.2M35.3 24h3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.55" />
-        <path d="m24 14.2 5.6 14.2-5.6-2.4-5.6 2.4Z" fill="currentColor" opacity="0.95" />
-        <path d="m24 33.8-3.4-8.6 3.4 1.45 3.4-1.45Z" fill="var(--graphite)" opacity="0.55" />
-        <circle cx="24" cy="24" r="2.15" fill="var(--graphite)" />
-        <circle cx="24" cy="24" r="0.95" fill="currentColor" />
+        <circle cx="24" cy="24" r="18.5" fill="none" stroke="currentColor" stroke-width="2.5" />
+        <circle cx="24" cy="13.6" r="3.2" fill="currentColor" />
+        <path
+          fill="currentColor"
+          d="M10.8 21.4h26.4v2.7H27.2l5.9 11.2-2.4 1.25-6.15-11.65h-1.1l-6.15 11.65-2.4-1.25 5.9-11.2H10.8z"
+        />
+        <path fill="currentColor" d="M22.55 24.1h2.9v12.8h-2.9z" />
       </svg>
     </span>
   </button>
@@ -45,77 +42,151 @@ import { url } from '@/lib/url';
     id="companion-panel"
     data-companion-panel
     aria-labelledby="companion-title"
+    aria-describedby="companion-sub"
   >
     <div class="companion-sheet">
       <header class="companion-head">
-        <button type="button" class="companion-back" data-companion-back hidden aria-label={'Zurück'}>
-          <Icon name="chevron-left" />
-          <span>{'Zurück'}</span>
-        </button>
         <div class="companion-head-copy">
-          <p class="companion-kicker">Campingcenter Overath</p>
-          <h2 id="companion-title" data-companion-heading>{'Hilfe & Service'}</h2>
-          <p class="companion-sub" data-companion-sub>{'Assistenten-Zentrum – wie können wir helfen?'}</p>
+          <h2 id="companion-title">{'Hilfe & Barrierefreiheit'}</h2>
+          <p class="companion-sub" id="companion-sub">{'Wir helfen dir gerne weiter.'}</p>
         </div>
-        <button type="button" class="companion-x" data-companion-close aria-label={'Schließen'}>
-          <Icon name="close" />
-        </button>
+        <div class="companion-head-tools">
+          <div class="companion-sizes" role="group" aria-label={'Fenstergröße'}>
+            <button type="button" class="companion-size-btn" data-companion-size="sm" aria-pressed="false">
+              {'KLEIN'}
+            </button>
+            <button type="button" class="companion-size-btn is-active" data-companion-size="md" aria-pressed="true">
+              {'MITTEL'}
+            </button>
+            <button type="button" class="companion-size-btn" data-companion-size="lg" aria-pressed="false">
+              {'GROSS'}
+            </button>
+          </div>
+          <button type="button" class="companion-icon-btn" data-companion-minimize aria-label={'Minimieren'}>
+            <span aria-hidden="true">–</span>
+          </button>
+          <button type="button" class="companion-icon-btn" data-companion-close aria-label={'Schließen'}>
+            <Icon name="close" />
+          </button>
+        </div>
       </header>
 
+      <div class="companion-tabs" role="tablist" aria-label={'Hilfe & Barrierefreiheit'}>
+        <button
+          type="button"
+          class="companion-tab is-active"
+          role="tab"
+          id="companion-tab-a11y"
+          aria-selected="true"
+          aria-controls="companion-panel-a11y"
+          data-companion-tab="a11y"
+        >
+          {'Barrierefreiheit'}
+        </button>
+        <button
+          type="button"
+          class="companion-tab"
+          role="tab"
+          id="companion-tab-chat"
+          aria-selected="false"
+          aria-controls="companion-panel-chat"
+          data-companion-tab="chat"
+          tabindex="-1"
+        >
+          {'Camping-KI'}
+        </button>
+        <button
+          type="button"
+          class="companion-tab"
+          role="tab"
+          id="companion-tab-contact"
+          aria-selected="false"
+          aria-controls="companion-panel-contact"
+          data-companion-tab="contact"
+          tabindex="-1"
+        >
+          {'Kontakt'}
+        </button>
+      </div>
+
       <div class="companion-body">
-        <div class="companion-view is-active" data-companion-view="hub">
-          <div class="companion-status" data-companion-status>
-            <span class="companion-status-dot" aria-hidden="true"></span>
-            <span data-companion-status-label>{'Aktuell geschlossen'}</span>
-          </div>
-
-          <ul class="companion-cards">
-            <li>
-              <button type="button" class="companion-card" data-companion-action="chat">
-                <span class="companion-card-icon" aria-hidden="true"><Icon name="sparkle" /></span>
-                <span class="companion-card-text">
-                  <span class="companion-card-title">{'Camping-KI'}</span>
-                  <span class="companion-card-hint">{'Fragen zu Kauf, Miete, Ankauf und Werkstatt – ehrlich und ohne erfundene Angaben.'}</span>
-                </span>
-                <Icon name="chevron-right" class="companion-card-chevron" />
-              </button>
-            </li>
-            <li>
-              <button type="button" class="companion-card" data-companion-action="a11y">
-                <span class="companion-card-icon" aria-hidden="true"><Icon name="a11y-compass" /></span>
-                <span class="companion-card-text">
-                  <span class="companion-card-title">{'Barrierefreiheit'}</span>
-                  <span class="companion-card-hint">{'Schrift, Kontrast, Bewegung und Lesbarkeit anpassen.'}</span>
-                </span>
-                <Icon name="chevron-right" class="companion-card-chevron" />
-              </button>
-            </li>
-            <li>
-              <button type="button" class="companion-card" data-companion-action="contact">
-                <span class="companion-card-icon" aria-hidden="true"><Icon name="phone" /></span>
-                <span class="companion-card-text">
-                  <span class="companion-card-title">{'Kontakt & Service'}</span>
-                  <span class="companion-card-hint">{'Anrufen, Nachricht schreiben oder Öffnungszeiten prüfen.'}</span>
-                </span>
-                <Icon name="chevron-right" class="companion-card-chevron" />
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        <div class="companion-view" data-companion-view="a11y" hidden>
+        <div
+          class="companion-view is-active"
+          role="tabpanel"
+          id="companion-panel-a11y"
+          aria-labelledby="companion-tab-a11y"
+          data-companion-view="a11y"
+        >
           <AccessibilityPrefs embedded />
           <p class="companion-a11y-note">
+            Diese Einstellungen erleichtern die Nutzung dieser Website. Sie ersetzen keine vollständige
+            Barrierefreiheitsprüfung.
             <a href={url('/barrierefreiheit/')}>{'Erklärung zur Barrierefreiheit'}</a>
           </p>
         </div>
 
-        <div class="companion-view" data-companion-view="contact" hidden>
-          <section class="companion-contact" aria-label={'Kontakt & Service'}>
+        <div
+          class="companion-view"
+          role="tabpanel"
+          id="companion-panel-chat"
+          aria-labelledby="companion-tab-chat"
+          data-companion-view="chat"
+          hidden
+        >
+          <div class="companion-chat" data-companion-chat>
+            <div class="companion-chat-body" data-companion-chat-body>
+              <div class="companion-chat-msg companion-chat-msg-bot is-latest" data-companion-chat-msg>
+                <p class="companion-chat-lead">{'Hallo – wie kann ich helfen?'}</p>
+                <p>
+                  {
+                    'Fragen zu Challenger, Kauf, Miete, Ankauf, Öffnungszeiten oder Service. Kurze Stichworte reichen.'
+                  }
+                </p>
+              </div>
+              <div class="companion-chat-chips" data-companion-chat-chips>
+                {
+                  CAMPING_QUICK_PROMPTS.map((q) => (
+                    <button type="button" class="companion-chat-chip" data-companion-chat-chip data-text={q.text}>
+                      {q.label}
+                    </button>
+                  ))
+                }
+              </div>
+              <div class="companion-chat-anchor" data-companion-chat-anchor aria-hidden="true"></div>
+            </div>
+            <form class="companion-chat-composer" data-companion-chat-form>
+              <label class="sr-only" for="companion-chat-input">{'Nachricht an Camping-KI'}</label>
+              <div class="companion-chat-input-wrap">
+                <textarea
+                  id="companion-chat-input"
+                  name="message"
+                  rows="1"
+                  placeholder={'Nachricht an Camping-KI …'}
+                  data-companion-chat-input
+                  maxlength="800"
+                ></textarea>
+                <button type="submit" class="companion-chat-send" data-companion-chat-send aria-label={'Senden'}>
+                  <Icon name="arrow-right" />
+                </button>
+              </div>
+              <p class="companion-chat-hint">{'Enter senden · Shift+Enter neue Zeile'}</p>
+            </form>
+          </div>
+        </div>
+
+        <div
+          class="companion-view"
+          role="tabpanel"
+          id="companion-panel-contact"
+          aria-labelledby="companion-tab-contact"
+          data-companion-view="contact"
+          hidden
+        >
+          <section class="companion-contact" aria-label={'Kontakt'}>
             <p class="companion-contact-lead">
-              Persönliche Beratung in Overath – Telefon, E-Mail oder Kontaktformular.
+              Persönliche Beratung in Overath – Anruf, Nachricht oder Anfahrt.
             </p>
-            <div class="companion-contact-row">
+            <div class="companion-contact-actions">
               <a
                 class="btn btn-accent companion-contact-btn"
                 href={company.phone.href}
@@ -134,6 +205,17 @@ import { url } from '@/lib/url';
                 <Icon name="mail" />
                 {'Nachricht schreiben'}
               </a>
+              <a
+                class="btn companion-contact-btn"
+                href={company.directions}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="cta_click"
+                data-track-location="companion-route"
+              >
+                <Icon name="route" />
+                {'Route planen'}
+              </a>
             </div>
             <p class="companion-contact-meta">
               <a href={company.phone.href}>{company.phone.display}</a>
@@ -141,22 +223,9 @@ import { url } from '@/lib/url';
               <a href={`mailto:${company.email}`}>{company.email}</a>
             </p>
             <p class="companion-contact-meta">
-              <a href={url('/werkstatt-kundendienst/')}>{'Werkstatt & Kundendienst'}</a>
-              ·
-              <a href={url('/vermietung-wohnmobile/')}>{'Vermietung'}</a>
+              {company.address.street}, {company.address.postalCode} {company.address.city}
             </p>
           </section>
-        </div>
-
-        <div class="companion-view" data-companion-view="offline" hidden>
-          <div class="companion-offline">
-            <h3>{'Beratung gerade nicht erreichbar'}</h3>
-            <p>{'Die Camping-KI ist momentan offline. Ruf uns an oder schreib uns – wir helfen persönlich weiter.'}</p>
-            <div class="companion-contact-row">
-              <a class="btn btn-accent" href={company.phone.href}>{'Jetzt anrufen'}</a>
-              <a class="btn" href={url('/kontakt/')}>{'Nachricht schreiben'}</a>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -164,66 +233,135 @@ import { url } from '@/lib/url';
 </div>
 
 <script>
+  import { track } from '@/lib/analytics';
+  import type { CampingAssistResult } from '@/lib/camping-assist';
+  import { url } from '@/lib/url';
+
+  const API = (import.meta.env.PUBLIC_API_BASE as string | undefined)?.replace(/\/$/, '') || '';
+  const SIZE_KEY = 'cco:companion-size';
+  const THINK_MS = 700;
+  const MSG_SHORT =
+    'Schreib bitte etwas genauer – z. B. „Challenger 240“, „mieten“ oder „Öffnungszeiten“.';
+  const THINK_LABEL = 'Camping-KI denkt';
+
+  type AssistFn = (message: string) => CampingAssistResult;
+  let assistCampingLazy: AssistFn | null = null;
+  let assistLoad: Promise<AssistFn> | null = null;
+
+  function loadAssist(): Promise<AssistFn> {
+    if (assistCampingLazy) return Promise.resolve(assistCampingLazy);
+    if (!assistLoad) {
+      assistLoad = import('@/lib/camping-assist').then((m) => {
+        assistCampingLazy = m.assistCamping;
+        return m.assistCamping;
+      });
+    }
+    return assistLoad;
+  }
+
+  function escapeHtml(s: string) {
+    return s
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+  }
+
+  function renderResult(data: CampingAssistResult): string {
+    const bullets = data.bullets?.length
+      ? `<ul class="companion-chat-points">${data.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`
+      : '';
+    const href = data.ctaHref ? (data.ctaHref.startsWith('http') ? data.ctaHref : url(data.ctaHref)) : '';
+    const cta =
+      data.ctaLabel && href
+        ? `<span class="companion-chat-actions"><a href="${href}">${escapeHtml(data.ctaLabel)}</a></span>`
+        : '';
+    const disclaimer = data.disclaimer
+      ? `<span class="companion-chat-disclaimer">${escapeHtml(data.disclaimer)}</span>`
+      : '';
+    return `<span class="companion-chat-title">${escapeHtml(data.title)}</span><p>${escapeHtml(data.summary)}</p>${bullets}${disclaimer}${cta}`;
+  }
+
+  function thinkingHtml() {
+    return `<span class="companion-chat-thinking" aria-live="polite"><span>${THINK_LABEL}</span><span class="companion-chat-dots" aria-hidden="true"><span></span><span></span><span></span></span></span>`;
+  }
+
+  function wait(ms: number) {
+    return new Promise((r) => window.setTimeout(r, ms));
+  }
+
   document.querySelectorAll<HTMLElement>('[data-companion]').forEach((root) => {
     const panel = root.querySelector<HTMLDialogElement>('[data-companion-panel]');
     const openBtn = root.querySelector<HTMLButtonElement>('[data-companion-open]');
     const closeBtn = root.querySelector('[data-companion-close]');
-    const backBtn = root.querySelector<HTMLElement>('[data-companion-back]');
-    const heading = root.querySelector('[data-companion-heading]');
-    const sub = root.querySelector<HTMLElement>('[data-companion-sub]');
-    const statusLabel = root.querySelector('[data-companion-status-label]');
-    const statusBox = root.querySelector<HTMLElement>('[data-companion-status]');
+    const minimizeBtn = root.querySelector('[data-companion-minimize]');
+    const sizeBtns = root.querySelectorAll<HTMLButtonElement>('[data-companion-size]');
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-companion-tab]');
+    const views = root.querySelectorAll<HTMLElement>('[data-companion-view]');
+
+    const chatBody = root.querySelector<HTMLElement>('[data-companion-chat-body]');
+    const chatForm = root.querySelector<HTMLFormElement>('[data-companion-chat-form]');
+    const chatInput = root.querySelector<HTMLTextAreaElement>('[data-companion-chat-input]');
+    const chatChips = root.querySelector<HTMLElement>('[data-companion-chat-chips]');
+    const chatAnchor = root.querySelector<HTMLElement>('[data-companion-chat-anchor]');
+
     if (!panel || !openBtn) return;
 
-    const currentLang = 'de';
-    const i18nTitle = root.dataset.i18nTitle || '';
-    const titles: Record<string, string> = {
-      hub: i18nTitle,
-      a11y: root.dataset.i18nA11y || '',
-      contact: root.dataset.i18nContact || '',
-      offline: root.dataset.i18nOffline || '',
-    };
-
-    const paintStatus = () => {
-      const html = document.documentElement;
-      const state = html.dataset.ccoOpen || 'closed';
-      const reason = html.dataset.ccoOpenReason || '';
-      let label =
-        reason === 'holiday'
-          ? root.dataset.i18nHoliday || ''
-          : state === 'open'
-            ? root.dataset.i18nOpen || ''
-            : root.dataset.i18nClosed || '';
-      if (html.dataset.ccoOpenLabel && currentLang === 'de') label = html.dataset.ccoOpenLabel;
-      if (statusLabel) statusLabel.textContent = label;
-      if (statusBox) {
-        statusBox.dataset.state = state;
-        statusBox.dataset.reason = reason;
+    const setSize = (size: string) => {
+      const allowed = ['sm', 'md', 'lg'];
+      const next = allowed.includes(size) ? size : 'md';
+      root.dataset.size = next;
+      sizeBtns.forEach((b) => {
+        const on = b.dataset.companionSize === next;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      try {
+        localStorage.setItem(SIZE_KEY, next);
+      } catch {
+        /* ignore */
       }
     };
-    paintStatus();
-    window.addEventListener('cco:open-status', paintStatus);
 
-    const setView = (name: string) => {
-      root.querySelectorAll<HTMLElement>('[data-companion-view]').forEach((el) => {
-        const on = el.dataset.companionView === name;
-        el.hidden = !on;
-        el.classList.toggle('is-active', on);
+    try {
+      const saved = localStorage.getItem(SIZE_KEY);
+      if (saved) setSize(saved);
+    } catch {
+      /* ignore */
+    }
+
+    const setTab = (name: string) => {
+      const tabName = name === 'chat' || name === 'contact' || name === 'a11y' ? name : 'a11y';
+      tabs.forEach((t) => {
+        const on = t.dataset.companionTab === tabName;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
       });
-      if (heading) heading.textContent = titles[name] || i18nTitle;
-      if (sub) sub.hidden = name !== 'hub';
-      if (backBtn) backBtn.hidden = name === 'hub';
-      if (name === 'a11y') window.dispatchEvent(new CustomEvent('cco:a11y-sync'));
+      views.forEach((v) => {
+        const on = v.dataset.companionView === tabName;
+        v.hidden = !on;
+        v.classList.toggle('is-active', on);
+      });
+      if (tabName === 'a11y') window.dispatchEvent(new CustomEvent('cco:a11y-sync'));
+      if (tabName === 'chat') {
+        void loadAssist();
+        window.dispatchEvent(new CustomEvent('cco:chat-opened'));
+        chatInput?.focus({ preventScroll: true });
+        scrollChat();
+      }
     };
 
-    const setOpen = (open: boolean) => {
+    const setOpen = (open: boolean, tab?: string) => {
       openBtn.setAttribute('aria-expanded', String(open));
       if (open) {
         if (!panel.open) panel.showModal();
-        document.body.classList.add('scroll-locked', 'companion-open');
-        paintStatus();
-        setView('hub');
-        openBtn.classList.add('has-arrived');
+        document.body.classList.add('companion-open');
+        setTab(tab || 'a11y');
+        const focusTarget =
+          root.querySelector<HTMLElement>('.companion-tab.is-active') ||
+          root.querySelector<HTMLElement>('[data-companion-close]');
+        focusTarget?.focus({ preventScroll: true });
       } else if (panel.open) {
         panel.close();
       }
@@ -231,74 +369,166 @@ import { url } from '@/lib/url';
 
     panel.addEventListener('close', () => {
       openBtn.setAttribute('aria-expanded', 'false');
-      document.body.classList.remove('scroll-locked', 'companion-open');
-      setView('hub');
+      document.body.classList.remove('companion-open');
       openBtn.focus({ preventScroll: true });
     });
 
     openBtn.addEventListener('click', () => setOpen(!panel.open));
     closeBtn?.addEventListener('click', () => setOpen(false));
-    backBtn?.addEventListener('click', () => setView('hub'));
+    minimizeBtn?.addEventListener('click', () => setOpen(false));
+
     panel.addEventListener('click', (e) => {
       if (e.target === panel) setOpen(false);
     });
 
-    root.querySelectorAll<HTMLElement>('[data-companion-action]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const action = btn.dataset.companionAction;
-        if (action === 'chat') {
-          setOpen(false);
-          let opened = false;
-          const onReady = () => {
-            opened = true;
-          };
-          window.addEventListener('cco:chat-opened', onReady, { once: true });
-          window.dispatchEvent(new CustomEvent('cco:open-chat', { detail: { lang: currentLang } }));
-          window.setTimeout(() => {
-            window.removeEventListener('cco:chat-opened', onReady);
-            if (!opened) {
-              setOpen(true);
-              setView('offline');
-            }
-          }, 900);
-          return;
+    sizeBtns.forEach((b) => b.addEventListener('click', () => setSize(b.dataset.companionSize || 'md')));
+
+    tabs.forEach((t) => {
+      t.addEventListener('click', () => setTab(t.dataset.companionTab || 'a11y'));
+      t.addEventListener('keydown', (e) => {
+        const order = ['a11y', 'chat', 'contact'];
+        const i = order.indexOf(t.dataset.companionTab || 'a11y');
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const dir = e.key === 'ArrowRight' ? 1 : -1;
+          const next = order[(i + dir + order.length) % order.length] || 'a11y';
+          setTab(next);
+          root.querySelector<HTMLButtonElement>(`[data-companion-tab="${next}"]`)?.focus();
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          setTab('a11y');
+          root.querySelector<HTMLButtonElement>('[data-companion-tab="a11y"]')?.focus();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          setTab('contact');
+          root.querySelector<HTMLButtonElement>('[data-companion-tab="contact"]')?.focus();
         }
-        if (action === 'a11y') setView('a11y');
-        if (action === 'contact') setView('contact');
       });
     });
 
-    try {
-      if (!sessionStorage.getItem('cco:companion-arrived')) {
-        openBtn.classList.add('will-arrive');
-        sessionStorage.setItem('cco:companion-arrived', '1');
-        window.setTimeout(() => {
-          openBtn.classList.remove('will-arrive');
-          openBtn.classList.add('has-arrived');
-        }, 80);
-      } else {
-        openBtn.classList.add('has-arrived');
-      }
-    } catch {
-      openBtn.classList.add('has-arrived');
+    window.addEventListener('cco:open-companion', ((ev: CustomEvent<{ view?: string; tab?: string }>) => {
+      const tab = ev.detail?.tab || ev.detail?.view || 'a11y';
+      const mapped = tab === 'hub' ? 'a11y' : tab;
+      setOpen(true, mapped);
+    }) as EventListener);
+
+    window.addEventListener('cco:open-chat', () => {
+      setOpen(true, 'chat');
+    });
+
+    /* —— Compact Camping-KI —— */
+    function scrollChat() {
+      if (!chatBody) return;
+      requestAnimationFrame(() => {
+        chatBody.scrollTop = chatBody.scrollHeight;
+      });
     }
 
-    window.addEventListener('cco:open-companion', ((ev: CustomEvent<{ view?: string }>) => {
-      setOpen(true);
-      if (ev.detail?.view) setView(ev.detail.view);
-    }) as EventListener);
+    function markLatest(el: HTMLElement) {
+      chatBody?.querySelectorAll('.is-latest').forEach((n) => n.classList.remove('is-latest'));
+      el.classList.add('is-latest');
+      scrollChat();
+    }
+
+    function appendMsg(text: string, who: 'bot' | 'user', asHtml = false) {
+      if (!chatBody) return null;
+      const el = document.createElement('div');
+      el.className = `companion-chat-msg companion-chat-msg-${who}`;
+      el.dataset.companionChatMsg = '';
+      if (asHtml) el.innerHTML = text;
+      else el.textContent = text;
+      if (chatAnchor) chatBody.insertBefore(el, chatAnchor);
+      else chatBody.appendChild(el);
+      markLatest(el);
+      return el;
+    }
+
+    async function ask(message: string): Promise<CampingAssistResult> {
+      const assistCamping = await loadAssist();
+      let data = assistCamping(message);
+      try {
+        if (API) {
+          const res = await fetch(`${API}/api/camping-assistant`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, lang: 'de' }),
+          });
+          if (res.ok) data = (await res.json()) as CampingAssistResult;
+        }
+      } catch {
+        /* local rules / offline fallback */
+      }
+      return data;
+    }
+
+    function autosize(ta: HTMLTextAreaElement) {
+      ta.style.height = 'auto';
+      ta.style.height = `${Math.min(ta.scrollHeight, 96)}px`;
+    }
+
+    async function run(message: string) {
+      const cleaned = message.trim();
+      if (cleaned.length < 2) return;
+      if (cleaned.length < 4) {
+        appendMsg(MSG_SHORT, 'bot');
+        return;
+      }
+      chatChips?.setAttribute('hidden', '');
+      appendMsg(cleaned, 'user');
+      if (chatInput) {
+        chatInput.value = '';
+        autosize(chatInput);
+      }
+      track('camping_assistant_start', { source: 'companion' });
+
+      const thinking = appendMsg(thinkingHtml(), 'bot', true);
+      thinking?.classList.add('is-thinking');
+      const started = Date.now();
+      const data = await ask(cleaned);
+      const left = THINK_MS - (Date.now() - started);
+      if (left > 0) await wait(left);
+
+      if (thinking) {
+        thinking.classList.remove('is-thinking');
+        thinking.innerHTML = renderResult(data);
+        markLatest(thinking);
+      }
+      track('camping_assistant_complete', { provider: data.provider, off_topic: data.offTopic ? 1 : 0 });
+    }
+
+    chatForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      void run(chatInput?.value || '');
+    });
+    chatInput?.addEventListener('input', () => chatInput && autosize(chatInput));
+    chatInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        void run(chatInput.value);
+      }
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-companion-chat-chip]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        void run(chip.dataset.text || chip.textContent || '');
+      });
+    });
   });
 </script>
 
 <style>
   .companion {
     --companion-bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + var(--consent-lift, 0px) + 1rem);
+    --companion-fab: 3.15rem;
+    --cw: min(360px, calc(100vw - 24px));
+    --ch: min(480px, calc(100dvh - 100px));
     position: fixed;
     right: max(0.85rem, env(safe-area-inset-right, 0px));
     bottom: var(--companion-bottom);
     z-index: var(--z-companion, 68);
     display: grid;
     justify-items: end;
+    align-content: end;
+    gap: 0.65rem;
     pointer-events: none;
     font-family: var(--font-body);
   }
@@ -307,46 +537,48 @@ import { url } from '@/lib/url';
     pointer-events: auto;
   }
 
+  .companion[data-size='sm'] {
+    --cw: min(320px, calc(100vw - 24px));
+    --ch: min(400px, calc(100dvh - 100px));
+  }
+
+  .companion[data-size='md'] {
+    --cw: min(360px, calc(100vw - 24px));
+    --ch: min(480px, calc(100dvh - 100px));
+  }
+
+  .companion[data-size='lg'] {
+    --cw: min(440px, calc(100vw - 24px));
+    --ch: min(620px, calc(100dvh - 100px));
+  }
+
   .companion-fab {
     display: grid;
     place-items: center;
-    width: 3.55rem;
-    height: 3.55rem;
-    min-width: 52px;
-    min-height: 52px;
+    width: var(--companion-fab);
+    height: var(--companion-fab);
+    min-width: 48px;
+    min-height: 48px;
     padding: 0;
-    border: 0;
-    border-radius: 1.15rem;
-    background: linear-gradient(160deg, #f4ebe0 0%, var(--brand) 55%, #b8732a 100%);
-    color: var(--graphite);
+    border: 1px solid rgb(28 32 36 / 0.14);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--graphite) 88%, var(--forest));
+    color: var(--ivory);
     box-shadow:
-      0 0 0 1px rgb(28 32 36 / 0.08),
-      0 14px 28px -14px rgb(28 32 36 / 0.45);
+      0 0 0 1px rgb(247 244 238 / 0.08) inset,
+      0 10px 22px -12px rgb(28 32 36 / 0.55);
     cursor: pointer;
-    transform: translateY(2px);
-    opacity: 0.96;
     transition:
-      transform 0.35s var(--ease-out),
+      background 0.2s var(--ease),
       box-shadow 0.2s var(--ease),
-      filter 0.2s var(--ease);
-  }
-
-  .companion-fab.will-arrive {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-
-  .companion-fab.has-arrived {
-    transform: translateY(0);
-    opacity: 1;
+      color 0.2s var(--ease);
   }
 
   .companion-fab:hover {
-    filter: brightness(1.03);
-    transform: translateY(-2px);
+    background: var(--graphite);
     box-shadow:
-      0 0 0 1px rgb(28 32 36 / 0.1),
-      0 18px 32px -14px rgb(28 32 36 / 0.5);
+      0 0 0 1px rgb(247 244 238 / 0.1) inset,
+      0 14px 26px -12px rgb(28 32 36 / 0.6);
   }
 
   .companion-fab:focus-visible {
@@ -355,116 +587,70 @@ import { url } from '@/lib/url';
   }
 
   .companion-fab[aria-expanded='true'] {
-    background: var(--graphite);
-    color: var(--brand);
+    background: var(--forest);
+    color: var(--ivory);
   }
 
   .companion-fab-svg {
-    width: 2rem;
-    height: 2rem;
+    width: 1.55rem;
+    height: 1.55rem;
     display: block;
   }
 
-  /* Desktop/tablet: right-side sheet (not centered modal). Mobile: bottom sheet. */
+  /* Compact support panel above launcher — never fullscreen */
   .companion-panel {
-    width: min(calc(100vw - 1rem), 26rem);
-    height: 100dvh;
-    max-height: 100dvh;
+    position: fixed;
+    inset: auto;
+    right: max(0.85rem, env(safe-area-inset-right, 0px));
+    bottom: calc(var(--companion-bottom) + var(--companion-fab) + 0.65rem);
+    width: var(--cw);
+    height: var(--ch);
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 100px);
     margin: 0;
-    margin-inline: auto 0;
     padding: 0;
     border: 0;
-    border-radius: 1.25rem 0 0 1.25rem;
+    border-radius: 1rem;
     background: transparent;
     color: var(--text);
     box-shadow: none;
+    overflow: visible;
   }
 
   .companion-panel::backdrop {
-    background: rgb(36 40 43 / 0.45);
-  }
-
-  @media (max-width: 39.99em) {
-    .companion-panel {
-      width: 100%;
-      max-width: none;
-      height: min(100dvh, 100%);
-      max-height: 100dvh;
-      margin: 0;
-      border-radius: 1.1rem 1.1rem 0 0;
-      margin-top: auto;
-    }
-
-    .companion-sheet {
-      height: 100%;
-      max-height: 100dvh;
-      border-radius: 1.1rem 1.1rem 0 0;
-    }
-  }
-
-  @media (min-width: 40em) {
-    .companion-sheet {
-      height: 100%;
-      max-height: inherit;
-      border-radius: 1.25rem 0 0 1.25rem;
-    }
+    background: rgb(36 40 43 / 0.28);
   }
 
   .companion-sheet {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    width: 100%;
+    height: 100%;
     max-height: inherit;
     overflow: hidden;
-    border: 1px solid rgb(28 32 36 / 0.08);
-    border-radius: 1.25rem;
-    background: linear-gradient(180deg, #fbf7f0 0%, #fff 42%);
-    box-shadow: 0 28px 56px -24px rgb(28 32 36 / 0.4);
+    border: 1px solid rgb(28 32 36 / 0.1);
+    border-radius: 1rem;
+    background: linear-gradient(180deg, #fbf7f0 0%, #fff 38%);
+    box-shadow: 0 22px 48px -22px rgb(28 32 36 / 0.45);
   }
 
   .companion-head {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.5rem 0.75rem;
-    align-items: start;
-    padding: 1rem 1rem 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 0.75rem 0.55rem;
     border-bottom: 1px solid rgb(28 32 36 / 0.06);
   }
 
-  .companion-back {
-    grid-column: 1 / -1;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    width: fit-content;
-    margin: 0 0 0.15rem;
-    padding: 0.25rem 0.4rem;
-    border: 0;
-    border-radius: 0.5rem;
-    background: rgb(28 32 36 / 0.05);
-    color: var(--text);
-    font: inherit;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .companion-back[hidden] {
-    display: none !important;
-  }
-
-  .companion-kicker {
-    margin: 0;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--brand-ink);
+  .companion-head-copy {
+    min-width: 0;
   }
 
   .companion-head-copy h2 {
-    margin: 0.2rem 0 0;
+    margin: 0;
     font-family: var(--font-display);
-    font-size: 1.35rem;
+    font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -472,151 +658,166 @@ import { url } from '@/lib/url';
   }
 
   .companion-sub {
-    margin: 0.35rem 0 0;
-    font-size: 0.92rem;
-    color: var(--text-muted);
-  }
-
-  .companion-sub[hidden] {
-    display: none !important;
-  }
-
-  .companion-x {
-    display: grid;
-    place-items: center;
-    width: 2.35rem;
-    height: 2.35rem;
-    border: 0;
-    border-radius: 50%;
-    background: rgb(28 32 36 / 0.06);
-    cursor: pointer;
-  }
-
-  .companion-body {
-    min-height: 0;
-    overflow: auto;
-    overscroll-behavior: contain;
-    padding: 0.85rem 1rem 1.15rem;
-  }
-
-  .companion-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    margin-bottom: 0.85rem;
-    padding: 0.4rem 0.7rem;
-    border-radius: 999px;
-    background: rgb(28 32 36 / 0.05);
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
-
-  .companion-status-dot {
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 50%;
-    background: #8a7170;
-  }
-
-  .companion-status[data-state='open'] .companion-status-dot {
-    background: var(--success);
-  }
-
-  .companion-cards {
-    display: grid;
-    gap: 0.55rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .companion-card {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 0.75rem;
-    align-items: center;
-    width: 100%;
-    padding: 0.85rem 0.9rem;
-    border: 1px solid rgb(28 32 36 / 0.08);
-    border-radius: 1rem;
-    background: #fff;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-    transition:
-      border-color 0.18s ease,
-      box-shadow 0.18s ease,
-      transform 0.18s ease;
-  }
-
-  .companion-card:hover {
-    border-color: rgb(208 129 21 / 0.45);
-    box-shadow: 0 10px 22px -16px rgb(28 32 36 / 0.35);
-    transform: translateY(-1px);
-  }
-
-  .companion-card-icon {
-    display: grid;
-    place-items: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 0.8rem;
-    background: var(--brand-soft);
-    color: var(--brand-ink);
-  }
-
-  .companion-card-title {
-    display: block;
-    font-size: 0.98rem;
-    font-weight: 800;
-  }
-
-  .companion-card-hint {
-    display: block;
-    margin-top: 0.15rem;
+    margin: 0.2rem 0 0;
     font-size: 0.78rem;
     line-height: 1.35;
     color: var(--text-muted);
   }
 
-  .companion-card-chevron {
-    width: 1rem;
-    height: 1rem;
-    opacity: 0.45;
+  .companion-head-tools {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.3rem;
+    flex: none;
   }
 
-  .companion-section-title {
-    margin: 1.1rem 0 0.55rem;
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  .companion-sizes {
+    display: inline-flex;
+    gap: 0.15rem;
+    padding: 0.12rem;
+    border: 1px solid rgb(28 32 36 / 0.1);
+    border-radius: 0.55rem;
+    background: var(--sand);
+  }
+
+  .companion-size-btn {
+    min-height: 1.7rem;
+    padding: 0 0.4rem;
+    border: 0;
+    border-radius: 0.4rem;
+    background: transparent;
     color: var(--text-muted);
+    font: inherit;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
   }
 
-  .companion-contact-row {
+  .companion-size-btn.is-active,
+  .companion-size-btn[aria-pressed='true'] {
+    background: #fff;
+    color: var(--graphite);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .companion-size-btn:focus-visible,
+  .companion-icon-btn:focus-visible,
+  .companion-tab:focus-visible,
+  .companion-chat-chip:focus-visible,
+  .companion-chat-send:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .companion-icon-btn {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(28 32 36 / 0.06);
+    color: var(--graphite);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
   }
 
-  .companion-contact-btn {
-    justify-content: center;
-    min-height: 2.7rem;
-    font-size: 0.85rem;
+  .companion-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.2rem;
+    padding: 0.45rem 0.55rem 0.35rem;
+    border-bottom: 1px solid rgb(28 32 36 / 0.06);
+    background: color-mix(in srgb, var(--sand) 55%, #fff);
   }
 
-  .companion-contact-lead {
-    margin: 0 0 0.85rem;
-    font-size: 0.92rem;
+  .companion-tab {
+    min-height: 2.15rem;
+    padding: 0.35rem 0.25rem;
+    border: 0;
+    border-radius: 0.55rem;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .companion-tab.is-active,
+  .companion-tab[aria-selected='true'] {
+    background: #fff;
+    color: var(--brand-ink);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .companion-body {
+    min-height: 0;
+    overflow: hidden;
+    display: grid;
+  }
+
+  .companion-view {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 0.7rem 0.75rem 0.9rem;
+  }
+
+  .companion-view[data-companion-view='chat'] {
+    display: grid;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .companion-view[data-companion-view='chat'].is-active {
+    display: grid;
+  }
+
+  .companion-view[hidden] {
+    display: none !important;
+  }
+
+  .companion-a11y-note {
+    margin: 0.85rem 0 0;
+    font-size: 0.75rem;
     line-height: 1.45;
     color: var(--text-muted);
   }
 
+  .companion-a11y-note a {
+    display: inline;
+    font-weight: 750;
+    color: var(--brand-ink);
+  }
+
+  .companion-contact-lead {
+    margin: 0 0 0.75rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .companion-contact-actions {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .companion-contact-btn {
+    justify-content: center;
+    min-height: 2.55rem;
+    font-size: 0.86rem;
+  }
+
   .companion-contact-meta {
     margin: 0.65rem 0 0;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     color: var(--text-muted);
   }
 
@@ -625,53 +826,245 @@ import { url } from '@/lib/url';
     font-weight: 700;
   }
 
-  .companion-offline {
-    padding: 0.5rem 0.15rem 0.25rem;
+  /* Embedded chat */
+  .companion-chat {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    min-height: 0;
+    height: 100%;
   }
 
-  .companion-offline h3 {
-    margin: 0 0 0.45rem;
-    font-size: 1.05rem;
+  .companion-chat-body {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 0.7rem 0.75rem 0.35rem;
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
   }
 
-  .companion-offline p {
-    margin: 0 0 0.9rem;
-    color: var(--text-muted);
+  .companion-chat-msg {
+    max-width: 95%;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.85rem;
+    font-size: 0.86rem;
     line-height: 1.45;
+    background: #fff;
+    border: 1px solid rgb(28 32 36 / 0.08);
   }
 
-  .companion-a11y-note {
-    margin: 0.85rem 0 0;
-    font-size: 0.82rem;
+  .companion-chat-msg p {
+    margin: 0.25rem 0 0;
   }
 
-  .companion-a11y-note a {
+  .companion-chat-msg p:first-child {
+    margin-top: 0;
+  }
+
+  .companion-chat-lead {
+    font-weight: 750;
+    color: var(--graphite);
+  }
+
+  .companion-chat-msg-user {
+    justify-self: end;
+    background: var(--brand-soft);
+    border-color: color-mix(in srgb, var(--brand) 35%, var(--line));
+    color: var(--brand-ink);
+  }
+
+  .companion-chat-title {
+    display: block;
+    font-weight: 800;
+    color: var(--graphite);
+    margin-bottom: 0.2rem;
+  }
+
+  .companion-chat-points {
+    margin: 0.4rem 0 0;
+    padding-left: 1.1rem;
+  }
+
+  .companion-chat-disclaimer {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .companion-chat-actions {
+    display: block;
+    margin-top: 0.5rem;
+  }
+
+  .companion-chat-actions a {
     font-weight: 750;
     color: var(--brand-ink);
   }
 
-  .companion-view[hidden] {
+  .companion-chat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .companion-chat-chips[hidden] {
     display: none !important;
   }
 
-  :global(body.companion-open) .companion-fab {
-    opacity: 0;
-    pointer-events: none;
+  .companion-chat-chip {
+    min-height: 2rem;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid rgb(28 32 36 / 0.1);
+    border-radius: 999px;
+    background: var(--sand);
+    color: var(--graphite);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .companion-chat-composer {
+    padding: 0.55rem 0.65rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid rgb(28 32 36 / 0.08);
+    background: #fff;
+  }
+
+  .companion-chat-input-wrap {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.35rem;
+    align-items: end;
+    padding: 0.35rem;
+    border: 1px solid rgb(28 32 36 / 0.12);
+    border-radius: 0.85rem;
+    background: var(--sand);
+  }
+
+  .companion-chat-input-wrap textarea {
+    width: 100%;
+    min-height: 2.4rem;
+    max-height: 6rem;
+    resize: none;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    padding: 0.45rem 0.4rem;
+  }
+
+  .companion-chat-input-wrap textarea:focus {
+    outline: none;
+  }
+
+  .companion-chat-input-wrap:focus-within {
+    outline: 3px solid var(--focus);
+    outline-offset: 1px;
+  }
+
+  .companion-chat-send {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 0;
+    border-radius: 0.65rem;
+    background: var(--graphite);
+    color: var(--ivory);
+    cursor: pointer;
+  }
+
+  .companion-chat-hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .companion-chat-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 650;
+    color: var(--text-muted);
+  }
+
+  .companion-chat-dots {
+    display: inline-flex;
+    gap: 0.18rem;
+  }
+
+  .companion-chat-dots span {
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: currentColor;
+    animation: companion-dot 1s ease-in-out infinite;
+  }
+
+  .companion-chat-dots span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .companion-chat-dots span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes companion-dot {
+    0%,
+    80%,
+    100% {
+      opacity: 0.35;
+      transform: translateY(0);
+    }
+    40% {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+  }
+
+  @media (min-width: 40em) {
+    .companion-fab {
+      width: 3.25rem;
+      height: 3.25rem;
+      min-width: 50px;
+      min-height: 50px;
+    }
+  }
+
+  @media (max-width: 24.99em) {
+    .companion-sizes {
+      display: none;
+    }
+
+    .companion[data-size='lg'] {
+      --cw: min(360px, calc(100vw - 24px));
+      --ch: min(520px, calc(100dvh - 100px));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .companion-fab,
+    .companion-chat-dots span {
+      transition: none;
+      animation: none;
+    }
+
+    .companion-chat-dots span {
+      opacity: 0.7;
+    }
+  }
+
+  :global(html.a11y-reduce-motion) .companion-chat-dots span {
+    animation: none;
+    opacity: 0.7;
   }
 
   :global(body:has(.chatw.is-open)) .companion-fab {
     opacity: 0;
     pointer-events: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .companion-fab,
-    .companion-fab.will-arrive,
-    .companion-fab.has-arrived,
-    .companion-card {
-      transition: none;
-      transform: none;
-      opacity: 1;
-    }
   }
 </style>

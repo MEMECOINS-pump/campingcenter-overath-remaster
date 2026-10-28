@@ -25,58 +25,113 @@ const embedded = Astro.props.embedded ?? true;
       )
     }
 
-    <p class="a11y-lead">{'Praktische Darstellungshilfen für diese Website. Die rechtliche Erklärung findest du unter Barrierefreiheit.'}</p>
+    <p class="a11y-lead">
+      {
+        'Praktische Darstellungshilfen für diese Website. Die Einstellungen gelten lokal auf diesem Gerät und ersetzen keine vollständige Barrierefreiheitsprüfung.'
+      }
+    </p>
 
     <section class="a11y-section" aria-labelledby="a11y-font-label">
       <h3 class="a11y-label" id="a11y-font-label">{'Schriftgröße'}</h3>
-      <div class="a11y-font" role="radiogroup" aria-labelledby="a11y-font-label">
-        <button type="button" class="a11y-font-btn" data-a11y-font="sm" aria-pressed="false" title={'Schrift verkleinern'}>
-          <span aria-hidden="true">A−</span>
-          <span class="sr-only">{'Schrift verkleinern'}</span>
+      <div class="a11y-seg a11y-seg-4" role="radiogroup" aria-labelledby="a11y-font-label">
+        <button type="button" class="a11y-seg-btn" data-a11y-font="sm" aria-pressed="false">
+          {'Klein'}
         </button>
-        <button type="button" class="a11y-font-btn" data-a11y-font="md" aria-pressed="true" title={'Standard-Schriftgröße'}>
-          <span aria-hidden="true">A</span>
-          <span class="sr-only">{'Standard-Schriftgröße'}</span>
+        <button type="button" class="a11y-seg-btn" data-a11y-font="md" aria-pressed="true">
+          {'Normal'}
         </button>
-        <button type="button" class="a11y-font-btn" data-a11y-font="lg" aria-pressed="false" title={'Schrift vergrößern'}>
-          <span aria-hidden="true">A+</span>
-          <span class="sr-only">{'Schrift vergrößern'}</span>
+        <button type="button" class="a11y-seg-btn" data-a11y-font="lg" aria-pressed="false">
+          {'Groß'}
+        </button>
+        <button type="button" class="a11y-seg-btn" data-a11y-font="xl" aria-pressed="false">
+          {'Sehr groß'}
         </button>
       </div>
     </section>
 
-    <section class="a11y-section" aria-labelledby="a11y-opts-label">
-      <h3 class="a11y-label" id="a11y-opts-label">{'Darstellung'}</h3>
-      <ul class="a11y-list">
-        <li>
-          <button type="button" class="a11y-opt" data-a11y-toggle="contrast" aria-pressed="false">
-            <span class="a11y-opt-text">{'Kontrast erhöhen'}</span>
-            <span class="a11y-switch" aria-hidden="true"></span>
-          </button>
-        </li>
-        <li>
-          <button type="button" class="a11y-opt" data-a11y-toggle="reduceMotion" aria-pressed="false">
-            <span class="a11y-opt-text">{'Animationen reduzieren'}</span>
-            <span class="a11y-switch" aria-hidden="true"></span>
-          </button>
-        </li>
-        <li>
-          <button type="button" class="a11y-opt" data-a11y-toggle="readable" aria-pressed="false">
-            <span class="a11y-opt-text">{'Lesefreundliche Darstellung'}</span>
-            <span class="a11y-switch" aria-hidden="true"></span>
-          </button>
-        </li>
-        <li>
-          <button type="button" class="a11y-opt" data-a11y-toggle="links" aria-pressed="false">
-            <span class="a11y-opt-text">{'Links hervorheben'}</span>
-            <span class="a11y-switch" aria-hidden="true"></span>
-          </button>
-        </li>
-      </ul>
+    <section class="a11y-section" aria-labelledby="a11y-contrast-label">
+      <h3 class="a11y-label" id="a11y-contrast-label">{'Kontrast'}</h3>
+      <div class="a11y-seg" role="radiogroup" aria-labelledby="a11y-contrast-label">
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="contrast" data-a11y-value="off" aria-pressed="true">
+          {'Standard'}
+        </button>
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="contrast" data-a11y-value="on" aria-pressed="false">
+          {'Hoher Kontrast'}
+        </button>
+      </div>
     </section>
 
+    <section class="a11y-section" aria-labelledby="a11y-motion-label">
+      <h3 class="a11y-label" id="a11y-motion-label">{'Animationen'}</h3>
+      <div class="a11y-seg" role="radiogroup" aria-labelledby="a11y-motion-label">
+        <button
+          type="button"
+          class="a11y-seg-btn"
+          data-a11y-choice="reduceMotion"
+          data-a11y-value="off"
+          aria-pressed="true"
+        >
+          {'Standard'}
+        </button>
+        <button
+          type="button"
+          class="a11y-seg-btn"
+          data-a11y-choice="reduceMotion"
+          data-a11y-value="on"
+          aria-pressed="false"
+        >
+          {'Reduziert'}
+        </button>
+      </div>
+    </section>
+
+    <section class="a11y-section" aria-labelledby="a11y-links-label">
+      <h3 class="a11y-label" id="a11y-links-label">{'Links hervorheben'}</h3>
+      <div class="a11y-seg" role="radiogroup" aria-labelledby="a11y-links-label">
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="links" data-a11y-value="off" aria-pressed="true">
+          {'Aus'}
+        </button>
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="links" data-a11y-value="on" aria-pressed="false">
+          {'Ein'}
+        </button>
+      </div>
+    </section>
+
+    <section class="a11y-section" aria-labelledby="a11y-readable-label">
+      <h3 class="a11y-label" id="a11y-readable-label">{'Lesefreundliche Darstellung'}</h3>
+      <div class="a11y-seg" role="radiogroup" aria-labelledby="a11y-readable-label">
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="readable" data-a11y-value="off" aria-pressed="true">
+          {'Aus'}
+        </button>
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="readable" data-a11y-value="on" aria-pressed="false">
+          {'Ein'}
+        </button>
+      </div>
+    </section>
+
+    <section class="a11y-section" aria-labelledby="a11y-focus-label">
+      <h3 class="a11y-label" id="a11y-focus-label">{'Tastatur-Fokus hervorheben'}</h3>
+      <div class="a11y-seg" role="radiogroup" aria-labelledby="a11y-focus-label">
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="focus" data-a11y-value="off" aria-pressed="true">
+          {'Standard'}
+        </button>
+        <button type="button" class="a11y-seg-btn" data-a11y-choice="focus" data-a11y-value="on" aria-pressed="false">
+          {'Verstärkt'}
+        </button>
+      </div>
+    </section>
+
+    {/* Legacy toggle hooks kept for tests / sync — visually hidden, driven by segmented controls */}
+    <div class="a11y-legacy" hidden>
+      <button type="button" data-a11y-toggle="contrast" aria-pressed="false">contrast</button>
+      <button type="button" data-a11y-toggle="reduceMotion" aria-pressed="false">reduceMotion</button>
+      <button type="button" data-a11y-toggle="readable" aria-pressed="false">readable</button>
+      <button type="button" data-a11y-toggle="links" aria-pressed="false">links</button>
+      <button type="button" data-a11y-toggle="focus" aria-pressed="false">focus</button>
+    </div>
+
     <div class="a11y-actions">
-      <button type="button" class="a11y-reset" data-a11y-reset>{'Zurücksetzen'}</button>
+      <button type="button" class="a11y-reset" data-a11y-reset>{'Einstellungen zurücksetzen'}</button>
       {
         !embedded && (
           <a class="a11y-statement" href={url('/barrierefreiheit/')}>
@@ -95,7 +150,7 @@ const embedded = Astro.props.embedded ?? true;
     background: transparent;
     box-shadow: none;
     padding: 0;
-    gap: 0.85rem;
+    gap: 0.75rem;
     display: grid;
   }
 
@@ -122,145 +177,77 @@ const embedded = Astro.props.embedded ?? true;
 
   .a11y-lead {
     margin: 0;
-    font-size: 0.86rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     line-height: 1.45;
   }
 
   .a11y-section {
     display: grid;
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
 
   .a11y-label {
     margin: 0;
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     font-weight: 750;
     color: var(--slate);
   }
 
-  .a11y-font {
+  .a11y-seg {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.35rem;
-    padding: 0.3rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem;
+    padding: 0.28rem;
     border: 1px solid var(--line);
-    border-radius: 0.85rem;
+    border-radius: 0.75rem;
     background: var(--sand);
   }
 
-  .a11y-font-btn {
-    min-height: 2.75rem;
+  .a11y-seg-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .a11y-seg-btn {
+    min-height: 2.45rem;
+    padding: 0.35rem 0.3rem;
     border: 0;
-    border-radius: 0.65rem;
+    border-radius: 0.55rem;
     background: transparent;
     color: var(--text);
     font: inherit;
-    font-weight: 800;
+    font-size: 0.78rem;
+    font-weight: 750;
     cursor: pointer;
   }
 
-  .a11y-font-btn[data-a11y-font='sm'] {
-    font-size: 0.85rem;
-  }
-  .a11y-font-btn[data-a11y-font='md'] {
-    font-size: 1rem;
-  }
-  .a11y-font-btn[data-a11y-font='lg'] {
-    font-size: 1.2rem;
-  }
-
-  .a11y-font-btn[aria-pressed='true'] {
+  .a11y-seg-btn[aria-pressed='true'] {
     background: #fff;
     color: var(--brand-ink);
     box-shadow: var(--shadow-sm);
   }
 
-  .a11y-font-btn:focus-visible,
-  .a11y-opt:focus-visible,
+  .a11y-seg-btn:focus-visible,
   .a11y-reset:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
 
-  .a11y-list {
-    display: grid;
-    gap: 0.35rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .a11y-opt {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    width: 100%;
-    min-height: 2.85rem;
-    padding: 0.55rem 0.75rem;
-    border: 1px solid var(--line);
-    border-radius: 0.75rem;
-    background: #fff;
-    color: var(--text);
-    font: inherit;
-    font-size: 0.9rem;
-    font-weight: 650;
-    text-align: left;
-    cursor: pointer;
-  }
-
-  .a11y-switch {
-    position: relative;
-    flex: none;
-    width: 2.55rem;
-    height: 1.45rem;
-    border-radius: var(--radius-pill);
-    background: var(--sand-strong);
-  }
-
-  .a11y-switch::after {
-    content: '';
-    position: absolute;
-    top: 0.15rem;
-    left: 0.15rem;
-    width: 1.15rem;
-    height: 1.15rem;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: var(--shadow-sm);
-    transition: transform var(--dur) var(--ease);
-  }
-
-  .a11y-opt[aria-pressed='true'] {
-    border-color: color-mix(in srgb, var(--brand) 55%, var(--line));
-    background: var(--brand-soft);
-    color: var(--brand-ink);
-  }
-
-  .a11y-opt[aria-pressed='true'] .a11y-switch {
-    background: var(--forest);
-  }
-
-  .a11y-opt[aria-pressed='true'] .a11y-switch::after {
-    transform: translateX(1.1rem);
-  }
-
   .a11y-actions {
     display: grid;
     gap: 0.55rem;
-    margin-top: 0.15rem;
+    margin-top: 0.1rem;
   }
 
   .a11y-reset {
     width: 100%;
-    min-height: 2.75rem;
+    min-height: 2.65rem;
     border: 1px solid var(--line-strong);
     border-radius: 0.75rem;
     background: var(--sand);
     color: var(--graphite);
     font: inherit;
-    font-size: 0.9rem;
+    font-size: 0.86rem;
     font-weight: 700;
     cursor: pointer;
   }
@@ -271,6 +258,12 @@ const embedded = Astro.props.embedded ?? true;
     font-weight: 650;
     color: var(--brand-ink);
   }
+
+  @media (max-width: 22em) {
+    .a11y-seg-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 </style>
 
 <style is:global>
@@ -279,6 +272,9 @@ const embedded = Astro.props.embedded ?? true;
   }
   html.a11y-font-lg {
     font-size: 118.75%;
+  }
+  html.a11y-font-xl {
+    font-size: 137.5%;
   }
 
   html.a11y-contrast {
@@ -309,6 +305,12 @@ const embedded = Astro.props.embedded ?? true;
     color: var(--text);
   }
 
+  html.a11y-contrast img,
+  html.a11y-contrast video,
+  html.a11y-contrast svg:not(.companion-fab-svg):not(.icon) {
+    filter: none;
+  }
+
   html.a11y-reduce-motion *,
   html.a11y-reduce-motion *::before,
   html.a11y-reduce-motion *::after {
@@ -334,6 +336,10 @@ const embedded = Astro.props.embedded ?? true;
     max-width: 42rem;
   }
 
+  html.a11y-readable p + p {
+    margin-top: 1.1em;
+  }
+
   html.a11y-links a:not(.btn):not(.companion-fab):not([class*='chip']) {
     text-decoration: underline;
     text-decoration-thickness: 2px;
@@ -344,14 +350,31 @@ const embedded = Astro.props.embedded ?? true;
   html.a11y-links a:not(.btn):visited {
     text-decoration-style: double;
   }
+
+  html.a11y-focus-strong :focus-visible {
+    outline: 3px solid var(--focus) !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--focus) 28%, transparent) !important;
+  }
+
+  html.a11y-focus-strong a:focus-visible,
+  html.a11y-focus-strong button:focus-visible,
+  html.a11y-focus-strong input:focus-visible,
+  html.a11y-focus-strong textarea:focus-visible,
+  html.a11y-focus-strong select:focus-visible,
+  html.a11y-focus-strong summary:focus-visible,
+  html.a11y-focus-strong [tabindex]:focus-visible {
+    outline: 3px solid var(--focus) !important;
+    outline-offset: 3px !important;
+  }
 </style>
 
 <script>
   const KEY = 'cco:a11y';
   const LEGACY = 'cco-a11y';
-  const TOGGLES = ['contrast', 'reduceMotion', 'readable', 'links'] as const;
+  const TOGGLES = ['contrast', 'reduceMotion', 'readable', 'links', 'focus'] as const;
   type Toggle = (typeof TOGGLES)[number];
-  type FontSize = 'sm' | 'md' | 'lg';
+  type FontSize = 'sm' | 'md' | 'lg' | 'xl';
 
   type Prefs = {
     font: FontSize;
@@ -359,6 +382,7 @@ const embedded = Astro.props.embedded ?? true;
     reduceMotion: boolean;
     readable: boolean;
     links: boolean;
+    focus: boolean;
   };
 
   const defaults = (): Prefs => ({
@@ -367,12 +391,23 @@ const embedded = Astro.props.embedded ?? true;
     reduceMotion: false,
     readable: false,
     links: false,
+    focus: false,
   });
 
   function read(): Prefs {
     try {
       const raw = localStorage.getItem(KEY) || localStorage.getItem(LEGACY);
-      if (!raw) return defaults();
+      if (!raw) {
+        const base = defaults();
+        try {
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            base.reduceMotion = true;
+          }
+        } catch {
+          /* ignore */
+        }
+        return base;
+      }
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
         return {
@@ -381,16 +416,19 @@ const embedded = Astro.props.embedded ?? true;
           reduceMotion: parsed.includes('reduce-motion'),
           readable: parsed.includes('readable'),
           links: parsed.includes('links'),
+          focus: parsed.includes('focus'),
         };
       }
       if (parsed && typeof parsed === 'object') {
-        const font: FontSize = parsed.font === 'sm' || parsed.font === 'lg' ? parsed.font : 'md';
+        const font: FontSize =
+          parsed.font === 'sm' || parsed.font === 'lg' || parsed.font === 'xl' ? parsed.font : 'md';
         return {
           font,
           contrast: !!parsed.contrast,
           reduceMotion: !!parsed.reduceMotion,
           readable: !!parsed.readable,
           links: !!parsed.links,
+          focus: !!parsed.focus,
         };
       }
     } catch {
@@ -412,15 +450,25 @@ const embedded = Astro.props.embedded ?? true;
     const html = document.documentElement;
     html.classList.toggle('a11y-font-sm', prefs.font === 'sm');
     html.classList.toggle('a11y-font-lg', prefs.font === 'lg');
+    html.classList.toggle('a11y-font-xl', prefs.font === 'xl');
     html.dataset.a11yFont = prefs.font;
     html.classList.toggle('a11y-contrast', prefs.contrast);
     html.classList.toggle('a11y-reduce-motion', prefs.reduceMotion);
     html.classList.toggle('a11y-readable', prefs.readable);
     html.classList.toggle('a11y-links', prefs.links);
+    html.classList.toggle('a11y-focus-strong', prefs.focus);
 
     root?.querySelectorAll<HTMLButtonElement>('[data-a11y-font]').forEach((btn) => {
       btn.setAttribute('aria-pressed', String(btn.dataset.a11yFont === prefs.font));
     });
+
+    root?.querySelectorAll<HTMLButtonElement>('[data-a11y-choice]').forEach((btn) => {
+      const key = btn.dataset.a11yChoice as Toggle;
+      const wantOn = btn.dataset.a11yValue === 'on';
+      const isOn = !!prefs[key];
+      btn.setAttribute('aria-pressed', String(wantOn === isOn));
+    });
+
     root?.querySelectorAll<HTMLButtonElement>('[data-a11y-toggle]').forEach((btn) => {
       const key = btn.dataset.a11yToggle as Toggle;
       btn.setAttribute('aria-pressed', String(!!prefs[key]));
@@ -434,6 +482,16 @@ const embedded = Astro.props.embedded ?? true;
     root.querySelectorAll<HTMLButtonElement>('[data-a11y-font]').forEach((btn) => {
       btn.addEventListener('click', () => {
         prefs = { ...prefs, font: (btn.dataset.a11yFont as FontSize) || 'md' };
+        write(prefs);
+        apply(prefs, root);
+      });
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-a11y-choice]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.a11yChoice as Toggle;
+        if (!TOGGLES.includes(key)) return;
+        prefs = { ...prefs, [key]: btn.dataset.a11yValue === 'on' };
         write(prefs);
         apply(prefs, root);
       });

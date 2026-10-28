@@ -1030,9 +1030,20 @@ import { url } from '@/lib/url';
     };
 
     close?.addEventListener('click', () => setOpen(false));
-    window.addEventListener('cco:open-chat', () => {
+    /* Primary chat UX lives in CampingCompanion; keep panel for manuals / legacy deep-open */
+    window.addEventListener('cco:open-chat', ((ev: CustomEvent<{ embed?: boolean; manuals?: boolean }>) => {
+      if (ev.detail?.manuals || ev.detail?.embed === false) {
+        void loadAssist();
+        setOpen(true);
+        if (ev.detail?.manuals) setTab('manuals');
+        return;
+      }
+      window.dispatchEvent(new CustomEvent('cco:open-companion', { detail: { tab: 'chat' } }));
+    }) as EventListener);
+    window.addEventListener('cco:open-chat-manuals', () => {
       void loadAssist();
       setOpen(true);
+      setTab('manuals');
     });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && root.classList.contains('is-open')) setOpen(false);

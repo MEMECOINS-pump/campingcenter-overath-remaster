@@ -31,20 +31,23 @@ try{
   if(a11yRaw){
     var a=JSON.parse(a11yRaw);
     if(a&&typeof a==='object'&&!Array.isArray(a)){
-      var font=a.font==='sm'||a.font==='lg'?a.font:'md';
+      var font=a.font==='sm'||a.font==='lg'||a.font==='xl'?a.font:'md';
       html.dataset.a11yFont=font;
       html.classList.toggle('a11y-font-sm',font==='sm');
       html.classList.toggle('a11y-font-lg',font==='lg');
+      html.classList.toggle('a11y-font-xl',font==='xl');
       if(a.contrast)html.classList.add('a11y-contrast');
       if(a.reduceMotion)html.classList.add('a11y-reduce-motion');
       if(a.readable)html.classList.add('a11y-readable');
       if(a.links)html.classList.add('a11y-links');
+      if(a.focus)html.classList.add('a11y-focus-strong');
     }else if(Array.isArray(a)){
       if(a.indexOf('text-lg')>=0){html.classList.add('a11y-font-lg');html.dataset.a11yFont='lg';}
       if(a.indexOf('contrast')>=0)html.classList.add('a11y-contrast');
       if(a.indexOf('reduce-motion')>=0)html.classList.add('a11y-reduce-motion');
       if(a.indexOf('readable')>=0)html.classList.add('a11y-readable');
       if(a.indexOf('links')>=0)html.classList.add('a11y-links');
+      if(a.indexOf('focus')>=0)html.classList.add('a11y-focus-strong');
     }
   }
 }catch(e){}
