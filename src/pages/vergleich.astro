@@ -4,6 +4,7 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { priceLabel, specRows, vehicleImage, vehicles } from '@/lib/vehicles';
 import { breadcrumbSchema } from '@/lib/schema';
+import { COMPARE_MAX } from '@/lib/collections';
 import { url } from '@/lib/url';
 
 const crumbs = [{ label: 'Vergleich', href: '/vergleich/' }];
@@ -29,7 +30,7 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
 
 <BaseLayout
   title="Wohnmobile vergleichen"
-  description="Bis zu drei Wohnmobile aus dem Bestand des Campingcenter Overath direkt nebeneinander vergleichen – Preis, Maße, Gewicht und Technik."
+  description={`Bis zu ${COMPARE_MAX} Wohnmobile aus dem Bestand des Campingcenter Overath direkt nebeneinander vergleichen – Preis, Maße, Gewicht und Technik.`}
   noindex
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
@@ -38,7 +39,7 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Vergleich</p>
       <h1>Fahrzeuge vergleichen</h1>
-      <p class="lead">Bis zu drei Fahrzeuge nebeneinander – so siehst du auf einen Blick, was sie unterscheidet.</p>
+      <p class="lead">Bis zu {COMPARE_MAX} Fahrzeuge nebeneinander – so siehst du auf einen Blick, was sie unterscheidet.</p>
     </div>
   </section>
 
@@ -47,7 +48,7 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
       <div class="cmp-empty card card-pad" data-cmp-empty>
         <span class="cmp-empty-icon"><Icon name="compare" /></span>
         <h2 data-cmp-empty-title>Noch keine Fahrzeuge im Vergleich.</h2>
-        <p class="muted">Tippe in der Fahrzeugübersicht bei zwei oder drei Fahrzeugen auf „Vergleichen“.</p>
+        <p class="muted">Tippe in der Fahrzeugübersicht bei zwei bis {COMPARE_MAX} Fahrzeugen auf „Vergleichen“.</p>
         <div class="btn-row">
           <a class="btn" href={url('/wohnmobile/')}>Fahrzeuge auswählen <Icon name="arrow-right" class="arrow" /></a>
           <a class="btn btn-ghost" href={url('/merkliste/')}>Zur Merkliste</a>

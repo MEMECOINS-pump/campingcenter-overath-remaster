@@ -75,7 +75,7 @@ const questions = [
   {
     name: 'lengthMax',
     title: 'Wie lang darf dein Fahrzeug maximal sein?',
-    hint: 'Filtert nach normalisierter Fahrzeuglänge in mm.',
+    hint: 'Wir vergleichen mit der angegebenen Fahrzeuglänge.',
     options: [
       { value: '6', label: 'Bis 6 m', text: '' },
       { value: '6.5', label: 'Bis 6,5 m', text: '' },
@@ -120,8 +120,11 @@ const questions = [
       <p class="eyebrow">Mein perfekter Camper</p>
       <h1>Welcher Camper passt zu dir?</h1>
       <p class="lead">
-        Erzähl uns, wie du reisen möchtest – wir finden passende Fahrzeuge aus unserem aktuellen Bestand. Empfehlungen
-        nutzen nur verifizierte Angaben; fehlende Specs werden nicht erraten.
+        <span class="finder-lead-short">Erzähl uns, wie du reisen möchtest – wir finden passende Fahrzeuge aus dem aktuellen Bestand.</span>
+        <span class="finder-lead-full">
+          Erzähl uns, wie du reisen möchtest – wir finden passende Fahrzeuge aus unserem aktuellen Bestand. Empfehlungen
+          nutzen nur verifizierte Angaben; fehlende technische Daten werden nicht erraten.
+        </span>
       </p>
     </div>
   </section>
@@ -200,7 +203,7 @@ const questions = [
       </div>
 
       <form class="finder-lead card card-pad" data-finder-lead hidden>
-        <h3>Persönliche Beratung anfragen</h3>
+        <h2>Persönliche Beratung anfragen</h2>
         <p class="muted">Wir speichern deine Antworten und Empfehlungen sicher und werten sie für unser Team aus.</p>
         <div class="form-stack">
           <Field name="name" label="Name" required autocomplete="name" />
@@ -221,6 +224,52 @@ const questions = [
 <style>
   .finder-hero h1 {
     max-width: 16ch;
+  }
+
+  .finder-lead-short {
+    display: none;
+  }
+
+  @media (max-height: 740px) {
+    .finder-lead-full {
+      display: none;
+    }
+
+    .finder-lead-short {
+      display: inline;
+    }
+
+    .finder-options {
+      padding-right: calc(var(--companion-fab-h) + 0.85rem);
+    }
+  }
+
+  @media (max-width: 63.99em) {
+    .finder-hero {
+      padding-block: 0.85rem 0.35rem;
+    }
+
+    .finder-hero h1 {
+      font-size: clamp(1.7rem, 1.2rem + 2vw, 2.4rem);
+    }
+
+    .finder-hero .lead {
+      margin-top: 0.55rem;
+      font-size: var(--fs-sm);
+      line-height: 1.45;
+    }
+
+    .finder-q legend {
+      font-size: 1.45rem;
+    }
+
+    .finder-q.is-active {
+      scroll-margin-bottom: calc(var(--actionbar-h) + var(--companion-fab-h) + 1rem);
+    }
+
+    .finder-options {
+      padding-bottom: 0.25rem;
+    }
   }
 
   .finder {
@@ -316,13 +365,10 @@ const questions = [
   }
 
   .finder-nav {
-    position: sticky;
-    bottom: 0.75rem;
     display: flex;
     gap: 0.75rem;
     justify-content: space-between;
-    padding-top: 0.5rem;
-    background: linear-gradient(to top, var(--bg), rgb(from var(--bg) r g b / 0.85) 70%, transparent);
+    padding-top: 0.35rem;
   }
 
   .finder-next {
@@ -370,6 +416,10 @@ const questions = [
 
   .finder-lead {
     margin-top: 2.5rem;
+  }
+
+  .finder-lead h2 {
+    font-size: var(--fs-xl);
   }
 
   .finder-empty {

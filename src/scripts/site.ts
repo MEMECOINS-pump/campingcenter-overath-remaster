@@ -393,6 +393,23 @@ function initOpeningSheet(): void {
   });
 }
 
+/** Screen-reader hint for links that leave the site, without changing the visible label. */
+function annotateExternalLinks(): void {
+  for (const a of $$<HTMLAnchorElement>('a[target="_blank"]')) {
+    if (a.dataset.extNoted === '1') continue;
+    const label = `${a.getAttribute('aria-label') ?? ''} ${a.textContent ?? ''}`;
+    if (/neuen tab/i.test(label)) {
+      a.dataset.extNoted = '1';
+      continue;
+    }
+    const note = document.createElement('span');
+    note.className = 'sr-only';
+    note.textContent = ' (öffnet in neuem Tab)';
+    a.append(note);
+    a.dataset.extNoted = '1';
+  }
+}
+
 function bootPageUi(): void {
   initHeader();
   initMenu();
@@ -400,6 +417,7 @@ function bootPageUi(): void {
   initOpeningSheet();
   initHeaderTheme();
   initCompanion();
+  annotateExternalLinks();
   refreshOpenStatus();
   const html = document.documentElement;
   const n = html.dataset.ccoFavCount;

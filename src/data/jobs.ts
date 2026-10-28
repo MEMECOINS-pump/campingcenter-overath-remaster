@@ -68,7 +68,7 @@ export const jobs: Job[] = [
       'Als Reinigungskraft sorgst du dafür, dass sich unser Team und unsere Kunden in sauberen und gepflegten Räumen wohlfühlen. Ob Büros, Aufenthaltsräume oder Sanitäranlagen – mit deinem Einsatz machst du den Unterschied!',
     tasks: [
       'Reinigung der Verkaufshalle, WC und Aufenthaltsraum',
-      'Reinigung unserer Vermietflotte sowie von Neu- und Gebrauchtreisemobilen und Wohnwagen',
+      'Reinigung unserer Vermietflotte sowie von neuen und gebrauchten Reisemobilen und Wohnwagen',
     ],
     requirements: [
       'Eigenverantwortliches und lösungsorientiertes Arbeiten',

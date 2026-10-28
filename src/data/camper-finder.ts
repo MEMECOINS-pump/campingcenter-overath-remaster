@@ -121,7 +121,7 @@ const QUESTIONS: QRow[] = [
     de: {
       name: 'lengthMax',
       title: 'Wie lang darf dein Fahrzeug maximal sein?',
-      hint: 'Filtert nach normalisierter Fahrzeuglänge in mm.',
+      hint: 'Wir vergleichen mit der angegebenen Fahrzeuglänge.',
       options: [
         { value: '6', label: 'Bis 6 m', text: '' },
         { value: '6.5', label: 'Bis 6,5 m', text: '' },
