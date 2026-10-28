@@ -25,7 +25,6 @@ const ogImage = image
   : absoluteUrl('/og-default.jpg', Astro.site);
 ---
 
-<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
@@ -50,6 +49,10 @@ const ogImage = image
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:alt" content={imageAlt ?? 'Wohnmobil bei Sonnenuntergang am Meer – Campingcenter Overath'} />
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={imageAlt ?? 'Wohnmobil bei Sonnenuntergang am Meer – Campingcenter Overath'} />
 
 <Font cssVariable="--font-sans" preload />
 <Font cssVariable="--font-display" preload />

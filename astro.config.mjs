@@ -78,7 +78,9 @@ export default defineConfig({
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self' https://formspree.io mailto:",
-        'upgrade-insecure-requests',
+        // Not set: on an http preview WebKit upgrades every script to https and
+        // then fails the TLS handshake, so the site never boots. The public site
+        // is already https, and browsers block mixed active content there.
       ],
       // JS sets CSS vars for progress bars / chat resize / compare cols.
       // Keep hashed style-src for <style> elements; allow only style attributes.

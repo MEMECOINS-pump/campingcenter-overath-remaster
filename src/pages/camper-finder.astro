@@ -133,7 +133,7 @@ const questions = [
     <div class="container container-narrow">
       <form class="finder" data-finder novalidate>
         <div class="finder-progress" data-finder-progress>
-          <p><span data-finder-step>1 von {questions.length}</span></p>
+          <p><span data-finder-step aria-live="polite">1 von {questions.length}</span></p>
           <div class="finder-bar" aria-hidden="true"><span data-finder-bar></span></div>
         </div>
 
@@ -204,7 +204,7 @@ const questions = [
 
       <form class="finder-lead card card-pad" data-finder-lead hidden>
         <h2>Persönliche Beratung anfragen</h2>
-        <p class="muted">Wir speichern deine Antworten und Empfehlungen sicher und werten sie für unser Team aus.</p>
+        <p class="muted">Deine Antworten und die empfohlenen Fahrzeuge gehen an unser Team, damit wir dich passend beraten können.</p>
         <div class="form-stack">
           <Field name="name" label="Name" required autocomplete="name" />
           <Field name="email" label="E-Mail-Adresse" type="email" required autocomplete="email" />
