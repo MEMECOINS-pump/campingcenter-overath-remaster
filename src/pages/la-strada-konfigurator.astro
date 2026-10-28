@@ -1,4 +1,5 @@
 ﻿---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Field from '@/components/forms/Field.astro';
@@ -37,7 +38,8 @@ const configuratorUrl = 'https://konfigurator.lastrada-mobile.de/konfigurator';
     <a class="btn btn-light btn-lg" href="#anfrage">Persönliches Angebot anfragen</a>
   </PageHero>
 
-  <section class="section" aria-labelledby="ls-embed">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ls-embed">
+    <Atmosphere src="atmo-meadow" focus="center" />
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Offizieller Konfigurator</p>

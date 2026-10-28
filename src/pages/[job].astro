@@ -1,5 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -33,7 +34,8 @@ const sections = [
   inquiryLabel="Bewerben"
   jsonLd={[breadcrumbSchema(crumbs, Astro.site), jobSchema(job, Astro.site)]}
 >
-  <header class="page-hero jd-hero">
+  <header class="page-hero atmo jd-hero" data-header-theme="dark">
+    <Atmosphere src="atmo-meadow" focus="left" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">{job.employment}</p>

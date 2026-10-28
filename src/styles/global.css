@@ -1493,6 +1493,146 @@ body:has(.chatw.is-open) .ctray {
   padding-block: clamp(2.25rem, 1.5rem + 3vw, 4.5rem) clamp(2rem, 1.5rem + 2vw, 3.5rem);
 }
 
+/* Photo bands replace large flat ivory/paper areas. Text stays on a dark scrim (WCAG AA). */
+.atmo {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  background: #2a2622;
+  overflow: clip;
+}
+
+.atmo-media,
+.atmo-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.atmo-media picture,
+.atmo-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.atmo-media img {
+  object-fit: cover;
+}
+
+.atmo-media.focus-left img {
+  object-position: 20% 50%;
+}
+
+.atmo-media.focus-right img {
+  object-position: 80% 50%;
+}
+
+.atmo-media.focus-top img {
+  object-position: 50% 20%;
+}
+
+.atmo-media.focus-bottom img {
+  object-position: 50% 80%;
+}
+
+.atmo-shade {
+  background:
+    linear-gradient(180deg, rgb(14 12 10 / 0.8) 0%, rgb(14 12 10 / 0.68) 46%, rgb(14 12 10 / 0.82) 100%),
+    linear-gradient(90deg, rgb(14 12 10 / 0.5), transparent 72%);
+}
+
+.atmo > :not(.atmo-media):not(.atmo-shade) {
+  position: relative;
+  z-index: 1;
+}
+
+.atmo .eyebrow,
+.atmo :is(h1, h2, h3) {
+  color: #fff;
+  text-shadow: 0 1px 18px rgb(0 0 0 / 0.35);
+}
+
+.atmo .eyebrow {
+  color: #ffd9a3;
+}
+
+.atmo .lead,
+.atmo .muted,
+.atmo .small {
+  color: rgb(255 255 255 / 0.92);
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.28);
+}
+
+.atmo .crumbs,
+.atmo .crumbs a,
+.atmo .crumbs [aria-current] {
+  color: rgb(255 255 255 / 0.9);
+}
+
+.atmo .btn-ghost {
+  --btn-fg: #fff;
+  --btn-border: rgb(255 255 255 / 0.5);
+}
+
+.atmo .btn-ghost:hover {
+  --btn-bg: rgb(255 255 255 / 0.12);
+  --btn-border: #fff;
+}
+
+/* Cards, logos and form controls keep dark text on a light surface. */
+.atmo :is(.vcard, .card, .faq-item, .quick-card, .fpanel, .brand-link, .trust li, .jb-benefits li, .rt-steps li, .finder-why, .type, .ws-jump a, .mk-partners a, .partner, .input, .select, .textarea) {
+  color: var(--text);
+  text-shadow: none;
+}
+
+.atmo :is(.card, .vcard, .faq-item, .quick-card, .trust li, .brand-link, .rt-steps li, .finder-why, .jb-benefits li, .type) :is(h1, h2, h3, p, li, strong, small, a, summary) {
+  color: var(--text);
+  text-shadow: none;
+}
+
+.atmo :is(.card, .vcard, .faq-item, .quick-card) .btn {
+  color: var(--btn-fg);
+}
+
+.atmo :is(.card, .vcard, .faq-item, .rt-steps li, .finder-why) :is(.muted, .small) {
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+.atmo :is(.card, .vcard, .faq-item, .quick-card) .eyebrow {
+  color: var(--brand-ink);
+  text-shadow: none;
+}
+
+.atmo .faq {
+  border: 0;
+  gap: 0.45rem;
+}
+
+.atmo .faq-item {
+  background: rgb(250 248 244 / 0.96);
+  border-radius: var(--radius);
+  padding-inline: 0.85rem;
+  margin-bottom: 0.45rem;
+}
+
+.atmo .faq-item :is(summary, p, h3) {
+  color: var(--text);
+  text-shadow: none;
+}
+
+.atmo :is(.card, .vcard, .faq-item, .quick-card) .btn-ghost {
+  --btn-fg: var(--text);
+  --btn-border: var(--line-strong);
+}
+
+.atmo :is(.card, .vcard, .faq-item, .quick-card) .btn-ghost:hover {
+  --btn-bg: var(--white);
+  --btn-border: var(--graphite);
+}
+
 .page-hero h1 {
   max-width: 20ch;
   margin-top: var(--space-3);
@@ -1571,6 +1711,11 @@ body:has(.chatw.is-open) .ctray {
 .crumbs a:hover {
   text-decoration: underline;
   color: var(--text);
+}
+
+.atmo .crumbs a:hover,
+.atmo .crumbs [aria-current] {
+  color: #fff;
 }
 
 .crumbs [aria-current] {

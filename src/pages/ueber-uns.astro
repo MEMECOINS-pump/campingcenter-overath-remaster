@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -30,7 +31,8 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     focus="top"
   />
 
-  <section class="section" aria-labelledby="ab-story">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-story">
+    <Atmosphere src="atmo-lake" focus="center" />
     <div class="container split ab-story">
       <div class="ab-intro">
         <p class="eyebrow">Unsere Geschichte</p>
@@ -52,7 +54,8 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
 
   <Journey />
 
-  <section class="section" aria-labelledby="ab-videos">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-videos">
+    <Atmosphere src="atmo-meadow" focus="center" />
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Filme</p>
@@ -109,7 +112,7 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
   }
 
   .ab-stat span {
-    color: var(--text-muted);
+    color: rgb(255 255 255 / 0.88);
   }
 
   .ab-body {

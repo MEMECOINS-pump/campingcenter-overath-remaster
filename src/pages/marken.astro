@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -28,7 +29,8 @@ const inStock = (make?: string) => (make ? vehicles.filter((v) => v.make === mak
     imageAlt="Challenger Wohnmobil auf einer Brücke"
   />
 
-  <section class="section" aria-labelledby="mk-brands">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="mk-brands">
+    <Atmosphere src="atmo-lake" focus="left" />
     <div class="container">
       <h2 id="mk-brands" class="sr-only">Unsere Marken</h2>
       <ul class="mk-list" role="list">
@@ -86,7 +88,8 @@ const inStock = (make?: string) => (make ? vehicles.filter((v) => v.make === mak
     </div>
   </section>
 
-  <section class="section" aria-labelledby="mk-partners">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="mk-partners">
+    <Atmosphere src="atmo-meadow" focus="center" />
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Zubehör & Service</p>

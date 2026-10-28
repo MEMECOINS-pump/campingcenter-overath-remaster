@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import VehicleCard from '@/components/vehicles/VehicleCard.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
@@ -13,7 +14,8 @@ const usedCount = vehicles.filter((v) => v.condition === 'gebraucht').length;
 const newCount = vehicles.length - usedCount;
 ---
 
-<section class="section section-paper featured" aria-labelledby="featured-title">
+<section class="section atmo featured" data-header-theme="dark" aria-labelledby="featured-title">
+  <Atmosphere src="atmo-meadow" focus="center" />
   <div class="container">
     <div class="section-head-row">
       <SectionHeader
@@ -78,7 +80,7 @@ const newCount = vehicles.length - usedCount;
   .featured-note {
     margin-top: 0.75rem;
     font-size: var(--fs-xs);
-    color: var(--text-muted);
+    color: rgb(255 255 255 / 0.86);
   }
 
   @media (min-width: 64em) {

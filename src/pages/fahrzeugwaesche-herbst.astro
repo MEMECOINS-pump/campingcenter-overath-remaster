@@ -1,4 +1,5 @@
 ﻿---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -43,7 +44,8 @@ const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin
     </a>
   </PageHero>
 
-  <section class="section" aria-labelledby="fw-offer">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="fw-offer">
+    <Atmosphere src="atmo-meadow" focus="right" />
     <div class="container fw-grid">
       <div class="card card-pad fw-price">
         <p class="eyebrow">Außenreinigung komplett</p>
@@ -156,7 +158,7 @@ const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin
   .fw-results :global(.icon) {
     flex: none;
     margin-top: 0.15rem;
-    color: var(--brand-ink);
+    color: #ffd9a3;
   }
 
   .fw-photo {

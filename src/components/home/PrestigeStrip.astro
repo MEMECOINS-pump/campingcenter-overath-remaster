@@ -1,5 +1,6 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import { company } from '@/data/company';
 import { vehicles } from '@/lib/vehicles';
 import { url } from '@/lib/url';
@@ -13,7 +14,9 @@ const items = [
 ---
 
 <section class="prestige" aria-label="Warum Campingcenter Overath">
-  <div class="container prestige-inner">
+  <div class="container">
+    <div class="prestige-inner atmo">
+      <Atmosphere src="atmo-lake" focus="center" />
     <p class="prestige-brand">
       <span class="prestige-mark">CCO</span>
       <span class="prestige-name">{company.name}</span>
@@ -35,6 +38,7 @@ const items = [
     <a class="prestige-link" href={url('/ueber-uns/')}>
       Über uns <Icon name="arrow-right" />
     </a>
+    </div>
   </div>
 </section>
 
@@ -49,11 +53,11 @@ const items = [
     display: grid;
     gap: 1.25rem;
     padding: 1.25rem 1.35rem;
-    border: 1px solid var(--line);
+    border: 1px solid rgb(255 255 255 / 0.22);
     border-radius: var(--radius-lg);
-    background: rgb(255 255 255 / 0.92);
+    background: #2a2622;
     box-shadow: var(--shadow-md);
-    backdrop-filter: blur(10px);
+    color: #fff;
   }
   @media (min-width: 64em) {
     .prestige-inner {
@@ -65,12 +69,12 @@ const items = [
   .prestige-brand { display: grid; gap: 0.15rem; margin: 0; }
   .prestige-mark {
     font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em;
-    text-transform: uppercase; color: var(--brand);
+    text-transform: uppercase; color: #ffd9a3;
   }
   .prestige-name {
-    font-family: var(--font-display); font-size: 1.15rem; font-weight: 650; color: var(--ink);
+    font-family: var(--font-display); font-size: 1.15rem; font-weight: 650; color: #fff;
   }
-  .prestige-claim { font-size: 0.9rem; color: var(--muted); }
+  .prestige-claim { font-size: 0.9rem; color: rgb(255 255 255 / 0.88); }
   .prestige-list {
     display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem 1rem;
     margin: 0; padding: 0; list-style: none;
@@ -80,14 +84,14 @@ const items = [
   }
   .prestige-list li { display: flex; gap: 0.55rem; align-items: flex-start; min-width: 0; }
   .prestige-list :global(svg) {
-    width: 1.15rem; height: 1.15rem; flex-shrink: 0; margin-top: 0.15rem; color: var(--brand);
+    width: 1.15rem; height: 1.15rem; flex-shrink: 0; margin-top: 0.15rem; color: #ffd9a3;
   }
-  .prestige-list strong { display: block; font-size: 0.92rem; font-weight: 700; color: var(--ink); }
-  .prestige-list small { display: block; font-size: 0.78rem; color: var(--muted); }
+  .prestige-list strong { display: block; font-size: 0.92rem; font-weight: 700; color: #fff; }
+  .prestige-list small { display: block; font-size: 0.78rem; color: rgb(255 255 255 / 0.82); }
   .prestige-link {
     display: inline-flex; align-items: center; gap: 0.35rem; justify-self: start;
-    font-weight: 700; color: var(--brand-ink); text-decoration: none;
+    font-weight: 700; color: #ffd9a3; text-decoration: none;
   }
-  .prestige-link:hover { color: var(--brand); }
+  .prestige-link:hover { color: #fff; }
   .prestige-link :global(svg) { width: 1rem; height: 1rem; }
 </style>
