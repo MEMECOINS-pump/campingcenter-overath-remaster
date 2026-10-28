@@ -279,5 +279,111 @@ document.addEventListener('visibilitychange',function(){
 armOpenTimer();
 if(document.body)paintChrome();
 else document.addEventListener('DOMContentLoaded',paintChrome);
+
+/* ---- AI Compass emergency controller (runs before deferred modules) ----
+ * Root cause of “works only after refresh”: module site/companion often
+ * arrives after first paint; clicks before init were lost. This inline
+ * path opens/closes the dialog immediately and self-heals overlays.
+ */
+var ccoDbg=false;
+try{ccoDbg=localStorage.getItem('cco:debug-companion')==='1';}catch(e){}
+function ccoLog(){if(!ccoDbg||!window.console)return;try{console.info.apply(console,['[cco-companion]'].concat([].slice.call(arguments)));}catch(e){}}
+function ccoHealChat(){
+  document.querySelectorAll('[data-chat-widget]').forEach(function(chat){
+    if(!chat.classList.contains('is-open')){
+      chat.setAttribute('data-closed','');
+      chat.style.pointerEvents='none';
+      chat.style.visibility='hidden';
+    }
+  });
+}
+function ccoUniqueRoot(){
+  var roots=document.querySelectorAll('[data-companion]');
+  if(!roots.length)return null;
+  for(var i=1;i<roots.length;i++){try{roots[i].remove();}catch(e){}}
+  return roots[0];
+}
+function ccoSetOpen(open,tab){
+  var root=ccoUniqueRoot();
+  if(!root){ccoLog('setOpen: missing root');return false;}
+  ccoHealChat();
+  var panel=root.querySelector('[data-companion-panel]');
+  var btn=root.querySelector('[data-companion-open]');
+  if(!panel||!btn){ccoLog('setOpen: missing panel/btn');return false;}
+  btn.setAttribute('aria-expanded',open?'true':'false');
+  if(open){
+    try{if(!panel.open)panel.showModal();}catch(e){panel.setAttribute('open','');}
+    document.body.classList.add('companion-open');
+    if(tab){
+      root.querySelectorAll('[data-companion-tab]').forEach(function(t){
+        var on=t.getAttribute('data-companion-tab')===tab;
+        t.classList.toggle('is-active',on);
+        t.setAttribute('aria-selected',on?'true':'false');
+      });
+      root.querySelectorAll('[data-companion-view]').forEach(function(v){
+        var on=v.getAttribute('data-companion-view')===tab;
+        v.hidden=!on;
+        v.classList.toggle('is-active',on);
+      });
+    }
+  }else{
+    try{if(panel.open)panel.close();else panel.removeAttribute('open');}catch(e){panel.removeAttribute('open');}
+    document.body.classList.remove('companion-open');
+  }
+  ccoLog(open?'opened':'closed',location.pathname);
+  try{window.dispatchEvent(new CustomEvent('cco:companion-toggle',{detail:{open:!!open,tab:tab||null}}));}catch(e){}
+  return !!(open?panel.open||panel.hasAttribute('open'):!panel.open);
+}
+var ccoRecoverTries=0;
+function ccoRecover(reason){
+  if(ccoRecoverTries>=3){ccoLog('recover exhausted',reason);return false;}
+  ccoRecoverTries++;
+  ccoLog('recover',ccoRecoverTries,reason);
+  ccoHealChat();
+  ccoUniqueRoot();
+  try{if(typeof window.__ccoInitCompanion==='function')window.__ccoInitCompanion();}catch(e){ccoLog('recover init err',e);}
+  return true;
+}
+window.__ccoCompanionSetOpen=ccoSetOpen;
+window.__ccoCompanionHeal=ccoHealChat;
+window.__ccoCompanionRecover=ccoRecover;
+window.__ccoCompanionBoot=true;
+function ccoApplyOpen(open,tab){
+  var fn=window.__ccoCompanionSetOpen||ccoSetOpen;
+  try{return fn(open,tab);}catch(e){ccoLog('applyOpen err',e);return ccoSetOpen(open,tab);}
+}
+if(!window.__ccoCompanionClickBound){
+  window.__ccoCompanionClickBound=true;
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(!t||!t.closest)return;
+    var openBtn=t.closest('[data-companion-open]');
+    if(openBtn){
+      e.preventDefault();
+      e.stopPropagation();
+      var root=openBtn.closest('[data-companion]')||ccoUniqueRoot();
+      if(!root){ccoRecover('no-root-on-click');root=ccoUniqueRoot();}
+      if(!root)return;
+      var panel=root.querySelector('[data-companion-panel]');
+      var wantOpen=!(panel&&(panel.open||panel.hasAttribute('open')));
+      var ok=ccoApplyOpen(wantOpen);
+      if(wantOpen&&!ok){
+        ccoRecover('open-failed');
+        ccoApplyOpen(true);
+      }
+      return;
+    }
+    if(t.closest('[data-companion-close], [data-companion-minimize]')){
+      var r=t.closest('[data-companion]');
+      if(r){e.preventDefault();ccoApplyOpen(false);}
+      return;
+    }
+    var panelEl=t.closest&&t.closest('[data-companion-panel]');
+    if(panelEl&&e.target===panelEl){ccoApplyOpen(false);}
+  },true);
+  document.addEventListener('astro:page-load',function(){ccoHealChat();ccoUniqueRoot();ccoLog('page-load');});
+  document.addEventListener('astro:after-swap',function(){ccoHealChat();ccoUniqueRoot();ccoLog('after-swap');});
+  ccoLog('boot controller ready');
+}
 })();`;
 }

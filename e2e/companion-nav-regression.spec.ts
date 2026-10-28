@@ -49,6 +49,7 @@ test.describe('Companion navigation regression (no refresh)', () => {
 
     const softRoutes = [
       '/wohnmobile/',
+      '/wohnmobil-ankauf/',
       '/kontakt/',
       '/camper-finder/',
       '/werkstatt-kundendienst/',

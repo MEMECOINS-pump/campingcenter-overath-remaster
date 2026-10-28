@@ -49,16 +49,21 @@ describe('CampingCompanion support center', () => {
     expect(companion).toContain('AccessibilityPrefs');
 
     const controller = readFileSync(join(root, 'src/scripts/companion.ts'), 'utf8');
-    expect(controller).toContain('wireDelegation');
+    expect(controller).toContain('wireEnhancements');
     expect(controller).toContain("'click'");
     expect(controller).toContain('uniqueRoot');
     expect(controller).toContain('AI_UNAVAILABLE');
     expect(controller).toContain('export function initCompanion');
+    expect(controller).toContain('healChatOverlays');
+    expect(controller).toContain('recover');
+    expect(controller).toContain('__ccoCompanionSetOpen');
 
     const globalCss = readFileSync(join(root, 'src/styles/global.css'), 'utf8');
     expect(globalCss).toContain('[data-chat-widget].chatw:not(.is-open)');
     expect(globalCss).toContain('pointer-events: none !important');
     expect(globalCss).toContain('.companion[data-companion]');
+    expect(globalCss).toContain('.companion[data-companion] .companion-sheet');
+    expect(globalCss).toContain('--z-companion: 80');
 
     expect(chat).not.toContain('chatw-fab');
     expect(chat).toContain('cco:open-companion');
@@ -72,7 +77,8 @@ describe('CampingCompanion support center', () => {
     expect(a11y).toContain('Einstellungen zurücksetzen');
 
     expect(layout).toContain('CampingCompanion');
-    expect(layout).toContain('ChatWidget');
+    expect(layout).not.toContain("import ChatWidget");
+    expect(layout).not.toMatch(/<ChatWidget/);
     expect(layout).toContain('transition:persist="cco-companion"');
     expect(layout).not.toContain('transition:persist="cco-chat"');
     expect(layout).toMatch(/lang="de"/);
@@ -84,6 +90,10 @@ describe('CampingCompanion support center', () => {
     expect(boot).toContain('ccoFavCount');
     expect(boot).toContain('a11y-font-xl');
     expect(boot).toContain('a11y-focus-strong');
+    expect(boot).toContain('__ccoCompanionSetOpen');
+    expect(boot).toContain('__ccoCompanionBoot');
+    expect(boot).toContain('data-companion-open');
+    expect(boot).toContain('showModal');
     expect(boot).not.toContain('cco:lang');
     expect(boot).not.toContain('enRoutes');
   });

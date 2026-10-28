@@ -88,14 +88,14 @@
   --companion-fab-h: 3.5rem;
   --chat-fab-h: var(--companion-fab-h); /* legacy alias */
 
-  /* stacking: actionbar < compare < sticky-cta < toast < companion < chat < cookie < skip */
+  /* stacking: actionbar < compare < sticky-cta < toast < chat < companion < cookie < skip */
   --z-actionbar: 40;
   --z-compare: 42;
   --z-sticky-cta: 44;
   --z-toast: 60;
-  --z-companion: 72;
   --z-a11y: 65;
   --z-chat: 70;
+  --z-companion: 80;
   --z-cookie: 90;
 
   color-scheme: light;
@@ -172,7 +172,28 @@
   margin: 0;
   padding: 0;
   border: 0;
-  z-index: var(--z-companion, 72);
+  border-radius: 1rem;
+  background: transparent;
+  color: var(--text);
+  overflow: visible;
+  z-index: var(--z-companion, 80);
+}
+
+.companion[data-companion] .companion-sheet {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  max-height: inherit;
+  overflow: hidden;
+  border: 1px solid rgb(28 32 36 / 0.1);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, #fbf7f0 0%, #fff 38%);
+  box-shadow: 0 22px 48px -22px rgb(28 32 36 / 0.45);
+}
+
+.companion[data-companion] .companion-panel::backdrop {
+  background: rgb(36 40 43 / 0.28);
 }
 
 @media (min-width: 40em) {
