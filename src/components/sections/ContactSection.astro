@@ -70,6 +70,12 @@ const { title = 'Wir sind für dich da.', eyebrow = 'Kontakt & Anfahrt' } = Astr
   .contact-grid {
     display: grid;
     gap: 2.5rem;
+    min-width: 0;
+  }
+
+  .contact-grid > :global(*) {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .contact-info .section-head {
@@ -82,9 +88,11 @@ const { title = 'Wir sind für dich da.', eyebrow = 'Kontakt & Anfahrt' } = Astr
   }
 
   .contact-actions {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.6rem;
     margin-top: 1.5rem;
+    min-width: 0;
   }
 
   .contact-lines {
@@ -150,13 +158,6 @@ const { title = 'Wir sind für dich da.', eyebrow = 'Kontakt & Anfahrt' } = Astr
   .hours dd {
     margin: 0;
     color: var(--text-muted);
-  }
-
-  @media (min-width: 36em) {
-    .contact-actions {
-      grid-template-columns: repeat(3, auto);
-      justify-content: start;
-    }
   }
 
   @media (min-width: 64em) {
