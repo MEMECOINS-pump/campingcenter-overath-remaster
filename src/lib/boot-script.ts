@@ -95,6 +95,29 @@ function resolveHours(iso,day){
   if(!hours||!hours.length)return{kind:'closed',reason:'sunday',label:'Planmäßig geschlossen',hours:null,holiday:hol};
   return{kind:'hours',reason:'hours',label:'',hours:hours,holiday:policy==='weekly'?hol:null};
 }
+function clockLabel(hhmm){
+  var p=String(hhmm||'').split(':');
+  var h=p[0],m=p[1];
+  if(!h)return String(hhmm||'');
+  if(!m||m==='00')return String(Number(h));
+  return String(Number(h))+':'+m;
+}
+function openPill(closes){
+  var c=clockLabel(closes);
+  return{label:'Heute geöffnet bis '+c+' Uhr',shortLabel:'Geöffnet bis '+c+' Uhr',compactLabel:'Bis '+c+' Uhr geöffnet'};
+}
+function closedPill(reason,planLabel,holidayName){
+  if(reason==='holiday'){
+    var name=holidayName||planLabel||'Feiertag';
+    return{label:'Heute geschlossen – '+name,shortLabel:'Feiertag · Geschlossen',compactLabel:'Feiertag'};
+  }
+  if(reason==='manual'||reason==='special'){
+    var text=planLabel||'Sonderöffnungszeiten';
+    return{label:text,shortLabel:text.length>22?'Sonderöffnungszeiten':text,compactLabel:text.length>16?'Sonderzeiten':text};
+  }
+  if(reason==='sunday')return{label:'Heute geschlossen',shortLabel:'Geschlossen',compactLabel:'Geschlossen'};
+  return{label:'Aktuell geschlossen',shortLabel:'Geschlossen',compactLabel:'Geschlossen'};
+}
 function nextOpen(fromIso,fromMin){
   for(var offset=0;offset<14;offset++){
     var iso=addDays(fromIso,offset);
@@ -103,13 +126,13 @@ function nextOpen(fromIso,fromMin){
     var plan=resolveHours(iso,day);
     if(plan.kind!=='hours'||!plan.hours||!plan.hours[0])continue;
     if(offset===0){
-      for(var j=0;j<plan.hours.length;j++){if(toMin(plan.hours[j][0])>fromMin)return 'öffnet heute um '+plan.hours[j][0]+' Uhr';}
+      for(var j=0;j<plan.hours.length;j++){if(toMin(plan.hours[j][0])>fromMin)return 'Öffnet heute um '+plan.hours[j][0]+' Uhr';}
       continue;
     }
     var first=plan.hours[0][0];
-    if(offset===1)return 'öffnet morgen um '+first+' Uhr';
+    if(offset===1)return 'Öffnet morgen um '+first+' Uhr';
     var when=new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long'}).format(new Date(Number(iso.slice(0,4)),Number(iso.slice(5,7))-1,Number(iso.slice(8,10))));
-    return 'öffnet am '+when+' um '+first+' Uhr';
+    return 'Öffnet am '+when+' um '+first+' Uhr';
   }
   return '';
 }
@@ -124,24 +147,25 @@ function compute(){
   var now=berlin();
   var plan=resolveHours(now.iso,now.day);
   var opensNext=nextOpen(now.iso,now.minutes);
-  var state,reason,label,sub='',alertName='',bannerTitle,nextLine='',todayLabel;
+  var state,reason,label,shortLabel,compactLabel,sub='',alertName='',bannerTitle,nextLine='',todayLabel;
   if(plan.kind==='closed'){
     state='closed';reason=plan.reason;
+    var closed=closedPill(reason,plan.label,plan.label);
+    label=closed.label;shortLabel=closed.shortLabel;compactLabel=closed.compactLabel;
     if(reason==='holiday'){
-      label='Geschlossen wegen Feiertag: '+plan.label;
       alertName=plan.label;
       sub='Gesetzlicher Feiertag (NRW)'+(opensNext?' \u00b7 '+opensNext:'');
       todayLabel='Heute Feiertag: '+plan.label+' \u2013 wir haben geschlossen';
+      bannerTitle=label;
     }else if(reason==='manual'||reason==='special'){
-      label=plan.label;
       todayLabel=plan.label;
       sub=opensNext||'';
+      bannerTitle=label;
     }else{
-      label='Aktuell geschlossen';
       todayLabel=plan.label||todayHoursLabel(null);
       sub=opensNext||'';
+      bannerTitle=label;
     }
-    bannerTitle=label;
     nextLine=opensNext||'';
   }else{
     var slot=null;
@@ -152,34 +176,41 @@ function compute(){
     todayLabel=(plan.reason==='manual'||plan.reason==='special')?overrideHoursLabel(plan):todayHoursLabel(plan.hours);
     if(slot){
       state='open';reason=plan.reason;
-      label='Heute geöffnet \u00b7 bis '+slot[1]+' Uhr';
+      var open=openPill(slot[1]);
+      label=open.label;shortLabel=open.shortLabel;compactLabel=open.compactLabel;
       bannerTitle=label;
       nextLine='';
       sub='';
     }else{
       state='closed';
       reason=(plan.reason==='manual'||plan.reason==='special')?plan.reason:((now.day==='Sunday'||!dayHoursFor(now.day))?'sunday':'outside');
-      label='Aktuell geschlossen';
+      var closedOutside=closedPill(reason,plan.label,null);
+      label=closedOutside.label;shortLabel=closedOutside.shortLabel;compactLabel=closedOutside.compactLabel;
       sub=opensNext||'';
       bannerTitle=label;
       nextLine=opensNext||'';
     }
   }
-  return{state:state,reason:reason,label:label,sub:sub,alertName:alertName,todayLabel:todayLabel,bannerTitle:bannerTitle,nextLine:nextLine};
+  return{state:state,reason:reason,label:label,shortLabel:shortLabel,compactLabel:compactLabel,sub:sub,alertName:alertName,todayLabel:todayLabel,bannerTitle:bannerTitle,nextLine:nextLine};
 }
 function paintOpen(status){
-  var state=status.state,reason=status.reason,label=status.label,sub=status.sub,alertName=status.alertName;
+  var state=status.state,reason=status.reason,label=status.label,shortLabel=status.shortLabel,compactLabel=status.compactLabel,sub=status.sub,alertName=status.alertName;
   html.dataset.ccoOpen=state;
   html.dataset.ccoOpenReason=reason;
   html.dataset.ccoOpenLabel=label;
   html.dataset.ccoOpenAlert=alertName;
   document.querySelectorAll('[data-opening-status]').forEach(function(root){
     root.dataset.state=state;root.dataset.reason=reason;
-    root.querySelectorAll('[data-oh-line]').forEach(function(el){el.textContent=label;});
+    root.querySelectorAll('[data-oh-line-full]').forEach(function(el){el.textContent=label;});
+    root.querySelectorAll('[data-oh-line-short]').forEach(function(el){el.textContent=shortLabel;});
+    root.querySelectorAll('[data-oh-line-compact]').forEach(function(el){el.textContent=compactLabel;});
     root.querySelectorAll('[data-oh-sub]').forEach(function(el){
       if(sub){el.hidden=false;el.textContent=sub;}else{el.hidden=true;el.textContent='';}
     });
-    root.querySelectorAll('[data-oh-open]').forEach(function(btn){btn.dataset.state=state;btn.dataset.reason=reason;});
+    root.querySelectorAll('[data-oh-open]').forEach(function(btn){
+      btn.dataset.state=state;btn.dataset.reason=reason;
+      btn.setAttribute('aria-label',label+(sub?' · '+sub:''));
+    });
     root.querySelectorAll('[data-oh-banner]').forEach(function(banner){
       banner.dataset.state=state;banner.dataset.reason=reason;
     });

@@ -25,25 +25,83 @@ const defaultCtx = (): Required<OpenPlanContext> => ({
   holidayPolicy: defaultHolidayPolicy,
 });
 
+/** Responsive pill copy — one calculation, three lengths for available space. */
+export type PillCopy = {
+  /** Desktop / wide: longest accurate wording */
+  label: string;
+  /** Mobile / tablet utility row */
+  shortLabel: string;
+  /** Very narrow viewports */
+  compactLabel: string;
+};
+
 export type OpenStatus =
-  | {
+  | ({
       state: 'open';
-      label: string;
-      shortLabel: string;
       closesAt: string;
       todayLabel: string;
       holiday: null;
       reason: OpenReason;
-    }
-  | {
+    } & PillCopy)
+  | ({
       state: 'closed';
-      label: string;
-      shortLabel: string;
       opensNext: string | null;
       todayLabel: string;
       holiday: PublicHoliday | null;
       reason: OpenReason;
+    } & PillCopy);
+
+/** "13:00" → "13", "13:30" → "13:30" (badge-friendly German clock). */
+export function formatClockDisplay(hhmm: string): string {
+  const [h, m] = hhmm.split(':');
+  if (!h) return hhmm;
+  if (!m || m === '00') return String(Number(h));
+  return `${Number(h)}:${m}`;
+}
+
+function openPillCopy(closesAt: string): PillCopy {
+  const clock = formatClockDisplay(closesAt);
+  return {
+    label: `Heute geöffnet bis ${clock} Uhr`,
+    shortLabel: `Geöffnet bis ${clock} Uhr`,
+    compactLabel: `Bis ${clock} Uhr geöffnet`,
+  };
+}
+
+function closedPillCopy(
+  reason: OpenReason,
+  planLabel: string,
+  holidayName: string | null,
+): PillCopy {
+  if (reason === 'holiday') {
+    const name = holidayName || planLabel || 'Feiertag';
+    return {
+      label: `Heute geschlossen – ${name}`,
+      shortLabel: `Feiertag · Geschlossen`,
+      compactLabel: 'Feiertag',
     };
+  }
+  if (reason === 'manual' || reason === 'special') {
+    const text = planLabel || 'Sonderöffnungszeiten';
+    return {
+      label: text,
+      shortLabel: text.length > 22 ? 'Sonderöffnungszeiten' : text,
+      compactLabel: text.length > 16 ? 'Sonderzeiten' : text,
+    };
+  }
+  if (reason === 'sunday') {
+    return {
+      label: 'Heute geschlossen',
+      shortLabel: 'Geschlossen',
+      compactLabel: 'Geschlossen',
+    };
+  }
+  return {
+    label: 'Aktuell geschlossen',
+    shortLabel: 'Geschlossen',
+    compactLabel: 'Geschlossen',
+  };
+}
 
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -171,16 +229,16 @@ function nextOpenLabel(fromIso: string, fromMinutes: number, ctx: OpenPlanContex
 
     if (offset === 0) {
       const later = plan.hours.find((h) => toMin(h.opens) > fromMinutes);
-      if (later) return `öffnet heute um ${later.opens} Uhr`;
+      if (later) return `Öffnet heute um ${later.opens} Uhr`;
       continue;
     }
 
     const first = plan.hours[0];
-    if (offset === 1) return `öffnet morgen um ${first.opens} Uhr`;
+    if (offset === 1) return `Öffnet morgen um ${first.opens} Uhr`;
     const when = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }).format(
       new Date(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))),
     );
-    return `öffnet am ${when} um ${first.opens} Uhr`;
+    return `Öffnet am ${when} um ${first.opens} Uhr`;
   }
   return null;
 }
@@ -195,15 +253,15 @@ export function computeOpenStatus(
   const opensNext = nextOpenLabel(now.isoDate, now.minutes, ctx);
 
   if (plan.kind === 'closed') {
+    const pill = closedPillCopy(plan.reason, plan.label, plan.holiday?.name ?? null);
     if (plan.reason === 'holiday') {
       return {
         state: 'closed',
         reason: 'holiday',
         holiday: plan.holiday,
         opensNext,
-        shortLabel: 'FEIERTAG · Geschlossen',
         todayLabel: `Heute Feiertag: ${plan.label} – wir haben geschlossen`,
-        label: `Geschlossen wegen Feiertag: ${plan.label}`,
+        ...pill,
       };
     }
     if (plan.reason === 'manual' || plan.reason === 'special') {
@@ -212,9 +270,8 @@ export function computeOpenStatus(
         reason: plan.reason,
         holiday: null,
         opensNext,
-        shortLabel: 'Geschlossen',
         todayLabel: plan.label,
-        label: plan.label,
+        ...pill,
       };
     }
     return {
@@ -222,9 +279,8 @@ export function computeOpenStatus(
       reason: plan.reason,
       holiday: null,
       opensNext,
-      shortLabel: 'Geschlossen',
       todayLabel: plan.label,
-      label: 'Aktuell geschlossen',
+      ...pill,
     };
   }
 
@@ -239,9 +295,8 @@ export function computeOpenStatus(
       reason: plan.reason,
       holiday: null,
       closesAt: openSlot.closes,
-      shortLabel: 'Geöffnet',
       todayLabel,
-      label: `Heute geöffnet · bis ${openSlot.closes} Uhr`,
+      ...openPillCopy(openSlot.closes),
     };
   }
 
@@ -257,12 +312,11 @@ export function computeOpenStatus(
     reason,
     holiday: null,
     opensNext,
-    shortLabel: 'Geschlossen',
     todayLabel:
       plan.reason === 'manual' || plan.reason === 'special'
         ? `${plan.label}: ${formatOverrideHours(plan.hours)}`
         : plan.label,
-    label: 'Aktuell geschlossen',
+    ...closedPillCopy(reason, plan.label, null),
   };
 }
 

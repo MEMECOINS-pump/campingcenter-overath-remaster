@@ -45,6 +45,9 @@ const newCount = vehicles.length - usedCount;
 <style>
   .rail {
     margin-inline: calc(var(--gutter) * -1);
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: clip;
   }
 
   .rail-track {
@@ -53,6 +56,8 @@ const newCount = vehicles.length - usedCount;
     grid-auto-columns: min(82%, 21rem);
     gap: 1rem;
     padding: 0.25rem var(--gutter) 1rem;
+    min-width: 0;
+    max-width: 100%;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
@@ -79,6 +84,8 @@ const newCount = vehicles.length - usedCount;
   @media (min-width: 64em) {
     .rail {
       margin-inline: 0;
+      max-width: none;
+      overflow: visible;
     }
 
     .rail-track {
@@ -86,6 +93,7 @@ const newCount = vehicles.length - usedCount;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.5rem;
       padding: 0;
+      max-width: none;
       overflow: visible;
     }
   }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { easterSunday, holidayOn, nrwHolidaysForYear } from '@/data/holidays';
-import { computeOpenStatus, resolveDayPlan } from '@/lib/opening-hours';
+import { computeOpenStatus, formatClockDisplay, resolveDayPlan } from '@/lib/opening-hours';
 import type { OpenPlanContext } from '@/lib/opening-hours';
 
 /** Build a Date that is this wall-clock time in Europe/Berlin. */
@@ -62,7 +62,8 @@ describe('computeOpenStatus with holidays', () => {
     expect(s.reason).toBe('holiday');
     expect(s.holiday?.name).toBe('Neujahr');
     expect(s.label).toContain('Neujahr');
-    expect(s.label).toMatch(/Feiertag/i);
+    expect(s.label).toMatch(/geschlossen/i);
+    expect(s.shortLabel).toMatch(/Feiertag/i);
     expect(s.todayLabel).toContain('Feiertag');
   });
 
@@ -71,8 +72,9 @@ describe('computeOpenStatus with holidays', () => {
     expect(s.state).toBe('closed');
     expect(s.reason).toBe('holiday');
     expect(s.holiday?.name).toBe('1. Weihnachtstag');
-    expect(s.shortLabel).toMatch(/FEIERTAG/i);
+    expect(s.shortLabel).toMatch(/Feiertag/i);
     expect(s.label).toContain('1. Weihnachtstag');
+    expect(s.compactLabel).toBe('Feiertag');
   });
 
   it('marks German Unity Day 2026 as holiday', () => {
@@ -82,11 +84,21 @@ describe('computeOpenStatus with holidays', () => {
     expect(s.label).toContain('Tag der Deutschen Einheit');
   });
 
-  it('opens on a normal weekday morning', () => {
-    // 2026-01-07 is a Wednesday
+  it('opens on a normal weekday morning with responsive pill copy', () => {
+    // 2026-01-07 is a Wednesday — morning slot closes 13:00
     const s = computeOpenStatus(berlinDate('2026-01-07', 9, 30));
     expect(s.state).toBe('open');
-    expect(s.label).toMatch(/geöffnet/i);
+    expect(s.label).toBe('Heute geöffnet bis 13 Uhr');
+    expect(s.shortLabel).toBe('Geöffnet bis 13 Uhr');
+    expect(s.compactLabel).toBe('Bis 13 Uhr geöffnet');
+    if (s.state === 'open') expect(s.closesAt).toBe('13:00');
+  });
+
+  it('formats afternoon close as 17 Uhr on weekday', () => {
+    const s = computeOpenStatus(berlinDate('2026-01-07', 15, 0));
+    expect(s.state).toBe('open');
+    expect(s.label).toBe('Heute geöffnet bis 17 Uhr');
+    expect(s.shortLabel).toBe('Geöffnet bis 17 Uhr');
   });
 
   it('skips holidays when announcing next open', () => {
@@ -174,5 +186,38 @@ describe('opening precedence manual > special > holiday > weekly', () => {
     const plan = resolveDayPlan('2026-01-10', 'Saturday', 2026, ctx);
     expect(plan.kind).toBe('closed');
     expect(plan.reason).toBe('manual');
+  });
+});
+
+describe('formatClockDisplay + pill copy variants', () => {
+  it('drops :00 minutes for badge clocks', () => {
+    expect(formatClockDisplay('13:00')).toBe('13');
+    expect(formatClockDisplay('09:00')).toBe('9');
+    expect(formatClockDisplay('18:30')).toBe('18:30');
+  });
+
+  it('uses Heute geschlossen on Sunday', () => {
+    const s = computeOpenStatus(berlinDate('2026-01-11', 12, 0));
+    expect(s.state).toBe('closed');
+    expect(s.reason).toBe('sunday');
+    expect(s.label).toBe('Heute geschlossen');
+    expect(s.shortLabel).toBe('Geschlossen');
+  });
+
+  it('uses Aktuell geschlossen outside weekday hours with next-open hint', () => {
+    const s = computeOpenStatus(berlinDate('2026-01-07', 20, 0));
+    expect(s.state).toBe('closed');
+    expect(s.reason).toBe('outside');
+    expect(s.label).toBe('Aktuell geschlossen');
+    if (s.state === 'closed') {
+      expect(s.opensNext).toMatch(/Öffnet morgen um/i);
+    }
+  });
+
+  it('Allerheiligen 2026 is a closed NRW holiday', () => {
+    const s = computeOpenStatus(berlinDate('2026-11-01', 11, 0));
+    expect(s.reason).toBe('holiday');
+    expect(s.holiday?.name).toBe('Allerheiligen');
+    expect(s.label).toContain('Allerheiligen');
   });
 });
