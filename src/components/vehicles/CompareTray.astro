@@ -18,19 +18,21 @@ import { url } from '@/lib/url';
   .ctray {
     position: fixed;
     z-index: var(--z-compare, 42);
-    left: 50%;
+    /* Keep clear of Adventure Compass FAB (bottom-right) + action bar */
+    left: max(0.75rem, env(safe-area-inset-left, 0px));
+    right: calc(var(--companion-fab-h, 3.5rem) + 1.5rem + env(safe-area-inset-right, 0px));
     bottom: calc(var(--actionbar-h, 0px) + 0.75rem + env(safe-area-inset-bottom, 0px));
     display: flex;
     align-items: center;
     gap: 0.6rem;
     width: max-content;
-    max-width: calc(100vw - 1.5rem);
+    max-width: calc(100vw - var(--companion-fab-h, 3.5rem) - 2.5rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    margin-inline: auto;
     padding: 0.4rem 0.4rem 0.4rem 1rem;
     border-radius: var(--radius-pill);
     background: var(--graphite);
     color: #fff;
     box-shadow: var(--shadow-lg, 0 18px 40px rgb(0 0 0 / 0.25));
-    transform: translateX(-50%);
     animation: ctray-in 0.3s var(--ease-out);
   }
 
@@ -73,7 +75,23 @@ import { url } from '@/lib/url';
   @keyframes ctray-in {
     from {
       opacity: 0;
-      transform: translate(-50%, 1rem);
+      transform: translateY(1rem);
+    }
+  }
+
+  @media (min-width: 64em) {
+    .ctray {
+      left: 50%;
+      right: auto;
+      max-width: calc(100vw - 1.5rem);
+      transform: translateX(-50%);
+    }
+
+    @keyframes ctray-in {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 1rem);
+      }
     }
   }
 </style>
