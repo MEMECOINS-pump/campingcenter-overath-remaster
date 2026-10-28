@@ -5,7 +5,7 @@
 
 export const company = {
   name: 'Campingcenter Overath',
-  legalName: 'Campingcenter Overath GmbH & Co KG',
+  legalName: 'Campingcenter Overath GmbH & Co. KG',
   claim: 'Wir pflegen die Kultur des Campings',
   motto: 'Von Campern für Camper',
   foundedStatement: 'Seit 30 Jahren',

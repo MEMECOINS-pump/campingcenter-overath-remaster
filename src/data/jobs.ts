@@ -2,6 +2,7 @@
  * Stellenangebote laut https://ccoverath.de/jobs/ (Stand 2026-09-30).
  * `sourceModified` ist das Änderungsdatum der jeweiligen Originalseite (WordPress REST API).
  */
+import { company } from './company';
 
 export interface Job {
   slug: string;
@@ -101,5 +102,5 @@ export const employer = {
     'Wachsendes Unternehmen',
     'Überdurchschnittliche Bezahlung für Quereinsteiger',
   ],
-  postalContact: 'Campingcenter Overath GmbH & Co KG, z. Hd. Herrn Martin Meinke, Weberstraße 12, 51491 Overath',
+  postalContact: `${company.legalName}, z. Hd. Herrn Martin Meinke, ${company.address.street}, ${company.address.postalCode} ${company.address.city}`,
 };
