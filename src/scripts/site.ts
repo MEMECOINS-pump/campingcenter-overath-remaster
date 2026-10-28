@@ -1,6 +1,7 @@
 import { bindTrackAttributes, track } from '@/lib/analytics';
 import { readConsent, writeConsent } from '@/lib/consent';
 import { COMPARE_MAX, clearCollection, hasItem, onCollectionChange, readCollection, toggleItem } from '@/lib/collections';
+import { initCompanion } from '@/scripts/companion';
 
 const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel);
 const $$ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) =>
@@ -398,6 +399,7 @@ function bootPageUi(): void {
   initReveal();
   initOpeningSheet();
   initHeaderTheme();
+  initCompanion();
   refreshOpenStatus();
   const html = document.documentElement;
   const n = html.dataset.ccoFavCount;
@@ -416,4 +418,7 @@ initCollections();
 bindTrackAttributes();
 bootPageUi();
 document.addEventListener('astro:page-load', bootPageUi);
-document.addEventListener('astro:after-swap', refreshOpenStatus);
+document.addEventListener('astro:after-swap', () => {
+  refreshOpenStatus();
+  initCompanion();
+});

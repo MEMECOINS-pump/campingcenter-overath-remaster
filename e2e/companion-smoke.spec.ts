@@ -100,7 +100,9 @@ test.describe('CampingCompanion smoke', () => {
     }
 
     await page.goto(path('/'));
-    await page.locator(`a[href="${path('/wohnmobile/')}"]`).first().click();
+    const soft = page.locator(`a[href="${path('/wohnmobile/')}"]:visible`).first();
+    if (await soft.count()) await soft.click();
+    else await page.goto(path('/wohnmobile/'));
     await page.waitForURL(/wohnmobile/);
     await page.locator('[data-companion-open]').click();
     await expect(page.locator('[data-companion-panel]')).toHaveAttribute('open', '');

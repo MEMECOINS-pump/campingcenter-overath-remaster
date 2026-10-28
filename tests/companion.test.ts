@@ -25,7 +25,9 @@ describe('CampingCompanion support center', () => {
     expect(companion).toContain('Recognizable a11y pictogram');
     expect(companion).toContain('#1a73e8');
     expect(companion).toContain('companion-tab-a11y-svg');
-    expect(companion).toContain("dataset.bound === '1'");
+    expect(companion).toContain("import { initCompanion } from '@/scripts/companion'");
+    expect(companion).toContain("astro:page-load");
+    expect(companion).toContain("astro:after-swap");
     expect(companion).not.toContain('Premium Kompass');
     expect(companion).not.toContain('Minimalist motorhome');
     expect(companion).not.toMatch(/<rect x="4" y="18" width="28"/);
@@ -44,8 +46,19 @@ describe('CampingCompanion support center', () => {
     expect(companion).toContain('Nachricht schreiben');
     expect(companion).toContain('Route planen');
     expect(companion).toContain('company.directions');
-    expect(companion).toContain("import('@/lib/camping-assist')");
     expect(companion).toContain('AccessibilityPrefs');
+
+    const controller = readFileSync(join(root, 'src/scripts/companion.ts'), 'utf8');
+    expect(controller).toContain('wireDelegation');
+    expect(controller).toContain("'click'");
+    expect(controller).toContain('uniqueRoot');
+    expect(controller).toContain('AI_UNAVAILABLE');
+    expect(controller).toContain('export function initCompanion');
+
+    const globalCss = readFileSync(join(root, 'src/styles/global.css'), 'utf8');
+    expect(globalCss).toContain('[data-chat-widget].chatw:not(.is-open)');
+    expect(globalCss).toContain('pointer-events: none !important');
+    expect(globalCss).toContain('.companion[data-companion]');
 
     expect(chat).not.toContain('chatw-fab');
     expect(chat).toContain('cco:open-companion');
@@ -60,6 +73,8 @@ describe('CampingCompanion support center', () => {
 
     expect(layout).toContain('CampingCompanion');
     expect(layout).toContain('ChatWidget');
+    expect(layout).toContain('transition:persist="cco-companion"');
+    expect(layout).not.toContain('transition:persist="cco-chat"');
     expect(layout).toMatch(/lang="de"/);
   });
 
@@ -93,11 +108,12 @@ describe('CampingCompanion support center', () => {
   });
 
   it('chat lazy-loads assist rules (companion + widget)', () => {
-    const companion = readFileSync(join(root, 'src/components/layout/CampingCompanion.astro'), 'utf8');
+    const companionUi = readFileSync(join(root, 'src/components/layout/CampingCompanion.astro'), 'utf8');
+    const companion = readFileSync(join(root, 'src/scripts/companion.ts'), 'utf8');
     const chat = readFileSync(join(root, 'src/components/layout/ChatWidget.astro'), 'utf8');
+    expect(companionUi).toContain('CAMPING_QUICK_PROMPTS');
     expect(companion).toContain("import('@/lib/camping-assist')");
     expect(companion).toContain('loadAssist');
-    expect(companion).toContain('CAMPING_QUICK_PROMPTS');
     expect(chat).toContain("import('@/lib/camping-assist')");
     expect(chat).toContain('loadAssist');
     expect(chat).toContain('CAMPING_QUICK_PROMPTS');

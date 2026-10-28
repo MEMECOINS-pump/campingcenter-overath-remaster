@@ -59,8 +59,10 @@ const boot = buildBootScript();
     {actionBar && <MobileActionBar inquiryHref={inquiryHref} inquiryLabel={inquiryLabel} />}
     <slot name="sticky" />
     {compareTray && <CompareTray />}
+    {/* Companion persists across soft-nav; styles critical for hits live in global.css. */}
     <CampingCompanion transition:persist="cco-companion" />
-    <ChatWidget transition:persist="cco-chat" />
+    {/* Do NOT persist ChatWidget — scoped CSS hash mismatch after VT made it steal FAB clicks. */}
+    <ChatWidget />
     <CookieConsent />
     <div class="toast" role="status" aria-live="polite" data-toast transition:persist="cco-toast"></div>
     <script>

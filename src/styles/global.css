@@ -101,6 +101,132 @@
   color-scheme: light;
 }
 
+/*
+ * GLOBAL companion + legacy chat hit-testing + FAB geometry.
+ * Must NOT live only in scoped component CSS: after ClientRouter + transition:persist,
+ * Astro scoped hashes no longer match the persisted DOM → FAB lost size / chat regained
+ * pointer-events and blocked clicks until a hard refresh.
+ */
+.companion[data-companion] {
+  --companion-bottom: calc(var(--actionbar-h, 0px) + var(--safe-bottom) + var(--consent-lift, 0px) + 1rem);
+  --companion-fab: 3.25rem;
+  --cw: min(360px, calc(100vw - 24px));
+  --ch: min(480px, calc(100dvh - 100px));
+  position: fixed;
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  bottom: var(--companion-bottom);
+  z-index: var(--z-companion, 72);
+  display: grid;
+  justify-items: end;
+  align-content: end;
+  gap: 0.65rem;
+  pointer-events: none;
+  font-family: var(--font-body);
+}
+
+.companion[data-companion][data-size='sm'] {
+  --cw: min(320px, calc(100vw - 24px));
+  --ch: min(400px, calc(100dvh - 100px));
+}
+
+.companion[data-companion][data-size='md'] {
+  --cw: min(360px, calc(100vw - 24px));
+  --ch: min(480px, calc(100dvh - 100px));
+}
+
+.companion[data-companion][data-size='lg'] {
+  --cw: min(440px, calc(100vw - 24px));
+  --ch: min(620px, calc(100dvh - 100px));
+}
+
+.companion[data-companion] > * {
+  pointer-events: auto;
+}
+
+.companion[data-companion] .companion-fab {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--companion-fab);
+  height: var(--companion-fab);
+  min-width: 50px;
+  min-height: 50px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.companion[data-companion] .companion-panel {
+  position: fixed;
+  inset: auto;
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  bottom: calc(var(--companion-bottom) + var(--companion-fab) + 0.65rem);
+  width: var(--cw);
+  height: var(--ch);
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 100px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  z-index: var(--z-companion, 72);
+}
+
+@media (min-width: 40em) {
+  .companion[data-companion] {
+    --companion-fab: 3.5rem;
+  }
+
+  .companion[data-companion] .companion-fab {
+    width: 3.5rem;
+    height: 3.5rem;
+    min-width: 54px;
+    min-height: 54px;
+  }
+}
+
+@media (max-width: 39.99em) {
+  .companion[data-companion] {
+    --cw: min(380px, calc(100vw - 24px));
+    --ch: min(500px, calc(100dvh - 100px));
+    right: 0;
+    left: 0;
+    width: 100%;
+    padding-inline: 12px;
+    box-sizing: border-box;
+    justify-items: center;
+  }
+
+  .companion[data-companion] .companion-fab {
+    justify-self: end;
+  }
+
+  .companion[data-companion] .companion-panel {
+    left: 50%;
+    right: auto;
+    translate: -50% 0;
+  }
+}
+
+[data-chat-widget].chatw:not(.is-open),
+[data-chat-widget][data-closed] {
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  visibility: hidden;
+}
+
+[data-chat-widget].chatw:not(.is-open) > *,
+[data-chat-widget][data-closed] > * {
+  pointer-events: none !important;
+}
+
 /* CSP-safe holiday alert height (no JS style.setProperty). */
 html:has([data-oh-alert]:not([hidden])) {
   --header-alert-h: var(--header-alert-h-active);
