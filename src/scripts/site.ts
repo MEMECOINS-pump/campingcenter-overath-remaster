@@ -58,10 +58,11 @@ let headerThemeIo: IntersectionObserver | null = null;
 
 function tagHeaderThemeSections(): void {
   const main = $('#main') ?? document.body;
-  $$('.section-sand, .section-paper, .section-forest, .page-hero, .hero, [data-header-theme]', main).forEach((el) => {
+  $$('.section-sand, .section-paper, .section-forest, .page-hero, .phero, .hero, [data-header-theme]', main).forEach((el) => {
     if (el.hasAttribute('data-header-theme')) return;
-    if (el.classList.contains('hero')) el.setAttribute('data-header-theme', 'dark');
-    else if (el.classList.contains('section-forest')) el.setAttribute('data-header-theme', 'forest');
+    if (el.classList.contains('hero') || el.classList.contains('page-hero') || el.classList.contains('phero')) {
+      el.setAttribute('data-header-theme', 'dark');
+    } else if (el.classList.contains('section-forest')) el.setAttribute('data-header-theme', 'forest');
     else if (el.classList.contains('section-sand')) el.setAttribute('data-header-theme', 'sand');
     else el.setAttribute('data-header-theme', 'light');
   });
@@ -410,12 +411,76 @@ function annotateExternalLinks(): void {
   }
 }
 
+let atmoObserver: ResizeObserver | null = null;
+
+/** Repeat each section photo in overlapped bands so a tall section stays covered
+ *  without scaling one crop to the full scroll height. */
+function layoutAtmosphere(): void {
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const band = 52 * rem;
+  const minOverlap = 8 * rem;
+  const maxStep = band - minOverlap;
+  $$('[data-atmo-stack]').forEach((stack) => {
+    const section = stack.closest('.atmo');
+    const first = stack.querySelector<HTMLElement>(':scope > .atmo-band');
+    if (!section || !first) return;
+    const hero = section.classList.contains('page-hero');
+    const height = section.getBoundingClientRect().height;
+    let count = 1;
+    if (!hero && height > band + 4) {
+      count = Math.ceil((height - minOverlap) / maxStep);
+      count = Math.max(2, Math.min(24, count));
+    }
+    let bands = Array.from(stack.querySelectorAll<HTMLElement>(':scope > .atmo-band'));
+    while (bands.length < count) {
+      const source = bands[0];
+      if (!source) break;
+      const clone = source.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('img').forEach((img) => {
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.removeAttribute('fetchpriority');
+      });
+      stack.appendChild(clone);
+      bands.push(clone);
+    }
+    while (bands.length > count) bands.pop()?.remove();
+    bands = Array.from(stack.querySelectorAll<HTMLElement>(':scope > .atmo-band'));
+    const step = count === 1 ? 0 : (height - band) / (count - 1);
+    bands.forEach((el, i) => {
+      const only = count === 1;
+      el.classList.toggle('is-only', only);
+      el.classList.toggle('is-first', i === 0);
+      el.classList.toggle('is-last', i === count - 1);
+      el.style.zIndex = String(count - i);
+      if (only) {
+        el.style.top = '0px';
+        el.style.height = '100%';
+        return;
+      }
+      const top = i === count - 1 ? Math.max(0, height - band) : step * i;
+      el.style.top = `${top}px`;
+      el.style.height = `${band}px`;
+    });
+  });
+}
+
+function initAtmosphere(): void {
+  atmoObserver?.disconnect();
+  layoutAtmosphere();
+  const sections = $$('.atmo');
+  if (!sections.length || !('ResizeObserver' in window)) return;
+  atmoObserver = new ResizeObserver(() => layoutAtmosphere());
+  sections.forEach((el) => atmoObserver?.observe(el));
+}
+
 function bootPageUi(): void {
   initHeader();
   initMenu();
   initReveal();
   initOpeningSheet();
   initHeaderTheme();
+  initAtmosphere();
   initCompanion();
   annotateExternalLinks();
   refreshOpenStatus();

@@ -4,9 +4,9 @@ import Icon from '@/components/ui/Icon.astro';
 import { url } from '@/lib/url';
 ---
 
-<section class="cf-hero" aria-labelledby="cf-hero-title">
+<section class="cf-hero" data-header-theme="dark" aria-labelledby="cf-hero-title">
   <div class="cf-media" aria-hidden="true">
-    <Photo src="lake-motorhomes" alt="" sizes="100vw" widths={[960, 1440, 1920]} quality={68} />
+    <Photo src="atmo-shore" alt="" sizes="100vw" widths={[640, 960, 1280, 1920, 2560, 3200, 3840]} quality={85} />
   </div>
   <div class="cf-shade" aria-hidden="true"></div>
   <div class="container cf-inner">
@@ -35,6 +35,7 @@ import { url } from '@/lib/url';
     isolation: isolate;
     color: #fff;
     overflow: hidden;
+    background: #141210;
   }
 
   .cf-media,
@@ -48,12 +49,14 @@ import { url } from '@/lib/url';
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: 64% 72%;
+    filter: sepia(0.16) saturate(0.86) contrast(1.05) brightness(0.88);
   }
 
   .cf-shade {
     background:
-      linear-gradient(120deg, rgb(14 12 10 / 0.88) 10%, rgb(14 12 10 / 0.45) 55%, rgb(14 12 10 / 0.7)),
-      linear-gradient(to top, rgb(14 12 10 / 0.55), transparent 50%);
+      linear-gradient(180deg, #141210 0, rgb(20 18 16 / 0.2) 3rem, rgb(20 18 16 / 0.2) calc(100% - 3.5rem), #141210 100%),
+      linear-gradient(90deg, rgb(12 10 8 / 0.62), rgb(12 10 8 / 0.16) 62%);
   }
 
   .cf-inner {
@@ -111,11 +114,9 @@ import { url } from '@/lib/url';
 
   @keyframes cf-rise {
     from {
-      opacity: 0;
       transform: translateY(12px);
     }
     to {
-      opacity: 1;
       transform: none;
     }
   }

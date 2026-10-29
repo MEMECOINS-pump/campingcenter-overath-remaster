@@ -26,9 +26,9 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     eyebrow="Über uns"
     title="Von Campern für Camper."
     lead={story.lead}
-    image="team-wide"
-    imageAlt="Das Team des Campingcenter Overath"
-    focus="top"
+    image="atmo-forest"
+    imageAlt=""
+    focus="center"
   />
 
   <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-story">
@@ -48,10 +48,6 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     </div>
   </section>
 
-  <section class="ab-wide" aria-hidden="true">
-    <Photo src="panorama-yard" alt="" sizes="100vw" widths={[640, 1024, 1600, 2200]} />
-  </section>
-
   <Journey />
 
   <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-videos">
@@ -69,7 +65,8 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     </div>
   </section>
 
-  <section class="section section-dark" aria-labelledby="ab-jobs">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-jobs">
+    <Atmosphere src="atmo-forest" focus="left" />
     <div class="container split">
       <div class="ab-jobs-photo">
         <Photo src="team" alt="Mitarbeitende des Campingcenter Overath" sizes="(min-width: 60em) 45vw, 92vw" widths={[480, 768, 1080]} />
@@ -120,12 +117,6 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     gap: 1rem;
     font-size: var(--fs-lg);
     line-height: 1.65;
-  }
-
-  .ab-wide :global(img) {
-    width: 100%;
-    height: clamp(14rem, 40vw, 34rem);
-    object-fit: cover;
   }
 
   .ab-video-grid {
