@@ -20,7 +20,7 @@ const scenes = tourScenes.map((s) => ({ id: s.id, title: s.title, src: url(`/${s
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
   <header class="page-hero atmo" data-header-theme="dark">
-    <Atmosphere src="atmo-lake" focus="center" />
+    <Atmosphere src="atmo-shore" focus="center" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Virtueller Rundgang</p>
@@ -29,7 +29,8 @@ const scenes = tourScenes.map((s) => ({ id: s.id, title: s.title, src: url(`/${s
     </div>
   </header>
 
-  <section class="section-tight tour-section" aria-label="360° Rundgang">
+  <section class="section-tight atmo tour-section" data-header-theme="dark" aria-label="360° Rundgang">
+    <Atmosphere src="atmo-forest" />
     <div class="container">
       <div class="tour" data-tour data-scenes={JSON.stringify(scenes)}>
         <div class="tour-stage">

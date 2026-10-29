@@ -36,7 +36,7 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
   <section class="page-hero atmo cmp-hero" data-header-theme="dark">
-    <Atmosphere src="atmo-lake" focus="left" />
+    <Atmosphere src="atmo-shore" focus="left" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Vergleich</p>
@@ -45,7 +45,8 @@ const usedGroups = groups.map((g) => ({ ...g, keys: g.keys.filter((k) => labels.
     </div>
   </section>
 
-  <section class="section-tight" aria-label="Vergleichstabelle">
+  <section class="section-tight atmo" data-header-theme="dark" aria-label="Vergleichstabelle">
+    <Atmosphere src="atmo-forest" />
     <div class="container">
       <div class="cmp-empty card card-pad" data-cmp-empty>
         <span class="cmp-empty-icon"><Icon name="compare" /></span>

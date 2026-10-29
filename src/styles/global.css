@@ -323,7 +323,7 @@ html {
 body {
   margin: 0;
   min-height: 100svh;
-  background: var(--bg);
+  background: #141210;
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--fs-md);
@@ -1537,6 +1537,47 @@ body:has(.chatw.is-open) .ctray {
   object-position: 50% 80%;
 }
 
+/* Keep the subject in frame from a 320px phone up to a wide desktop. */
+.atmo-media.focus-campfire img {
+  object-position: 50% 62%;
+}
+
+.atmo-media.focus-forest img {
+  object-position: 48% 46%;
+}
+
+.atmo-media.focus-stars img {
+  object-position: 50% 72%;
+}
+
+.atmo-media.focus-shore img {
+  object-position: 58% 70%;
+}
+
+@media (min-width: 48em) {
+  .atmo-media.focus-campfire img {
+    object-position: 50% 55%;
+  }
+
+  .atmo-media.focus-stars img {
+    object-position: 46% 38%;
+  }
+
+  .atmo-media.focus-shore img {
+    object-position: 70% 74%;
+  }
+}
+
+@media (min-width: 80em) {
+  .atmo-media.focus-forest img {
+    object-position: 50% 42%;
+  }
+
+  .atmo-media.focus-shore img {
+    object-position: 64% 68%;
+  }
+}
+
 .atmo-shade {
   background:
     linear-gradient(180deg, rgb(14 12 10 / 0.8) 0%, rgb(14 12 10 / 0.68) 46%, rgb(14 12 10 / 0.82) 100%),
@@ -1582,12 +1623,12 @@ body:has(.chatw.is-open) .ctray {
 }
 
 /* Cards, logos and form controls keep dark text on a light surface. */
-.atmo :is(.vcard, .card, .faq-item, .quick-card, .fpanel, .brand-link, .trust li, .jb-benefits li, .rt-steps li, .finder-why, .type, .ws-jump a, .mk-partners a, .partner, .input, .select, .textarea) {
+.atmo :is(.vcard, .card, .faq-item, .quick-card, .fpanel, .brand-link, .trust li, .jb-benefits li, .rt-steps li, .finder-why, .type, .hours, .choice-body, .sr-toolbar, .sr-aside, .legal, .ws-jump a, .mk-partners a, .partner, .input, .select, .textarea) {
   color: var(--text);
   text-shadow: none;
 }
 
-.atmo :is(.card, .vcard, .faq-item, .quick-card, .trust li, .brand-link, .rt-steps li, .finder-why, .jb-benefits li, .type) :is(h1, h2, h3, p, li, strong, small, a, summary) {
+.atmo :is(.card, .vcard, .faq-item, .quick-card, .trust li, .brand-link, .rt-steps li, .finder-why, .jb-benefits li, .type, .hours, .choice-body, .legal) :is(h1, h2, h3, p, li, strong, small, a, summary) {
   color: var(--text);
   text-shadow: none;
 }
@@ -1601,7 +1642,7 @@ body:has(.chatw.is-open) .ctray {
   text-shadow: none;
 }
 
-.atmo :is(.card, .vcard, .faq-item, .quick-card) .eyebrow {
+.atmo :is(.card, .vcard, .faq-item, .quick-card, .legal) .eyebrow {
   color: var(--brand-ink);
   text-shadow: none;
 }
@@ -1631,6 +1672,47 @@ body:has(.chatw.is-open) .ctray {
 .atmo :is(.card, .vcard, .faq-item, .quick-card) .btn-ghost:hover {
   --btn-bg: var(--white);
   --btn-border: var(--graphite);
+}
+
+.atmo .legal {
+  background: rgb(250 248 244 / 0.97);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.25rem, 0.8rem + 1.5vw, 2.25rem);
+  margin-block: 1.25rem 0;
+}
+
+.atmo .sr-aside {
+  background: rgb(250 248 244 / 0.96);
+  border-radius: var(--radius-lg);
+  padding: 1rem 0.85rem 1rem 1rem;
+}
+
+.atmo .contact-address,
+.atmo .contact-lines,
+.atmo .contact-lines a {
+  color: rgb(255 255 255 / 0.92);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
+}
+
+.atmo .map-card,
+.atmo .map-card :is(p, a, button) {
+  color: var(--text);
+  text-shadow: none;
+}
+
+.atmo .map-card .map-note,
+.atmo .map-card .map-note a {
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+.atmo .map-card .btn {
+  color: var(--btn-fg);
+}
+
+.atmo .map-card .btn-ghost {
+  --btn-fg: var(--text);
+  --btn-border: var(--line-strong);
 }
 
 .page-hero h1 {

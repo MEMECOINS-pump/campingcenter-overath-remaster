@@ -50,7 +50,8 @@ const today = new Date().toISOString().slice(0, 10);
     </a>
   </PageHero>
 
-  <section class="section-tight ws-highlights" aria-label="Schwerpunkte">
+  <section class="section-tight atmo ws-highlights" data-header-theme="dark" aria-label="Schwerpunkte">
+    <Atmosphere src="atmo-forest" />
     <div class="container">
       <ul class="grid grid-3" role="list">
         {
@@ -69,7 +70,7 @@ const today = new Date().toISOString().slice(0, 10);
   </section>
 
   <section class="section atmo" data-header-theme="dark" aria-labelledby="ws-services">
-    <Atmosphere src="atmo-lake" focus="center" />
+    <Atmosphere src="atmo-shore" focus="center" />
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Leistungen</p>
@@ -116,7 +117,8 @@ const today = new Date().toISOString().slice(0, 10);
     </div>
   </section>
 
-  <section class="section section-sand" aria-labelledby="ws-video">
+  <section class="section atmo" data-header-theme="dark" aria-labelledby="ws-video">
+    <Atmosphere src="atmo-stars" />
     <div class="container split">
       <div>
         <p class="eyebrow">Einblick</p>
@@ -133,7 +135,8 @@ const today = new Date().toISOString().slice(0, 10);
 
   <WorkshopAssistant />
 
-  <section id="termin" class="section ws-request" aria-labelledby="ws-form-title">
+  <section id="termin" class="section atmo ws-request" data-header-theme="dark" aria-labelledby="ws-form-title">
+    <Atmosphere src="atmo-campfire" />
     <div class="container ws-request-grid">
       <div class="ws-request-intro">
         <p class="eyebrow">Terminanfrage</p>

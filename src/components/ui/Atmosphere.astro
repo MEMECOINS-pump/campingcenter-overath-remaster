@@ -4,13 +4,16 @@ import Photo from '@/components/ui/Photo.astro';
 interface Props {
   /** File name without extension in src/assets/images. */
   src: string;
-  focus?: 'center' | 'left' | 'right' | 'top' | 'bottom';
+  focus?: 'center' | 'left' | 'right' | 'top' | 'bottom' | 'campfire' | 'forest' | 'stars' | 'shore';
+  /** First screen only. Everything else stays lazy. */
+  priority?: boolean;
 }
 
-const { src, focus = 'center' } = Astro.props;
+const { src, focus = 'center', priority = false } = Astro.props;
+const named = src.startsWith('atmo-') ? src.slice('atmo-'.length) : focus;
 ---
 
-<div class:list={['atmo-media', `focus-${focus}`]} aria-hidden="true">
-  <Photo src={src} alt="" sizes="100vw" widths={[640, 960, 1280]} quality={62} />
+<div class:list={['atmo-media', `focus-${named}`]} aria-hidden="true">
+  <Photo src={src} alt="" sizes="100vw" widths={[640, 1280, 1920, 2560, 3840]} quality={72} priority={priority} />
 </div>
 <div class="atmo-shade" aria-hidden="true"></div>

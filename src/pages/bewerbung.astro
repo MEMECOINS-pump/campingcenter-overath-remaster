@@ -30,7 +30,7 @@ const positions = [
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
   <header class="page-hero atmo" data-header-theme="dark">
-    <Atmosphere src="atmo-lake" focus="right" />
+    <Atmosphere src="atmo-shore" focus="right" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Bewerbung</p>
@@ -39,7 +39,8 @@ const positions = [
     </div>
   </header>
 
-  <section id="bewerbung" class="section-tight">
+  <section id="bewerbung" class="section-tight atmo" data-header-theme="dark">
+    <Atmosphere src="atmo-stars" />
     <div class="container bw-grid">
       <div class="card card-pad">
         <form class="form-stack" data-form="application" data-subject="Bewerbung über die Website">

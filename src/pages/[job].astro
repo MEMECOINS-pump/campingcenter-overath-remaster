@@ -35,7 +35,7 @@ const sections = [
   jsonLd={[breadcrumbSchema(crumbs, Astro.site), jobSchema(job, Astro.site)]}
 >
   <header class="page-hero atmo jd-hero" data-header-theme="dark">
-    <Atmosphere src="atmo-meadow" focus="left" />
+    <Atmosphere src="atmo-forest" focus="left" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">{job.employment}</p>
@@ -50,7 +50,8 @@ const sections = [
     </div>
   </header>
 
-  <section class="section-tight">
+  <section class="section-tight atmo" data-header-theme="dark">
+    <Atmosphere src="atmo-forest" />
     <div class="container jd-grid">
       <div class="jd-main">
         {
