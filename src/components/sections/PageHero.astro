@@ -16,9 +16,9 @@ interface Props {
 const { eyebrow, title, lead, image, imageAlt, crumbs, focus = 'center', size = 'md' } = Astro.props;
 ---
 
-<section class:list={['phero', `phero-${size}`, `focus-${focus}`]} aria-labelledby="page-title">
+<section class:list={['phero', `phero-${size}`, `focus-${focus}`]} data-header-theme="dark" aria-labelledby="page-title">
   <div class="phero-media">
-    <Photo src={image} alt={imageAlt} priority sizes="100vw" widths={[640, 960, 1280, 1920]} quality={70} />
+    <Photo src={image} alt={imageAlt} priority sizes="100vw" widths={[640, 960, 1280, 1920, 2560, 3200, 3840, 5120]} quality={85} />
   </div>
   <div class="phero-shade" aria-hidden="true"></div>
   <div class="container phero-inner">

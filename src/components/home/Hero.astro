@@ -19,9 +19,9 @@ const facts = [
       src="atmo-campfire"
       alt=""
       priority
-      widths={[640, 1280, 1920, 2560, 3840]}
+      widths={[640, 960, 1280, 1920, 2560, 3200, 3840]}
       sizes="100vw"
-      quality={72}
+      quality={88}
       class="hero-img"
     />
   </div>
@@ -73,7 +73,7 @@ const facts = [
     display: grid;
     min-height: max(38rem, 100svh);
     color: #fff;
-    background: #2a2622;
+    background: #141210;
   }
 
   .hero-media,
@@ -92,6 +92,7 @@ const facts = [
   .hero-media :global(img) {
     object-fit: cover;
     object-position: 50% 62%;
+    filter: sepia(0.16) saturate(0.86) contrast(1.05) brightness(0.88);
   }
 
   @media (min-width: 48em) {
@@ -108,8 +109,8 @@ const facts = [
 
   .hero-shade {
     background:
-      linear-gradient(to top, rgb(14 12 10 / 0.82) 0%, rgb(14 12 10 / 0.35) 45%, rgb(14 12 10 / 0.18) 70%, rgb(14 12 10 / 0.5) 100%),
-      linear-gradient(to right, rgb(14 12 10 / 0.45), transparent 65%);
+      linear-gradient(180deg, rgb(20 18 16 / 0.48) 0%, rgb(20 18 16 / 0.14) 16%, rgb(20 18 16 / 0.16) calc(100% - 7rem), #141210 100%),
+      linear-gradient(90deg, rgb(20 16 12 / 0.5), transparent 58%);
   }
 
   .hero-inner {

@@ -11,7 +11,7 @@ const current = stripBase(Astro.url.pathname);
 const isActive = (href: string, children?: { href: string }[]) =>
   current === href || (href !== '/' && current.startsWith(href)) || !!children?.some((c) => current.startsWith(c.href));
 ---
-<header class="site-header" data-header data-overlay={overlay ? 'true' : undefined}>
+<header class="site-header" data-header data-theme="dark" data-overlay={overlay ? 'true' : undefined}>
   <OpeningStatus>
     <a slot="leading" class="header-logo" href={url('/')} aria-label={`${company.name} – Startseite`}>
       <Logo tone={overlay ? 'light' : 'dark'} />
@@ -55,7 +55,6 @@ const isActive = (href: string, children?: { href: string }[]) =>
     -webkit-backdrop-filter: saturate(1.4) blur(14px);
     border-bottom: 1px solid var(--line);
     transition:
-      background-color 0.25s ease,
       border-color 0.25s ease,
       box-shadow 0.25s ease;
   }
@@ -97,7 +96,7 @@ const isActive = (href: string, children?: { href: string }[]) =>
 
   .site-header[data-theme='dark'],
   .site-header[data-overlay].is-solid[data-theme='dark'] {
-    background: rgb(24 28 30 / 0.72);
+    background: #161412;
     border-color: rgb(255 255 255 / 0.1);
     color: #f7f4ee;
   }

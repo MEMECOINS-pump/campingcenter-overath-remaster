@@ -60,7 +60,8 @@ const faqs = [
     serviceSchema('Ankauf von Wohnmobilen, Wohnwagen, Vans und Booten', ankauf.promise, '/wohnmobil-ankauf/', Astro.site),
   ]}
 >
-  <section class="page-hero section-dark ak-hero">
+  <section class="page-hero atmo ak-hero" data-header-theme="dark">
+    <Atmosphere src="atmo-campfire" priority />
     <div class="container ak-hero-grid">
       <div>
         <Breadcrumbs items={crumbs} tone="light" />
@@ -478,7 +479,7 @@ const faqs = [
   }
 
   .wz-step-name {
-    color: var(--text-muted);
+    color: rgb(255 255 255 / 0.88);
   }
 
   .wz-bar {
@@ -525,7 +526,7 @@ const faqs = [
     font-family: var(--font-body);
     font-size: var(--fs-sm);
     font-weight: 750;
-    color: var(--brand-ink);
+    color: #ffd9a3;
   }
 
   .wz-hint {
@@ -603,6 +604,11 @@ const faqs = [
     :global(body.kb-open) .wz-nav {
       position: static;
       box-shadow: none;
+    }
+
+    .wz-nav :global(.btn-ghost) {
+      --btn-fg: var(--text);
+      --btn-border: var(--line-strong);
     }
   }
 

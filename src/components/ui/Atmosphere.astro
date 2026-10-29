@@ -13,7 +13,9 @@ const { src, focus = 'center', priority = false } = Astro.props;
 const named = src.startsWith('atmo-') ? src.slice('atmo-'.length) : focus;
 ---
 
-<div class:list={['atmo-media', `focus-${named}`]} aria-hidden="true">
-  <Photo src={src} alt="" sizes="100vw" widths={[640, 1280, 1920, 2560, 3840]} quality={72} priority={priority} />
+<div class="atmo-stack" data-atmo-stack aria-hidden="true">
+  <div class:list={['atmo-band', 'is-only', `focus-${named}`]}>
+    <Photo src={src} alt="" sizes="100vw" widths={[640, 960, 1280, 1920, 2560, 3200, 3840, 5120]} quality={85} priority={priority} />
+  </div>
 </div>
 <div class="atmo-shade" aria-hidden="true"></div>
