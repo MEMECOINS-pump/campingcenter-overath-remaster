@@ -19,7 +19,7 @@ const crumbs = [{ label: 'Merkliste', href: '/merkliste/' }];
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
   <section class="page-hero atmo" data-header-theme="dark">
-    <Atmosphere src="atmo-meadow" focus="right" />
+    <Atmosphere src="atmo-forest" focus="right" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Merkliste</p>
@@ -28,7 +28,8 @@ const crumbs = [{ label: 'Merkliste', href: '/merkliste/' }];
     </div>
   </section>
 
-  <section class="section-tight" aria-label="Gemerkte Fahrzeuge" data-favlist>
+  <section class="section-tight atmo" data-header-theme="dark" aria-label="Gemerkte Fahrzeuge" data-favlist>
+    <Atmosphere src="atmo-stars" />
     <div class="container">
       <div class="fl-toolbar" data-fl-toolbar hidden>
         <p class="fl-count" role="status" aria-live="polite"><strong data-fl-count>0</strong> <span data-fl-noun>Fahrzeuge</span> gemerkt</p>

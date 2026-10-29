@@ -1,4 +1,5 @@
 ---
+import Atmosphere from '@/components/ui/Atmosphere.astro';
 import Icon from '@/components/ui/Icon.astro';
 import MapPreview from '@/components/embeds/MapPreview.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
@@ -12,7 +13,8 @@ interface Props {
 const { title = 'Wir sind für dich da.', eyebrow = 'Kontakt & Anfahrt' } = Astro.props;
 ---
 
-<section class="section section-sand contact" aria-labelledby="contact-title">
+<section class="section atmo contact" data-header-theme="dark" aria-labelledby="contact-title">
+  <Atmosphere src="atmo-shore" />
   <div class="container contact-grid">
     <div class="contact-info">
       <SectionHeader id="contact-title" eyebrow={eyebrow} title={title} />

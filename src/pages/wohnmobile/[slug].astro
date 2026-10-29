@@ -66,7 +66,8 @@ const benefits = isNew
   actionBar={false}
   jsonLd={[vehicleSchema(v, absoluteUrl(path, Astro.site), Astro.site), breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <article class="vd" data-vehicle-page={v.id}>
+  <article class="vd atmo" data-header-theme="dark" data-vehicle-page={v.id}>
+    <Atmosphere src="atmo-shore" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
 
@@ -220,7 +221,7 @@ const benefits = isNew
     {
       similar.length > 0 && (
         <section class="section atmo" data-header-theme="dark" aria-labelledby="vd-similar">
-          <Atmosphere src="atmo-lake" focus="right" />
+          <Atmosphere src="atmo-shore" focus="right" />
           <div class="container">
             <div class="section-head-row">
               <div class="section-head">

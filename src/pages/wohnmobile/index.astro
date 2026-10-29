@@ -24,7 +24,7 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
   <section class="page-hero atmo sr-hero" data-header-theme="dark">
-    <Atmosphere src="atmo-meadow" focus="center" />
+    <Atmosphere src="atmo-forest" focus="center" />
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Fahrzeuge im Bestand</p>
@@ -35,7 +35,8 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
     </div>
   </section>
 
-  <section class="section-tight showroom" aria-label="Fahrzeugübersicht">
+  <section class="section-tight atmo showroom" data-header-theme="dark" aria-label="Fahrzeugübersicht">
+    <Atmosphere src="atmo-shore" />
     <div class="container sr-layout">
       <aside class="sr-aside" aria-labelledby="sr-filter-title">
         <h2 id="sr-filter-title" class="sr-aside-title">Filter</h2>
