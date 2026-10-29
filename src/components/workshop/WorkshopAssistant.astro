@@ -1,10 +1,8 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import Icon from '@/components/ui/Icon.astro';
 ---
 
-<section class="section atmo" id="assistent" data-header-theme="dark" aria-labelledby="wa-title">
-  <Atmosphere src="atmo-forest" />
+<section class="section section-sand" id="assistent" aria-labelledby="wa-title">
   <div class="container wa">
     <div class="wa-copy">
       <p class="eyebrow">Werkstatt-Assistent</p>
@@ -22,15 +20,15 @@ import Icon from '@/components/ui/Icon.astro';
       <div class="wa-grid">
         <label class="field">
           <span class="field-label">Hersteller</span>
-          <input class="input" type="text" size="1" data-wa-make placeholder="falls bekannt" autocomplete="off" />
+          <input class="input" type="text" size="1" data-wa-make placeholder="optional" autocomplete="off" />
         </label>
         <label class="field">
           <span class="field-label">Modell</span>
-          <input class="input" type="text" size="1" data-wa-model placeholder="falls bekannt" autocomplete="off" />
+          <input class="input" type="text" size="1" data-wa-model placeholder="optional" autocomplete="off" />
         </label>
         <label class="field">
           <span class="field-label">Fehlercode</span>
-          <input class="input" type="text" size="1" data-wa-code placeholder="falls bekannt" autocomplete="off" />
+          <input class="input" type="text" size="1" data-wa-code placeholder="optional" autocomplete="off" />
         </label>
       </div>
       <button type="button" class="btn btn-accent" data-wa-run>

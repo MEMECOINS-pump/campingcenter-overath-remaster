@@ -2,7 +2,6 @@
  * Stellenangebote laut https://ccoverath.de/jobs/ (Stand 2026-09-30).
  * `sourceModified` ist das Änderungsdatum der jeweiligen Originalseite (WordPress REST API).
  */
-import { company } from './company';
 
 export interface Job {
   slug: string;
@@ -69,7 +68,7 @@ export const jobs: Job[] = [
       'Als Reinigungskraft sorgst du dafür, dass sich unser Team und unsere Kunden in sauberen und gepflegten Räumen wohlfühlen. Ob Büros, Aufenthaltsräume oder Sanitäranlagen – mit deinem Einsatz machst du den Unterschied!',
     tasks: [
       'Reinigung der Verkaufshalle, WC und Aufenthaltsraum',
-      'Reinigung unserer Vermietflotte sowie von neuen und gebrauchten Reisemobilen und Wohnwagen',
+      'Reinigung unserer Vermietflotte sowie von Neu- und Gebrauchtreisemobilen und Wohnwagen',
     ],
     requirements: [
       'Eigenverantwortliches und lösungsorientiertes Arbeiten',
@@ -102,5 +101,5 @@ export const employer = {
     'Wachsendes Unternehmen',
     'Überdurchschnittliche Bezahlung für Quereinsteiger',
   ],
-  postalContact: `${company.legalName}, z. Hd. Herrn Martin Meinke, ${company.address.street}, ${company.address.postalCode} ${company.address.city}`,
+  postalContact: 'Campingcenter Overath GmbH & Co KG, z. Hd. Herrn Martin Meinke, Weberstraße 12, 51491 Overath',
 };

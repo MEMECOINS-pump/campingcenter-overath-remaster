@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -29,8 +28,7 @@ const positions = [
   inquiryLabel="Bewerben"
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <header class="page-hero atmo" data-header-theme="dark">
-    <Atmosphere src="atmo-shore" focus="right" />
+  <header class="page-hero">
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Bewerbung</p>
@@ -39,8 +37,7 @@ const positions = [
     </div>
   </header>
 
-  <section id="bewerbung" class="section-tight atmo" data-header-theme="dark">
-    <Atmosphere src="atmo-stars" />
+  <section id="bewerbung" class="section-tight">
     <div class="container bw-grid">
       <div class="card card-pad">
         <form class="form-stack" data-form="application" data-subject="Bewerbung über die Website">

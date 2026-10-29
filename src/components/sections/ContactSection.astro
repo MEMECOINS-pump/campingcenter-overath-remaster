@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import Icon from '@/components/ui/Icon.astro';
 import MapPreview from '@/components/embeds/MapPreview.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
@@ -13,8 +12,7 @@ interface Props {
 const { title = 'Wir sind für dich da.', eyebrow = 'Kontakt & Anfahrt' } = Astro.props;
 ---
 
-<section class="section atmo contact" data-header-theme="dark" aria-labelledby="contact-title">
-  <Atmosphere src="atmo-shore" />
+<section class="section section-sand contact" aria-labelledby="contact-title">
   <div class="container contact-grid">
     <div class="contact-info">
       <SectionHeader id="contact-title" eyebrow={eyebrow} title={title} />
@@ -100,13 +98,12 @@ const { title = 'Wir sind für dich da.', eyebrow = 'Kontakt & Anfahrt' } = Astr
   .contact-lines {
     margin-top: 1rem;
     font-size: var(--fs-sm);
-    color: rgb(255 255 255 / 0.92);
+    color: var(--text-muted);
     overflow-wrap: anywhere;
-    text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
   }
 
   .contact-lines a {
-    color: #fff;
+    color: var(--text);
     font-weight: 600;
   }
 

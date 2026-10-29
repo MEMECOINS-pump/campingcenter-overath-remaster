@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { company } from '@/data/company';
@@ -17,8 +16,7 @@ const { title, path, original, updated, nativeStatement = false } = Astro.props;
 const originalUrl = original ? new URL(original, company.officialWebsite).href : null;
 ---
 
-<header class="page-hero atmo" data-header-theme="dark">
-  <Atmosphere src="atmo-forest" focus="center" />
+<header class="page-hero">
   <div class="container-narrow">
     <Breadcrumbs items={[{ label: title, href: path }]} />
     <h1>{title}</h1>
@@ -26,9 +24,7 @@ const originalUrl = original ? new URL(original, company.officialWebsite).href :
   </div>
 </header>
 
-<section class="legal-stage atmo" data-header-theme="dark">
-  <Atmosphere src="atmo-stars" />
-  <div class="container-narrow legal">
+<div class="container-narrow legal">
   {
     !nativeStatement && originalUrl && (
       <aside class="legal-note" aria-label="Hinweis zur Präsentationsfassung">
@@ -58,16 +54,11 @@ const originalUrl = original ? new URL(original, company.officialWebsite).href :
   <div class="prose legal-body">
     <slot />
   </div>
-  </div>
-</section>
+</div>
 
 <style>
-  .legal-stage {
-    padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 5rem);
-  }
-
   .legal {
-    color: var(--text);
+    padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
   }
 
   .legal-note {

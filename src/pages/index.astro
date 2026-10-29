@@ -11,7 +11,6 @@ import StorySection from '@/components/home/StorySection.astro';
 import AnkaufTeaser from '@/components/home/AnkaufTeaser.astro';
 import WorkshopTeaser from '@/components/home/WorkshopTeaser.astro';
 import RentalTeaser from '@/components/home/RentalTeaser.astro';
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import FaqAccordion from '@/components/ui/FaqAccordion.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import ContactSection from '@/components/sections/ContactSection.astro';
@@ -41,8 +40,7 @@ import { faqSchema } from '@/lib/schema';
   <RentalTeaser />
   <StorySection />
 
-  <section class="section atmo faq-section" data-header-theme="dark" aria-labelledby="faq-title">
-    <Atmosphere src="atmo-forest" focus="center" />
+  <section class="section faq-section" aria-labelledby="faq-title">
     <div class="container faq-grid">
       <SectionHeader id="faq-title" eyebrow="Häufige Fragen" title="Gut zu wissen." lead="Die wichtigsten Antworten rund um Kauf, Ankauf, Miete und Werkstatt." />
       <FaqAccordion items={faqs} />

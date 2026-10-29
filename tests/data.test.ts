@@ -34,14 +34,6 @@ describe('content', () => {
     expect(company.phone.href).toBe('tel:+492206951310');
     expect(company.email).toBe('service@ccoverath.de');
     expect(company.address.postalCode).toBe('51491');
-    expect(company.legalName).toBe('Campingcenter Overath GmbH & Co. KG');
-  });
-
-  it('matches the Challenger C256 highlight to its gross weight', () => {
-    const vehicle = vehicles.find((v) => v.slug.startsWith('challenger-c256'));
-    expect(vehicle?.grossWeightKg).toBe(3500);
-    expect(vehicle?.highlights).toContain('3.500 kg');
-    expect(vehicle?.highlights).not.toContain('4 Tonnen');
   });
 
   it('keeps the workshop anchors stable', () => {

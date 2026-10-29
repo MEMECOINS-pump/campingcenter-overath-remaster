@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -26,13 +25,12 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     eyebrow="Über uns"
     title="Von Campern für Camper."
     lead={story.lead}
-    image="atmo-forest"
-    imageAlt=""
-    focus="center"
+    image="team-wide"
+    imageAlt="Das Team des Campingcenter Overath"
+    focus="top"
   />
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-story">
-    <Atmosphere src="atmo-shore" focus="center" />
+  <section class="section" aria-labelledby="ab-story">
     <div class="container split ab-story">
       <div class="ab-intro">
         <p class="eyebrow">Unsere Geschichte</p>
@@ -48,10 +46,13 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     </div>
   </section>
 
+  <section class="ab-wide" aria-hidden="true">
+    <Photo src="panorama-yard" alt="" sizes="100vw" widths={[640, 1024, 1600, 2200]} />
+  </section>
+
   <Journey />
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-videos">
-    <Atmosphere src="atmo-forest" focus="center" />
+  <section class="section" aria-labelledby="ab-videos">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Filme</p>
@@ -65,8 +66,7 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ab-jobs">
-    <Atmosphere src="atmo-forest" focus="left" />
+  <section class="section section-dark" aria-labelledby="ab-jobs">
     <div class="container split">
       <div class="ab-jobs-photo">
         <Photo src="team" alt="Mitarbeitende des Campingcenter Overath" sizes="(min-width: 60em) 45vw, 92vw" widths={[480, 768, 1080]} />
@@ -109,7 +109,7 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
   }
 
   .ab-stat span {
-    color: rgb(255 255 255 / 0.88);
+    color: var(--text-muted);
   }
 
   .ab-body {
@@ -117,6 +117,12 @@ const crumbs = [{ label: 'Über uns', href: '/ueber-uns/' }];
     gap: 1rem;
     font-size: var(--fs-lg);
     line-height: 1.65;
+  }
+
+  .ab-wide :global(img) {
+    width: 100%;
+    height: clamp(14rem, 40vw, 34rem);
+    object-fit: cover;
   }
 
   .ab-video-grid {

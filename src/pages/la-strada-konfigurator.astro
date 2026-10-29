@@ -1,5 +1,4 @@
 ﻿---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Field from '@/components/forms/Field.astro';
@@ -29,8 +28,8 @@ const configuratorUrl = 'https://konfigurator.lastrada-mobile.de/konfigurator';
     eyebrow="LA STRADA · Vertragspartner"
     title="Dein LA STRADA. Bei uns konfiguriert."
     lead="Nutze den offiziellen LA STRADA Konfigurator und sende uns danach deine Konfiguration – wir erstellen dir ein persönliches, unverbindliches Angebot."
-    image="atmo-shore"
-    imageAlt=""
+    image="challenger-bridge"
+    imageAlt="Reisemobil auf der Straße"
   >
     <a class="btn btn-accent btn-lg" href={configuratorUrl} target="_blank" rel="noopener" data-track="lastrada_configurator_open">
       Konfigurator öffnen <Icon name="external" /><span class="sr-only"> (öffnet in neuem Tab)</span>
@@ -38,8 +37,7 @@ const configuratorUrl = 'https://konfigurator.lastrada-mobile.de/konfigurator';
     <a class="btn btn-light btn-lg" href="#anfrage">Persönliches Angebot anfragen</a>
   </PageHero>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ls-embed">
-    <Atmosphere src="atmo-forest" focus="center" />
+  <section class="section" aria-labelledby="ls-embed">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Offizieller Konfigurator</p>
@@ -65,8 +63,7 @@ const configuratorUrl = 'https://konfigurator.lastrada-mobile.de/konfigurator';
     </div>
   </section>
 
-  <section class="section atmo" id="anfrage" data-header-theme="dark" aria-labelledby="ls-form-title">
-    <Atmosphere src="atmo-shore" />
+  <section class="section section-sand" id="anfrage" aria-labelledby="ls-form-title">
     <div class="container split">
       <div>
         <p class="eyebrow">Nächster Schritt</p>
@@ -103,16 +100,11 @@ const configuratorUrl = 'https://konfigurator.lastrada-mobile.de/konfigurator';
 <style>
   .ls-frame {
     overflow: hidden;
-    min-width: 0;
-    max-width: 100%;
   }
 
   .ls-iframe {
     display: block;
-    /* width:1px + min-width:100% stops the embedded page from stretching the layout. */
-    width: 1px;
-    min-width: 100%;
-    max-width: 100%;
+    width: 100%;
     min-height: min(78svh, 52rem);
     border: 0;
     background: var(--sand);

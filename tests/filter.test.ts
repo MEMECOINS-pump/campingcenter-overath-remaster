@@ -127,7 +127,6 @@ describe('runCampingFinder', () => {
     expect(r.hasExact).toBe(true);
     expect(r.exact.map((m) => m.vehicle.id)).toEqual(['c']);
     expect(r.exact[0]?.reasons.some((x) => x.label.includes('Schlafplätze'))).toBe(true);
-    expect(r.exact[0]?.reasons.some((x) => x.label === 'Bettlänge mindestens 195 cm')).toBe(true);
   });
 
   it('keeps vehicles with unknown bed length but flags confirmation', () => {

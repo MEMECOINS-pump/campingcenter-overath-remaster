@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -66,8 +65,7 @@ const benefits = isNew
   actionBar={false}
   jsonLd={[vehicleSchema(v, absoluteUrl(path, Astro.site), Astro.site), breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <article class="vd atmo" data-header-theme="dark" data-vehicle-page={v.id}>
-    <Atmosphere src="atmo-shore" />
+  <article class="vd" data-vehicle-page={v.id}>
     <div class="container">
       <Breadcrumbs items={crumbs} />
 
@@ -220,8 +218,7 @@ const benefits = isNew
 
     {
       similar.length > 0 && (
-        <section class="section atmo" data-header-theme="dark" aria-labelledby="vd-similar">
-          <Atmosphere src="atmo-shore" focus="right" />
+        <section class="section section-paper" aria-labelledby="vd-similar">
           <div class="container">
             <div class="section-head-row">
               <div class="section-head">
@@ -271,11 +268,6 @@ const benefits = isNew
     display: grid;
     gap: 1.5rem;
     margin-top: 1rem;
-  }
-
-  .vd-gallery {
-    min-width: 0;
-    max-width: 100%;
   }
 
   @media (min-width: 64em) {
@@ -452,7 +444,6 @@ const benefits = isNew
     border-radius: var(--radius-pill);
     background: var(--surface);
     border: 1px solid var(--line);
-    color: var(--text);
     font-weight: 600;
   }
 

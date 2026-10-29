@@ -1,6 +1,5 @@
 ---
 import { Image } from 'astro:assets';
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -25,12 +24,11 @@ const inStock = (make?: string) => (make ? vehicles.filter((v) => v.make === mak
     eyebrow="Vertragshändler"
     title="Starke Marken. Persönliche Beratung."
     lead="Wir beraten dich herstellerübergreifend – und zeigen dir ehrlich, welches Modell wirklich zu dir passt."
-    image="atmo-forest"
-    imageAlt=""
+    image="challenger-bridge"
+    imageAlt="Challenger Wohnmobil auf einer Brücke"
   />
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="mk-brands">
-    <Atmosphere src="atmo-shore" focus="left" />
+  <section class="section" aria-labelledby="mk-brands">
     <div class="container">
       <h2 id="mk-brands" class="sr-only">Unsere Marken</h2>
       <ul class="mk-list" role="list">
@@ -73,8 +71,7 @@ const inStock = (make?: string) => (make ? vehicles.filter((v) => v.make === mak
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="mk-why">
-    <Atmosphere src="atmo-forest" />
+  <section class="section section-sand" aria-labelledby="mk-why">
     <div class="container split">
       <div>
         <p class="eyebrow">Warum mehrere Marken?</p>
@@ -89,8 +86,7 @@ const inStock = (make?: string) => (make ? vehicles.filter((v) => v.make === mak
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="mk-partners">
-    <Atmosphere src="atmo-forest" focus="center" />
+  <section class="section" aria-labelledby="mk-partners">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Zubehör & Service</p>

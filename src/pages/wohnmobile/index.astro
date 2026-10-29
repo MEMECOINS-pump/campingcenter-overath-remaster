@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -9,7 +8,6 @@ import CtaSection from '@/components/sections/CtaSection.astro';
 import { snapshotDate, vehicles, inventorySource } from '@/lib/vehicles';
 import { breadcrumbSchema } from '@/lib/schema';
 import { formatDateDE } from '@/lib/format';
-import { COMPARE_MAX } from '@/lib/collections';
 import { url } from '@/lib/url';
 
 const usedCount = vehicles.filter((v) => v.condition === 'gebraucht').length;
@@ -23,20 +21,18 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
   description={`${vehicles.length} Wohnmobile im Bestand: ${newCount} Neufahrzeuge und ${usedCount} gebrauchte Reisemobile von Challenger, La Strada, Eura Mobil und mehr. Filtern, merken, vergleichen – persönlich beraten in Overath.`}
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <section class="page-hero atmo sr-hero" data-header-theme="dark">
-    <Atmosphere src="atmo-forest" focus="center" />
+  <section class="page-hero section-paper sr-hero">
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Fahrzeuge im Bestand</p>
       <h1>Wohnmobile in Overath</h1>
       <p class="lead">
-        {newCount} Neufahrzeuge und {usedCount} gebrauchte Wohnmobile – alle bei uns vor Ort. Filtere nach deinen Wünschen, merke dir Favoriten oder vergleiche bis zu {COMPARE_MAX} Fahrzeuge.
+        {newCount} Neufahrzeuge und {usedCount} gebrauchte Wohnmobile – alle bei uns vor Ort. Filtere nach deinen Wünschen, merke dir Favoriten oder vergleiche bis zu drei Fahrzeuge.
       </p>
     </div>
   </section>
 
-  <section class="section-tight atmo showroom" data-header-theme="dark" aria-label="Fahrzeugübersicht">
-    <Atmosphere src="atmo-shore" />
+  <section class="section-tight showroom" aria-label="Fahrzeugübersicht">
     <div class="container sr-layout">
       <aside class="sr-aside" aria-labelledby="sr-filter-title">
         <h2 id="sr-filter-title" class="sr-aside-title">Filter</h2>
@@ -56,7 +52,7 @@ const crumbs = [{ label: 'Wohnmobile', href: '/wohnmobile/' }];
           <div class="sr-sort">
             <label for="sr-sort">Sortieren</label>
             <select id="sr-sort" class="select" data-sort>
-              <option value="empfohlen">Empfohlen</option>
+              <option value="empfohlen">Empfohlene Reihenfolge</option>
               <option value="preis-auf">Preis aufsteigend</option>
               <option value="preis-ab">Preis absteigend</option>
               <option value="km-auf">Kilometer aufsteigend</option>
