@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -25,8 +24,7 @@ const icons = ['tag', 'shield', 'key', 'check', 'users', 'refresh'] as const;
   description={`${used.length} gebrauchte Wohnmobile im Bestand – von Campern geprüft, mit ehrlicher Beratung, Finanzierung und Inzahlungnahme. Campingcenter Overath, Weberstraße 12.`}
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <section class="page-hero atmo" data-header-theme="dark">
-    <Atmosphere src="atmo-shore" focus="right" />
+  <section class="page-hero section-paper">
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Gebrauchte Wohnmobile</p>
@@ -41,8 +39,7 @@ const icons = ['tag', 'shield', 'key', 'check', 'users', 'refresh'] as const;
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="used-why">
-    <Atmosphere src="atmo-forest" focus="left" />
+  <section class="section" aria-labelledby="used-why">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Warum gebraucht?</p>
@@ -64,8 +61,7 @@ const icons = ['tag', 'shield', 'key', 'check', 'users', 'refresh'] as const;
     </div>
   </section>
 
-  <section id="bestand" class="section atmo" data-header-theme="dark" aria-labelledby="used-stock">
-    <Atmosphere src="atmo-forest" focus="center" />
+  <section id="bestand" class="section section-paper" aria-labelledby="used-stock">
     <div class="container">
       <div class="section-head-row">
         <div class="section-head">
@@ -89,8 +85,7 @@ const icons = ['tag', 'shield', 'key', 'check', 'users', 'refresh'] as const;
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="used-sell">
-    <Atmosphere src="atmo-shore" focus="center" />
+  <section class="section" aria-labelledby="used-sell">
     <div class="container">
       <div class="used-sell card card-pad">
         <div>

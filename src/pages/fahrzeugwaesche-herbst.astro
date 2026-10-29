@@ -1,5 +1,4 @@
 ﻿---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -33,8 +32,8 @@ const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin
     eyebrow={promotion.eyebrow}
     title="Sauber in die nächste Saison."
     lead={promotion.lead}
-    image="atmo-shore"
-    imageAlt=""
+    image="wash-result"
+    imageAlt="Frisch gewaschenes Wohnmobil"
   >
     <a class="btn btn-accent btn-lg" href={termin} data-track="cta_click" data-track-location="wash_hero">
       Waschtermin anfragen <Icon name="arrow-right" class="arrow" />
@@ -44,8 +43,7 @@ const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin
     </a>
   </PageHero>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="fw-offer">
-    <Atmosphere src="atmo-forest" focus="right" />
+  <section class="section" aria-labelledby="fw-offer">
     <div class="container fw-grid">
       <div class="card card-pad fw-price">
         <p class="eyebrow">Außenreinigung komplett</p>
@@ -78,8 +76,7 @@ const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin
     </div>
   </section>
 
-  <section class="section-tight atmo" data-header-theme="dark" aria-label="Hinweis">
-    <Atmosphere src="atmo-shore" />
+  <section class="section-tight" aria-label="Hinweis">
     <div class="container-narrow">
       <p class="small muted fw-disclaimer">
         <Icon name="info" />
@@ -159,7 +156,7 @@ const termin = url('/werkstatt-kundendienst/?anliegen=Fahrzeugw%C3%A4sche#termin
   .fw-results :global(.icon) {
     flex: none;
     margin-top: 0.15rem;
-    color: #ffd9a3;
+    color: var(--brand-ink);
   }
 
   .fw-photo {

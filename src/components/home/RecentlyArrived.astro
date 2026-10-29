@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import VehicleCard from '@/components/vehicles/VehicleCard.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
@@ -12,8 +11,7 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
 
 {
   arrived.length > 0 && (
-    <section class="section atmo arrived" data-header-theme="dark" aria-labelledby="arrived-title">
-      <Atmosphere src="atmo-stars" />
+    <section class="section arrived" aria-labelledby="arrived-title">
       <div class="container">
         <div class="section-head-row">
           <SectionHeader
@@ -47,6 +45,10 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
 }
 
 <style>
+  .arrived {
+    background: var(--sand);
+  }
+
   .rail {
     margin-inline: calc(var(--gutter) * -1);
     min-width: 0;
@@ -82,7 +84,7 @@ const { vehicles: arrived, showNewBadge } = recentlyArrivedVehicles(4);
   .arrived-note {
     margin-top: 0.75rem;
     font-size: var(--fs-xs);
-    color: rgb(255 255 255 / 0.86);
+    color: var(--text-muted);
   }
 
   @media (min-width: 64em) {

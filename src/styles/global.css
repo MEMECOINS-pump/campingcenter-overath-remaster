@@ -287,13 +287,6 @@ main#main[data-cco-main] {
   }
 }
 
-/* Two-line status ("Geschlossen" + next opening) must stay inside the header, not over the page. */
-@media (max-width: 89.99em) {
-  :root {
-    --header-utility-h: 4.25rem;
-  }
-}
-
 /* One header row once the logo–nav gap can hold the status pill. */
 @media (min-width: 90em) {
   :root {
@@ -315,12 +308,6 @@ html {
   hanging-punctuation: first last;
 }
 
-@media (max-width: 63.99em) {
-  html:has(body[data-actionbar]) {
-    scroll-padding-bottom: calc(4.2rem + var(--companion-fab-h) + 1rem + var(--safe-bottom));
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -330,7 +317,7 @@ html {
 body {
   margin: 0;
   min-height: 100svh;
-  background: #141210;
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--fs-md);
@@ -559,10 +546,6 @@ ol.grid {
   align-items: center;
 }
 
-.split > * {
-  min-width: 0;
-}
-
 @media (min-width: 60em) {
   .split {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -670,9 +653,7 @@ ol.grid {
   letter-spacing: 0.005em;
   line-height: 1.2;
   text-decoration: none;
-  max-width: 100%;
-  white-space: normal;
-  text-align: center;
+  white-space: nowrap;
   transition:
     background-color var(--dur) var(--ease),
     color var(--dur) var(--ease),
@@ -681,6 +662,14 @@ ol.grid {
     box-shadow var(--dur) var(--ease);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+@media (max-width: 24em) {
+  .btn {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .btn:hover {
@@ -1038,8 +1027,6 @@ ol.grid {
 .select,
 .textarea {
   width: 100%;
-  min-width: 0;
-  max-width: 100%;
   min-height: 3.25rem;
   padding: 0.8rem 1rem;
   border: 1px solid var(--line-strong);
@@ -1334,12 +1321,16 @@ ol.grid {
 
 @media (prefers-reduced-motion: no-preference) {
   .js .reveal {
+    opacity: 0;
     transform: translateY(18px);
-    transition: transform 700ms var(--ease-out);
+    transition:
+      opacity 700ms var(--ease-out),
+      transform 700ms var(--ease-out);
     transition-delay: var(--delay, 0ms);
   }
 
   .js .reveal.is-visible {
+    opacity: 1;
     transform: none;
   }
 }
@@ -1405,8 +1396,6 @@ body.scroll-locked {
 @media (max-width: 63.99em) {
   body[data-actionbar] {
     --actionbar-h: 4.2rem;
-    /* Action bar plus the compass, so the last content can scroll clear of both. */
-    padding-bottom: calc(var(--actionbar-h) + var(--companion-fab-h) + 0.85rem + var(--safe-bottom));
   }
 
   /* Chat/Keyboard: Actionbar ist weg – Layout-Offset mitziehen */
@@ -1418,7 +1407,6 @@ body.scroll-locked {
   /* Ankauf-Wizard: sticky Bottom-Nav → Chat/Cookie höher */
   body.page-ankauf {
     --actionbar-h: 4.5rem;
-    padding-bottom: calc(var(--actionbar-h) + var(--companion-fab-h) + 0.85rem + var(--safe-bottom));
   }
 
   body.page-ankauf.bar-hidden,
@@ -1494,448 +1482,6 @@ body:has(.chatw.is-open) .ctray {
 .page-hero {
   position: relative;
   padding-block: clamp(2.25rem, 1.5rem + 3vw, 4.5rem) clamp(2rem, 1.5rem + 2vw, 3.5rem);
-}
-
-/* Photo bands replace large flat ivory/paper areas. Text stays on a dark scrim (WCAG AA). */
-.atmo {
-  position: relative;
-  isolation: isolate;
-  color: #fff;
-  /* Shared ground. Every photo feathers into this so sections meet without a hard seam. */
-  background:
-    radial-gradient(120% 28rem at 50% 0%, rgb(92 52 24 / 0.28), transparent 72%),
-    #141210;
-  overflow: clip;
-}
-
-.atmo-stack,
-.atmo-shade {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.atmo-stack {
-  overflow: hidden;
-}
-
-/* One cover per band. Tall sections repeat the same frame, overlapped,
-   so the photo fills the section without stretching a single crop. */
-.atmo-band {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 100%;
-  /* Fade only the lower edge. The next band sits underneath, fully opaque,
-     so two copies of the same crop meet without a dark seam. */
-  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 calc(100% - 6rem), transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0, #000 calc(100% - 6rem), transparent 100%);
-}
-
-.atmo-band.is-first:not(.is-only) {
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 5rem, #000 calc(100% - 6rem), transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0, #000 5rem, #000 calc(100% - 6rem), transparent 100%);
-}
-
-.atmo-band.is-only {
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 min(5rem, 18%), #000 calc(100% - min(6rem, 22%)), transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0, #000 min(5rem, 18%), #000 calc(100% - min(6rem, 22%)), transparent 100%);
-}
-
-.page-hero.atmo .atmo-band {
-  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 calc(100% - min(7rem, 26%)), transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0, #000 calc(100% - min(7rem, 26%)), transparent 100%);
-}
-
-.atmo-card .atmo-band {
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-.atmo-band picture,
-.atmo-band img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.atmo-band img {
-  /* One warm grade so campfire, forest, night and lake read as one series. */
-  filter: sepia(0.16) saturate(0.86) contrast(1.05) brightness(0.88);
-}
-
-.atmo-band.focus-left img {
-  object-position: 20% 50%;
-}
-
-.atmo-band.focus-right img {
-  object-position: 80% 50%;
-}
-
-.atmo-band.focus-top img {
-  object-position: 50% 20%;
-}
-
-.atmo-band.focus-bottom img {
-  object-position: 50% 80%;
-}
-
-/* Keep the subject in frame from a 320px phone up to a wide desktop. */
-.atmo-band.focus-campfire img {
-  object-position: 50% 62%;
-}
-
-.atmo-band.focus-forest img {
-  object-position: 48% 46%;
-}
-
-.atmo-band.focus-stars img {
-  object-position: 50% 72%;
-}
-
-.atmo-band.focus-shore img {
-  object-position: 58% 70%;
-}
-
-@media (min-width: 48em) {
-  .atmo-band.focus-campfire img {
-    object-position: 50% 55%;
-  }
-
-  .atmo-band.focus-stars img {
-    object-position: 46% 38%;
-  }
-
-  .atmo-band.focus-shore img {
-    object-position: 70% 74%;
-  }
-}
-
-@media (min-width: 80em) {
-  .atmo-band.focus-forest img {
-    object-position: 50% 42%;
-  }
-
-  .atmo-band.focus-shore img {
-    object-position: 64% 68%;
-  }
-}
-
-.atmo-shade {
-  background:
-    linear-gradient(180deg, rgb(20 18 16 / 0.34), rgb(20 18 16 / 0.1) 16%, rgb(20 18 16 / 0.14) 72%, rgb(20 18 16 / 0.42)),
-    linear-gradient(90deg, rgb(12 10 8 / 0.48), rgb(12 10 8 / 0.08) 46%, rgb(12 10 8 / 0.16));
-}
-
-/* The stock grid sits on a sunlit forest. Keep the heading band dark enough
-   for white type, then let the photograph show between the cards. */
-.featured .atmo-shade {
-  background:
-    linear-gradient(180deg, rgb(12 14 10 / 0.4) 0, rgb(12 14 10 / 0.18) 7rem, rgb(12 14 10 / 0.06) 14rem, rgb(12 14 10 / 0.04) 72%, rgb(12 14 10 / 0.34)),
-    linear-gradient(90deg, rgb(8 10 6 / 0.22), transparent 40%);
-}
-
-.featured .atmo-band img {
-  /* Aim at the sunlit trunks, not the dark foreground, and lift the exposure. */
-  filter: sepia(0.05) saturate(1.05) contrast(1.04) brightness(1.16);
-  object-position: 58% 34%;
-}
-
-.featured .atmo-band.is-first:not(.is-only) {
-  -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.45) 0, #000 3rem, #000 calc(100% - 6rem), transparent 100%);
-  mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.45) 0, #000 3rem, #000 calc(100% - 6rem), transparent 100%);
-}
-
-.atmo.featured .btn-ghost {
-  --btn-bg: rgb(12 14 10 / 0.62);
-  --btn-fg: #fff;
-  --btn-border: rgb(255 255 255 / 0.62);
-}
-
-.atmo > :not(.atmo-stack):not(.atmo-shade) {
-  position: relative;
-  z-index: 1;
-}
-
-.atmo .eyebrow,
-.atmo :is(h1, h2, h3) {
-  color: #fff;
-  text-shadow: 0 1px 18px rgb(0 0 0 / 0.35);
-}
-
-.atmo .eyebrow {
-  color: #ffd9a3;
-}
-
-.atmo .lead,
-.atmo .muted,
-.atmo .small {
-  color: rgb(255 255 255 / 0.92);
-  text-shadow: 0 1px 14px rgb(0 0 0 / 0.28);
-}
-
-.atmo .crumbs,
-.atmo .crumbs a,
-.atmo .crumbs [aria-current] {
-  color: rgb(255 255 255 / 0.92);
-}
-
-.atmo a:not(.btn) {
-  color: #fff;
-}
-
-.atmo :is(.card, .vcard, .legal, .vd-summary, .map-card, .hours, .finder-opt-card, .choice-body, .sr-aside, .cmp, .faq-item, .quick-card) a:not(.btn) {
-  color: var(--text);
-}
-
-.atmo .btn-ghost {
-  --btn-fg: #fff;
-  --btn-border: rgb(255 255 255 / 0.5);
-}
-
-.atmo .btn-ghost:hover {
-  --btn-bg: rgb(255 255 255 / 0.12);
-  --btn-border: #fff;
-}
-
-/* Cards, logos and form controls keep dark text on a light surface. */
-.atmo :is(.vcard, .card, .faq-item, .quick-card, .fpanel, .brand-link, .trust li, .jb-benefits li, .rt-steps li, .finder-why, .type, .hours, .choice-body, .sr-toolbar, .sr-aside, .legal, .ws-jump a, .mk-partners a, .partner, .input, .select, .textarea) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo :is(.card, .vcard, .faq-item, .quick-card, .trust li, .brand-link, .rt-steps li, .finder-why, .jb-benefits li, .type, .hours, .choice-body, .legal) :is(h1, h2, h3, p, li, strong, small, a, summary) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo :is(.card, .vcard, .faq-item, .quick-card) .btn {
-  color: var(--btn-fg);
-}
-
-.atmo :is(.card, .vcard, .faq-item, .rt-steps li, .finder-why, .legal, .hours, .map-card, .vd-summary, .cmp, .agb-doc) :is(.muted, .small) {
-  color: var(--text-muted);
-  text-shadow: none;
-}
-
-.atmo .vd-highlights li {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo :is(.card, .vcard, .faq-item, .quick-card, .legal) .eyebrow {
-  color: var(--brand-ink);
-  text-shadow: none;
-}
-
-.atmo .faq {
-  border: 0;
-  gap: 0.45rem;
-}
-
-.atmo .faq-item {
-  background: rgb(250 248 244 / 0.96);
-  border-radius: var(--radius);
-  padding-inline: 0.85rem;
-  margin-bottom: 0.45rem;
-}
-
-.atmo .faq-item :is(summary, p, h3) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo :is(.card, .vcard, .faq-item, .quick-card) .btn-ghost {
-  --btn-fg: var(--text);
-  --btn-border: var(--line-strong);
-}
-
-.atmo :is(.card, .vcard, .faq-item, .quick-card) .btn-ghost:hover {
-  --btn-bg: var(--white);
-  --btn-border: var(--graphite);
-}
-
-.atmo .legal {
-  background: rgb(250 248 244 / 0.97);
-  border-radius: var(--radius-lg);
-  padding: clamp(1.25rem, 0.8rem + 1.5vw, 2.25rem);
-  margin-block: 1.25rem 0;
-}
-
-.atmo .sr-aside {
-  background: rgb(250 248 244 / 0.96);
-  border-radius: var(--radius-lg);
-  padding: 1rem 0.85rem 1rem 1rem;
-}
-
-.atmo .sr-aside :is(h2, h3, p, label, span, legend) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo .sr-aside .btn-ghost {
-  --btn-fg: var(--text);
-  --btn-border: var(--line-strong);
-}
-
-@media (max-width: 63.99em) {
-  .atmo .sr-toolbar,
-  .atmo .sr-toolbar :is(p, span, button) {
-    color: var(--text);
-    text-shadow: none;
-  }
-
-  .atmo .sr-toolbar .btn-ghost {
-    --btn-fg: var(--text);
-    --btn-border: var(--line-strong);
-  }
-}
-
-.atmo .vd-summary {
-  background: rgb(250 248 244 / 0.96);
-  color: var(--text);
-  border-radius: var(--radius-lg);
-  padding: 1.15rem 1.2rem 1.25rem;
-}
-
-.atmo .vd-summary :is(h1, h2, p, a, span, small, li, dt, dd, strong, label) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo .vd-facts,
-.atmo .vd-facts :is(dt, dd) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo .vd-facts dt,
-.atmo .vd-summary .muted,
-.atmo .vd-price small {
-  color: var(--text-muted);
-  text-shadow: none;
-}
-
-.atmo .contact-address,
-.atmo .contact-lines,
-.atmo .contact-lines a {
-  color: rgb(255 255 255 / 0.92);
-  text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
-}
-
-.atmo .map-card,
-.atmo .map-card :is(p, a, button) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo .map-card .map-note,
-.atmo .map-card .map-note a {
-  color: var(--text-muted);
-  text-shadow: none;
-}
-
-/* Light chips and option cards must not inherit the photo-band's white type. */
-.atmo :is(.finder-opt-card, .choice-body, .seg-opt span, .chip-choice span) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo .finder-opt-card :is(strong, span, small),
-.atmo .choice-body :is(strong, span, small) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo .finder-opt-card span,
-.atmo .choice-body small {
-  color: var(--text-muted);
-}
-
-.atmo .finder-opt input:hover + .finder-opt-card,
-.atmo .choice input:hover + .choice-body,
-.atmo .seg-opt input:hover + span,
-.atmo .chip-choice input:hover + span {
-  border-color: var(--graphite);
-}
-
-.atmo .finder-opt input:checked + .finder-opt-card {
-  color: var(--text);
-  background: var(--sand);
-  border-color: var(--graphite);
-  box-shadow: inset 0 0 0 1px var(--graphite);
-}
-
-.atmo .finder-opt input:checked + .finder-opt-card strong {
-  color: var(--text);
-}
-
-.atmo .finder-opt input:checked + .finder-opt-card span {
-  color: var(--text-muted);
-}
-
-.atmo .finder-opt input:focus-visible + .finder-opt-card,
-.atmo .choice input:focus-visible + .choice-body {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
-
-.atmo .seg-opt input:checked + span,
-.atmo .chip-choice input:checked + span {
-  background: var(--graphite);
-  border-color: var(--graphite);
-  color: #fff;
-}
-
-.atmo .cmp,
-.atmo .cmp-empty,
-.atmo .cmp-head {
-  color: var(--text);
-  text-shadow: none;
-  background: rgb(250 248 244 / 0.96);
-}
-
-.atmo .cmp-head {
-  background: rgb(250 248 244 / 0.98);
-}
-
-.atmo .cmp :is(h2, h3, p, a, strong, span),
-.atmo .cmp-empty :is(h2, h3, p, a) {
-  color: var(--text);
-  text-shadow: none;
-}
-
-.atmo .cmp .cmp-label,
-.atmo .cmp .cmp-spec.is-same .cmp-values p,
-.atmo .cmp .muted {
-  color: var(--text-muted);
-  text-shadow: none;
-}
-
-.atmo .hint {
-  color: rgb(255 255 255 / 0.9);
-  text-shadow: 0 1px 12px rgb(0 0 0 / 0.3);
-}
-
-.atmo :is(.card, .legal, .finder-opt-card, .choice-body, .hours) .hint {
-  color: var(--text-muted);
-  text-shadow: none;
-}
-
-.atmo .finder-num {
-  color: #ffd9a3;
-}
-
-.atmo .map-card .btn {
-  color: var(--btn-fg);
-}
-
-.atmo .map-card .btn-ghost {
-  --btn-fg: var(--text);
-  --btn-border: var(--line-strong);
 }
 
 .page-hero h1 {
@@ -2018,11 +1564,6 @@ body:has(.chatw.is-open) .ctray {
   color: var(--text);
 }
 
-.atmo .crumbs a:hover,
-.atmo .crumbs [aria-current] {
-  color: #fff;
-}
-
 .crumbs [aria-current] {
   color: var(--text);
   font-weight: 600;
@@ -2054,7 +1595,7 @@ body:has(.chatw.is-open) .ctray {
   grid-template-columns: minmax(0, 1fr);
   min-height: clamp(32rem, 72svh, 44rem);
   color: #fff;
-  background: #141210;
+  background: #2a2622;
   overflow: clip;
 }
 
@@ -2074,7 +1615,6 @@ body:has(.chatw.is-open) .ctray {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: sepia(0.16) saturate(0.86) contrast(1.05) brightness(0.88);
 }
 
 .phero.focus-left .phero-media img {
@@ -2095,8 +1635,8 @@ body:has(.chatw.is-open) .ctray {
 
 .phero-shade {
   background:
-    linear-gradient(180deg, rgb(20 18 16 / 0.55) 0%, rgb(20 18 16 / 0.18) 20%, rgb(20 18 16 / 0.22) calc(100% - 10rem), #141210 100%),
-    linear-gradient(90deg, rgb(20 16 12 / 0.5), transparent 62%);
+    linear-gradient(to top, rgb(14 12 10 / 0.9) 0%, rgb(14 12 10 / 0.55) 48%, rgb(14 12 10 / 0.62) 100%),
+    linear-gradient(to right, rgb(14 12 10 / 0.72) 0%, rgb(14 12 10 / 0.35) 42%, transparent 78%);
 }
 
 .phero-inner {

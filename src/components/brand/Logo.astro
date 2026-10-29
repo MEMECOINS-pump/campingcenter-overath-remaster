@@ -99,19 +99,18 @@ const clipId = `cco-disc-${Math.random().toString(36).slice(2, 8)}`;
     }
   }
 
-  /* 360px is exactly 22.5em; the old 22.49em cutoff missed it and ellipsized the name. */
-  @media (max-width: 26em) {
+  @media (max-width: 22.49em) {
     .logo {
-      max-width: calc(100vw - 8.75rem);
+      max-width: min(100%, 11.5rem);
     }
 
     .logo-mark {
-      width: 2.15rem;
-      height: 2.15rem;
+      width: 2.2rem;
+      height: 2.2rem;
     }
 
     .logo-name {
-      font-size: clamp(0.78rem, 3.4vw, 0.92rem);
+      font-size: 0.9rem;
     }
   }
 </style>

@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -60,8 +59,7 @@ const faqs = [
     serviceSchema('Ankauf von Wohnmobilen, Wohnwagen, Vans und Booten', ankauf.promise, '/wohnmobil-ankauf/', Astro.site),
   ]}
 >
-  <section class="page-hero atmo ak-hero" data-header-theme="dark">
-    <Atmosphere src="atmo-campfire" priority />
+  <section class="page-hero section-dark ak-hero">
     <div class="container ak-hero-grid">
       <div>
         <Breadcrumbs items={crumbs} tone="light" />
@@ -88,8 +86,7 @@ const faqs = [
     </div>
   </section>
 
-  <section id="bewertung" class="section atmo ak-wizard-section" data-header-theme="dark" aria-labelledby="wz-title">
-    <Atmosphere src="atmo-campfire" />
+  <section id="bewertung" class="section ak-wizard-section" aria-labelledby="wz-title">
     <div class="container ak-layout">
       <div class="ak-main">
         <h2 id="wz-title" class="sr-only">Fahrzeug bewerten lassen</h2>
@@ -325,8 +322,7 @@ const faqs = [
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ak-why">
-    <Atmosphere src="atmo-forest" focus="left" />
+  <section class="section section-paper" aria-labelledby="ak-why">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Warum an uns verkaufen?</p>
@@ -345,8 +341,7 @@ const faqs = [
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ak-faq">
-    <Atmosphere src="atmo-shore" focus="center" />
+  <section class="section" aria-labelledby="ak-faq">
     <div class="container container-narrow">
       <div class="section-head">
         <p class="eyebrow">Häufige Fragen</p>
@@ -479,7 +474,7 @@ const faqs = [
   }
 
   .wz-step-name {
-    color: rgb(255 255 255 / 0.88);
+    color: var(--text-muted);
   }
 
   .wz-bar {
@@ -526,7 +521,7 @@ const faqs = [
     font-family: var(--font-body);
     font-size: var(--fs-sm);
     font-weight: 750;
-    color: #ffd9a3;
+    color: var(--brand-ink);
   }
 
   .wz-hint {
@@ -604,11 +599,6 @@ const faqs = [
     :global(body.kb-open) .wz-nav {
       position: static;
       box-shadow: none;
-    }
-
-    .wz-nav :global(.btn-ghost) {
-      --btn-fg: var(--text);
-      --btn-border: var(--line-strong);
     }
   }
 

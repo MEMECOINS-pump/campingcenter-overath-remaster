@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { company } from '@/data/company';
 
@@ -19,8 +18,7 @@ const trust = [
 ];
 ---
 
-<section class="section atmo journey" data-header-theme="dark" aria-labelledby="journey-title">
-  <Atmosphere src="atmo-shore" focus="center" />
+<section class="section section-paper journey" aria-labelledby="journey-title">
   <div class="container">
     <SectionHeader
       id="journey-title"
@@ -80,7 +78,7 @@ const trust = [
     bottom: 0.25rem;
     left: 1.6rem;
     width: 1px;
-    background: rgb(255 255 255 / 0.45);
+    background: var(--line-strong);
   }
 
   .stage:last-child::before {
@@ -109,7 +107,7 @@ const trust = [
 
   .stage p {
     margin-top: 0.3rem;
-    color: rgb(255 255 255 / 0.9);
+    color: var(--text-muted);
     font-size: var(--fs-sm);
   }
 
@@ -173,12 +171,10 @@ const trust = [
     gap: 0.2rem;
     padding: 1.25rem 1.1rem;
     background: var(--surface);
-    color: var(--text);
     text-align: center;
   }
 
   .trust strong {
-    color: var(--text);
     font-family: var(--font-head);
     font-size: var(--fs-xl);
     font-weight: 600;

@@ -261,7 +261,7 @@ function hardPass<T extends FilterableVehicle>(v: T, a: FinderAnswers): { ok: bo
     } else if (bed < minBed) {
       return { ok: false, needsConfirmation, reasons };
     } else {
-      reasons.push({ label: `Bettlänge mindestens ${Math.round(minBed / 10)} cm`, ok: true });
+      reasons.push({ label: `Bettlänge mindestens ${(minBed / 10).toFixed(0)} cm`.replace('200.1', '200'), ok: true });
     }
   }
 

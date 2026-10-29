@@ -1,6 +1,5 @@
 ---
 import 'pannellum/build/pannellum.css';
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -19,8 +18,7 @@ const scenes = tourScenes.map((s) => ({ id: s.id, title: s.title, src: url(`/${s
   description="Schau dich virtuell bei uns um: 13 Stationen im 360° Rundgang durch Ausstellung und Gelände des Campingcenter Overath."
   jsonLd={[breadcrumbSchema(crumbs, Astro.site)]}
 >
-  <header class="page-hero atmo" data-header-theme="dark">
-    <Atmosphere src="atmo-shore" focus="center" />
+  <header class="page-hero">
     <div class="container">
       <Breadcrumbs items={crumbs} />
       <p class="eyebrow">Virtueller Rundgang</p>
@@ -29,8 +27,7 @@ const scenes = tourScenes.map((s) => ({ id: s.id, title: s.title, src: url(`/${s
     </div>
   </header>
 
-  <section class="section-tight atmo tour-section" data-header-theme="dark" aria-label="360° Rundgang">
-    <Atmosphere src="atmo-forest" />
+  <section class="section-tight tour-section" aria-label="360° Rundgang">
     <div class="container">
       <div class="tour" data-tour data-scenes={JSON.stringify(scenes)}>
         <div class="tour-stage">
@@ -203,7 +200,6 @@ const scenes = tourScenes.map((s) => ({ id: s.id, title: s.title, src: url(`/${s
     border: 2px solid transparent;
     border-radius: var(--radius);
     background: var(--white);
-    color: var(--text);
     font-size: var(--fs-xs);
     font-weight: 620;
     text-align: left;

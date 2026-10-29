@@ -1,6 +1,5 @@
 ---
 import Photo from '@/components/ui/Photo.astro';
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import { vehicleTypes } from '@/data/content';
@@ -12,8 +11,7 @@ const hrefFor = (id: string, title: string) =>
   countFor(id) > 0 ? `/wohnmobile/?art=${id}` : `/kontakt/?fahrzeug=${encodeURIComponent(title)}#beratung`;
 ---
 
-<section class="section atmo finder" data-header-theme="dark" aria-labelledby="finder-title">
-  <Atmosphere src="atmo-forest" focus="center" />
+<section class="section section-paper finder" aria-labelledby="finder-title">
   <div class="container">
     <div class="section-head-row">
       <SectionHeader

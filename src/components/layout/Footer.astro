@@ -106,7 +106,7 @@ const groups = [
       }
       <li><button type="button" class="footer-consent" data-consent-open>Cookie-Einstellungen</button></li>
       <li>
-        <a href={company.social.facebook} target="_blank" rel="noopener" class="footer-social" aria-label="Campingcenter Overath auf Facebook (öffnet in neuem Tab)"><Icon name="facebook" /></a>
+        <a href={company.social.facebook} target="_blank" rel="noopener" class="footer-social"><Icon name="facebook" label="Campingcenter Overath auf Facebook" /></a>
       </li>
     </ul>
   </div>
@@ -120,7 +120,7 @@ const groups = [
 
 <style>
   .site-footer {
-    background: #141210;
+    background: var(--graphite);
     color: #e9e5de;
     padding-top: clamp(3rem, 2rem + 4vw, 5rem);
   }

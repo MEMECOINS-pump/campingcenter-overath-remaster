@@ -1,5 +1,4 @@
 ﻿---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -39,8 +38,8 @@ const today = new Date().toISOString().slice(0, 10);
     eyebrow="Werkstatt & Kundendienst"
     title="Dein Camper verdient den besten Service."
     lead="Fachwerkstatt für Wohnmobile und Wohnwagen in Overath – vom Sicherheitscheck mit Siegel bis zur GFK-Reparatur."
-    image="atmo-forest"
-    imageAlt=""
+    image="workshop-interior"
+    imageAlt="Werkstatt des Campingcenter Overath mit Wohnmobil auf der Hebebühne"
   >
     <a class="btn btn-accent btn-lg" href="#termin" data-track="cta_click" data-track-location="workshop_hero">
       Werkstatt-Termin anfragen <Icon name="arrow-right" class="arrow" />
@@ -50,8 +49,7 @@ const today = new Date().toISOString().slice(0, 10);
     </a>
   </PageHero>
 
-  <section class="section-tight atmo ws-highlights" data-header-theme="dark" aria-label="Schwerpunkte">
-    <Atmosphere src="atmo-forest" />
+  <section class="section-tight ws-highlights" aria-label="Schwerpunkte">
     <div class="container">
       <ul class="grid grid-3" role="list">
         {
@@ -69,8 +67,7 @@ const today = new Date().toISOString().slice(0, 10);
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ws-services">
-    <Atmosphere src="atmo-shore" focus="center" />
+  <section class="section" aria-labelledby="ws-services">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Leistungen</p>
@@ -117,8 +114,7 @@ const today = new Date().toISOString().slice(0, 10);
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ws-video">
-    <Atmosphere src="atmo-stars" />
+  <section class="section section-sand" aria-labelledby="ws-video">
     <div class="container split">
       <div>
         <p class="eyebrow">Einblick</p>
@@ -135,8 +131,7 @@ const today = new Date().toISOString().slice(0, 10);
 
   <WorkshopAssistant />
 
-  <section id="termin" class="section atmo ws-request" data-header-theme="dark" aria-labelledby="ws-form-title">
-    <Atmosphere src="atmo-campfire" />
+  <section id="termin" class="section ws-request" aria-labelledby="ws-form-title">
     <div class="container ws-request-grid">
       <div class="ws-request-intro">
         <p class="eyebrow">Terminanfrage</p>
@@ -305,7 +300,6 @@ const today = new Date().toISOString().slice(0, 10);
     border: 1px solid var(--line-strong);
     border-radius: var(--radius-pill);
     background: var(--white);
-    color: var(--text);
     font-size: var(--fs-sm);
     font-weight: 620;
     white-space: nowrap;

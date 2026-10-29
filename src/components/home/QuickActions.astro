@@ -1,5 +1,4 @@
 ---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import Icon, { type IconName } from '@/components/ui/Icon.astro';
 import { url } from '@/lib/url';
 
@@ -11,8 +10,7 @@ const actions: { title: string; text: string; cta: string; href: string; icon: I
 ];
 ---
 
-<section class="quick atmo" data-header-theme="dark" aria-labelledby="quick-title">
-  <Atmosphere src="atmo-campfire" />
+<section class="quick" aria-labelledby="quick-title">
   <div class="container">
     <h2 id="quick-title" class="sr-only">Was möchtest du tun?</h2>
     <ul class="quick-grid">
@@ -42,7 +40,7 @@ const actions: { title: string; text: string; cta: string; href: string; icon: I
   .quick {
     position: relative;
     z-index: 2;
-    padding-block: 1.5rem 2rem;
+    padding-top: 1.25rem;
   }
 
   .quick-grid {
@@ -141,7 +139,8 @@ const actions: { title: string; text: string; cta: string; href: string; icon: I
 
   @media (min-width: 48em) {
     .quick {
-      padding-block: 2.25rem 2.75rem;
+      margin-top: -4.5rem;
+      padding-top: 0;
     }
 
     .quick-grid {

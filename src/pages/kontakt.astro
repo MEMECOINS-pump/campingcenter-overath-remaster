@@ -1,5 +1,4 @@
 ﻿---
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -28,8 +27,8 @@ const today = new Date().toISOString().slice(0, 10);
     eyebrow="Kontakt"
     title="Wir sind für dich da."
     lead="Ruf an, schreib uns oder komm vorbei – in der Weberstraße in Overath beraten wir dich persönlich."
-    image="atmo-shore"
-    imageAlt=""
+    image="sales-advisor"
+    imageAlt="Berater des Campingcenter Overath im Gespräch"
   >
     <a class="btn btn-accent btn-lg" href={company.phone.href} data-track="call_click" data-track-location="contact_hero">
       <Icon name="phone" /> Anrufen
@@ -39,8 +38,7 @@ const today = new Date().toISOString().slice(0, 10);
 
   <ContactSection title="Besuch uns in Overath." eyebrow="Adresse & Öffnungszeiten" />
 
-  <section id="beratung" class="section atmo ct-form-section" data-header-theme="dark" aria-labelledby="ct-form-title">
-    <Atmosphere src="atmo-campfire" />
+  <section id="beratung" class="section ct-form-section" aria-labelledby="ct-form-title">
     <div class="container ct-grid">
       <div class="ct-intro">
         <p class="eyebrow">Nachricht & Beratung</p>
@@ -108,8 +106,7 @@ const today = new Date().toISOString().slice(0, 10);
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="ct-route">
-    <Atmosphere src="atmo-shore" focus="right" />
+  <section class="section section-paper" aria-labelledby="ct-route">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Anfahrt</p>

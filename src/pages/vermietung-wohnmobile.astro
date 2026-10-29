@@ -1,6 +1,5 @@
 ﻿---
 import { Image } from 'astro:assets';
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -40,8 +39,8 @@ const steps = [
     eyebrow="Wohnmobil mieten"
     title="Freiheit auf Zeit."
     lead="Wir sind Mietstation der ADAC Wohnmobilvermietung in Köln-Ost. Buche online rund um die Uhr – oder lass dich bei uns vor Ort beraten."
-    image="atmo-shore"
-    imageAlt=""
+    image="rental-header"
+    imageAlt="Mietwohnmobil auf einer Landstraße"
   >
     <a class="btn btn-accent btn-lg" href={rental.adacBookingUrl} target="_blank" rel="noopener" data-track="rental_booking_click" data-track-location="rental_hero">
       Wohnmobil beim ADAC buchen <Icon name="external" /><span class="sr-only"> (öffnet in neuem Tab)</span>
@@ -51,8 +50,7 @@ const steps = [
     </a>
   </PageHero>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="rt-partner">
-    <Atmosphere src="atmo-forest" focus="left" />
+  <section class="section" aria-labelledby="rt-partner">
     <div class="container split">
       <div class="rt-photo reveal">
         <Photo src="rental-fleet" alt="Mietwohnmobile auf dem Gelände des Campingcenter Overath" sizes="(min-width: 60em) 45vw, 92vw" widths={[480, 768, 1080]} />
@@ -70,8 +68,7 @@ const steps = [
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="rt-benefits">
-    <Atmosphere src="atmo-campfire" />
+  <section class="section section-sand" aria-labelledby="rt-benefits">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Deine Vorteile</p>
@@ -93,8 +90,7 @@ const steps = [
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="rt-steps">
-    <Atmosphere src="atmo-shore" focus="center" />
+  <section class="section" aria-labelledby="rt-steps">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">So einfach geht's</p>
@@ -129,8 +125,7 @@ const steps = [
     </div>
   </section>
 
-  <section class="section atmo" id="anfrage" data-header-theme="dark" aria-labelledby="rt-inquiry">
-    <Atmosphere src="atmo-shore" />
+  <section class="section" id="anfrage" aria-labelledby="rt-inquiry">
     <div class="container split">
       <div>
         <p class="eyebrow">Unverbindliche Anfrage</p>
@@ -175,8 +170,7 @@ const steps = [
     </div>
   </section>
 
-  <section class="section atmo" data-header-theme="dark" aria-labelledby="rt-partners">
-    <Atmosphere src="atmo-forest" focus="right" />
+  <section class="section" aria-labelledby="rt-partners">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Unsere Partner</p>
@@ -227,7 +221,7 @@ const steps = [
     padding: 1rem 1.1rem;
     border-radius: var(--radius);
     background: var(--forest-soft);
-    color: #243028;
+    color: var(--forest);
     font-weight: 600;
   }
 

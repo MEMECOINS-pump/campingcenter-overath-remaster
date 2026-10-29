@@ -1,6 +1,5 @@
 ---
 import { Image } from 'astro:assets';
-import Atmosphere from '@/components/ui/Atmosphere.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { brands } from '@/data/brands';
@@ -14,8 +13,7 @@ const { showHeader = true } = Astro.props;
 const count = (make?: string) => (make ? vehicles.filter((v) => v.make === make).length : 0);
 ---
 
-<section class="section atmo brands" data-header-theme="dark" aria-labelledby="brands-title">
-  <Atmosphere src="atmo-shore" focus="left" />
+<section class="section brands" aria-labelledby="brands-title">
   <div class="container">
     {
       showHeader && (

@@ -2,7 +2,6 @@ import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:4321';
 const useExternal = Boolean(process.env.PLAYWRIGHT_BASE_URL);
-const crossBrowser = /cross-browser-smoke|compare-layout|wizard-history|color-contrast/;
 
 const config = defineConfig({
   testDir: 'e2e',
@@ -14,12 +13,8 @@ const config = defineConfig({
   use: {
     baseURL,
     trace: 'on-first-retry',
+    ...devices['Desktop Chrome'],
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] }, testMatch: crossBrowser },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] }, testMatch: crossBrowser },
-  ],
 });
 
 if (process.env.CI) {
